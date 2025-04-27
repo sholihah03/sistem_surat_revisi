@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Models;
+
+use App\Models\Rw;
+use App\Models\Wargas;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class Rt extends Model
+{
+    use HasFactory;
+
+    protected $table = 'tb_rt';
+    protected $primaryKey = 'id_rt';
+
+    protected $fillable = [
+        'rw_id',
+        'username',
+        'nama_lengkap_rt',
+        'password',
+        'ttd_digital',
+        'ttd_digital_bersih',
+        'login',
+        'verifikasiSurat',
+    ];
+
+    protected $hidden = ['password'];
+
+    public function rw()
+    {
+        return $this->belongsTo(Rw::class, 'rw_id', 'id_rw');
+    }
+
+    public function wargas()
+    {
+        return $this->hasMany(Wargas::class, 'rt_id', 'id_rt');
+    }
+}

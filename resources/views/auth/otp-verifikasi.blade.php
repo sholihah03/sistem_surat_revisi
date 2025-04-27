@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verifikasi OTP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{-- buat hilangin panah di type number --}}
+    {{-- <style>
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style> --}}
+</head>
+<body class="min-h-screen bg-gray-50 flex items-center justify-center px-4" style="background-image: url('{{ asset('images/background login.png') }}')">
+
+    <div class="bg-white w-full max-w-md rounded-xl shadow-lg p-6 space-y-5">
+        <h2 class="text-2xl font-bold text-center text-gray-800">Verifikasi Kode OTP</h2>
+        <p class="text-center text-sm text-gray-600">Kode telah dikirim ke WhatsApp dan Email Anda.</p>
+
+        <form method="POST" action="" class="space-y-4">
+            @csrf
+
+            <!-- OTP Input -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Kode OTP</label>
+                <div class="flex justify-center gap-2">
+                    <input type="text" maxlength="1" inputmode="numeric" pattern="\d*" name="otp[]"
+                            class="w-12 h-12 text-center text-xl border border-blue-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 otp-input">
+                    <input type="text" maxlength="1" inputmode="numeric" pattern="\d*" name="otp[]"
+                            class="w-12 h-12 text-center text-xl border border-blue-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 otp-input">
+                    <input type="text" maxlength="1" inputmode="numeric" pattern="\d*" name="otp[]"
+                            class="w-12 h-12 text-center text-xl border border-blue-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 otp-input">
+                    <input type="text" maxlength="1" inputmode="numeric" pattern="\d*" name="otp[]"
+                            class="w-12 h-12 text-center text-xl border border-blue-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 otp-input">
+                    <input type="text" maxlength="1" inputmode="numeric" pattern="\d*" name="otp[]"
+                            class="w-12 h-12 text-center text-xl border border-blue-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 otp-input">
+                    <input type="text" maxlength="1" inputmode="numeric" pattern="\d*" name="otp[]"
+                            class="w-12 h-12 text-center text-xl border border-blue-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 otp-input">
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit"
+                class="w-full bg-yellow-400 hover:bg-yellow-500 text-white py-2 rounded-lg font-semibold transition">
+                Verifikasi
+            </button>
+
+            <!-- Kirim Ulang -->
+            <div class="text-center">
+                <p class="text-sm text-gray-600">Belum menerima kode?</p>
+                <button type="button" id="resendBtn" class="text-blue-600 hover:underline text-sm font-medium mt-1 disabled:opacity-50" disabled>
+                    Kirim Ulang OTP (<span id="timer">60</span> detik)
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let countdown = 60;
+        const timerEl = document.getElementById('timer');
+        const resendBtn = document.getElementById('resendBtn');
+
+        const interval = setInterval(() => {
+            countdown--;
+            timerEl.textContent = countdown;
+
+            if (countdown <= 0) {
+                clearInterval(interval);
+                resendBtn.disabled = false;
+                resendBtn.textContent = 'Kirim Ulang OTP';
+            }
+        }, 1000);
+
+        const inputs = document.querySelectorAll('.otp-input');
+        inputs.forEach((input, i) => {
+            input.addEventListener('input', () => {
+            if (input.value.length === 1 && i < inputs.length - 1) {
+                inputs[i + 1].focus();
+            }
+            });
+
+            input.addEventListener('keydown', (e) => {
+            if (e.key === "Backspace" && input.value === '' && i > 0) {
+                inputs[i - 1].focus();
+            }
+            });
+        });
+    </script>
+
+</body>
+</html>
