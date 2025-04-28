@@ -52,6 +52,7 @@ class DaftarController extends Controller
         // Validasi input yang diterima
         $request->validate([
             'no_kk' => 'required|numeric',
+            'nik' => 'required|numeric',
             'nama_lengkap' => 'required',
             'email' => 'required|email|unique:tb_wargas,email',
             'no_hp' => 'required|numeric',
@@ -101,6 +102,7 @@ class DaftarController extends Controller
             // Jika status_verifikasi sudah disetujui, simpan data ke tabel Wargas
             $warga = Wargas::create([
                 'no_kk' => $request->no_kk,
+                'nik' => $request->nik,
                 'nama_lengkap' => $request->nama_lengkap,
                 'email' => $request->email,
                 'no_hp' => $request->no_hp,

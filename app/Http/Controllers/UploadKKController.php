@@ -80,8 +80,8 @@ class UploadKKController extends Controller
 
         // Periksa jika alamat kecuali provinsi kosong
         $isAlamatIncomplete = empty($alamatData['nama_jalan']) || empty($alamatData['rt']) || empty($alamatData['rw']) ||
-                              empty($alamatData['kelurahan']) || empty($alamatData['kecamatan']) || empty($alamatData['kabupaten_kota']) ||
-                              empty($alamatData['kode_pos']);
+                                empty($alamatData['kelurahan']) || empty($alamatData['kecamatan']) || empty($alamatData['kabupaten_kota']) ||
+                                empty($alamatData['kode_pos']);
 
         // Jika data alamat tidak lengkap (kecuali provinsi), tampilkan modal error
         if ($isAlamatIncomplete) {
@@ -188,5 +188,6 @@ class UploadKKController extends Controller
 
         // Gabungkan lagi hasilnya
         return implode(' ', $filteredWords);
-    }
+    }   
+    
 }

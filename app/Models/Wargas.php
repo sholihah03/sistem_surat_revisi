@@ -18,6 +18,7 @@ class Wargas extends Authenticatable
         'nama_lengkap',
         'email',
         'no_kk',
+        'nik',
         'no_hp',
         'rt',
         'rw',

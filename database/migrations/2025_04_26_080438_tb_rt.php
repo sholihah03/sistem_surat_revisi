@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('tb_rt', function (Blueprint $table) {
             $table->id('id_rt');
             $table->foreignId('rw_id')->constrained('tb_rw', 'id_rw')->onDelete('cascade');
-            $table->string('username', 225)->unique();
+            $table->string('no_rt', 225);
             $table->string('nama_lengkap_rt', 225);
+            $table->string('email_rt', 225);
+            $table->string('no_hp_rt', 225);
             $table->string('password', 225);
             $table->text('ttd_digital')->nullable();
             $table->text('ttd_digital_bersih')->nullable();

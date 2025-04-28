@@ -15,7 +15,6 @@ class PengajuanSuratLain extends Model
     protected $primaryKey = 'id_pengajuan_surat_lain';
 
     protected $fillable = [
-        'keluarga_id',
         'tujuan_surat_id',
         'nomor_surat_pengajuan_lain',
         'status_pengajuan_lain',
@@ -24,11 +23,6 @@ class PengajuanSuratLain extends Model
         'alasan_penolakan_pengajuan_lain',
         'status_perkawinan_pengaju_lain',
     ];
-
-    public function anggotaKeluarga()
-    {
-        return $this->belongsTo(AnggotaKeluarga::class, 'keluarga_id', 'id_keluarga');
-    }
 
     public function tujuanSurat()
     {

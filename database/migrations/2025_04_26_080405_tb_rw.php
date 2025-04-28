@@ -14,8 +14,10 @@ return new class extends Migration
     {
         Schema::create('tb_rw', function (Blueprint $table) {
             $table->id('id_rw');
-            $table->string('username', 225)->unique();
+            $table->string('no_rw', 225);
             $table->string('nama_lengkap_rw', 225);
+            $table->string('email_rw', 225);
+            $table->string('no_hp_rw', 225);
             $table->string('password', 225);
             $table->text('ttd_digital')->nullable();
             $table->text('ttd_digital_bersih')->nullable();

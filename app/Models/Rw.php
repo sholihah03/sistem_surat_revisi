@@ -14,8 +14,10 @@ class Rw extends Model
     protected $primaryKey = 'id_rw';
 
     protected $fillable = [
-        'username',
+        'no_rw',
         'nama_lengkap_rw',
+        'email_rw',
+        'no_hp_rw',
         'password',
         'ttd_digital',
         'ttd_digital_bersih',

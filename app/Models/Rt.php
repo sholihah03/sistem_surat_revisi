@@ -16,8 +16,10 @@ class Rt extends Model
 
     protected $fillable = [
         'rw_id',
-        'username',
+        'no_rt',
         'nama_lengkap_rt',
+        'email_rt',
+        'no_hp_rt',
         'password',
         'ttd_digital',
         'ttd_digital_bersih',

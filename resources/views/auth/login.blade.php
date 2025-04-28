@@ -16,6 +16,60 @@
     <div class="min-h-screen flex items-center justify-center px-4">
         <div class="flex flex-col md:flex-row items-center bg-transparent w-full max-w-6xl">
 
+        <!-- Modal -->
+        @if(session('success'))
+        <div id="successModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div class="bg-white rounded-lg shadow-lg p-8 relative w-[520px] text-center animate-scale">
+                <!-- Tombol Close -->
+                <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+
+                <!-- Ikon Ceklis -->
+                <div class="flex justify-center mb-6">
+                    <img src="https://img.icons8.com/color/96/000000/ok--v1.png" alt="Success Icon" class="w-20 h-20">
+                </div>
+
+                <!-- Judul -->
+                <h2 class="text-2xl font-bold mb-4 text-gray-800 whitespace-nowrap">
+                    Terima kasih atas pendaftaran Anda.
+                </h2>
+
+                <!-- Deskripsi -->
+                <p class="text-gray-600 mb-8 text-base leading-relaxed">
+                    Data Anda saat ini sedang divalidasi oleh pihak RT.<br>
+                    Mohon menunggu hingga 24 jam untuk informasi berikutnya lewat Email atau WhatsApp.
+                </p>
+
+                <!-- Tombol Tutup -->
+                <button onclick="closeModal()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg">
+                    Tutup
+                </button>
+            </div>
+        </div>
+
+        <script>
+        function closeModal() {
+            document.getElementById('successModal').style.display = 'none';
+        }
+        </script>
+
+        <style>
+        @keyframes scaleUp {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .animate-scale {
+            animation: scaleUp 0.3s ease-out;
+        }
+        </style>
+        @endif
+
+
             <!-- Form Login -->
             <div class="bg-white rounded-2xl shadow-xl p-10 w-full md:w-1/2">
                 <h2 class="text-xl font-bold text-center text-black mb-6 leading-relaxed">
@@ -28,59 +82,51 @@
                     @csrf
 
                     <!-- Username -->
-                    <div class="flex items-center border border-blue-400 rounded-md px-3 py-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zM4.8 20.4c0-3.96 6.4-6 7.2-6s7.2 2.04 7.2 6v1.2H4.8v-1.2z"/>
-                        </svg>
-                        <input type="text" name="username" required placeholder="Nama Lengkap"
-                                class="w-full focus:outline-none bg-transparent text-gray-700" />
+                    <div class="flex flex-col">
+                        <label for="username" class="text-gray-700 font-semibold">Nama Lengkap</label>
+                        <p class="text-xs text-red-500">Harap isi sesuai dengan nama lengkap yang tertera di KTP.</p>
+                        <div class="flex items-center border border-blue-400 rounded-md px-3 py-2 mt-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zM4.8 20.4c0-3.96 6.4-6 7.2-6s7.2 2.04 7.2 6v1.2H4.8v-1.2z"/>
+                            </svg>
+                            <input type="text" id="username" name="nama_lengkap" required placeholder="Nama Lengkap"
+                                   class="w-full focus:outline-none bg-transparent text-gray-700" />
+                        </div>
                     </div>
 
                     <!-- Email -->
-                    <div class="flex items-center border border-blue-400 rounded-md px-3 py-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M2 6c0-1.1.9-2 2-2h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6zm2 0l8 5 8-5H4zm0 2.3v9.7h16V8.3l-8 5-8-5z"/>
-                        </svg>
-                        <input type="email" name="email" required placeholder="Email"
-                                class="w-full focus:outline-none bg-transparent text-gray-700" />
+                    <div class="flex flex-col">
+                        <label for="email" class="text-gray-700 font-semibold mb-1">Email</label>
+                        <div class="flex items-center border border-blue-400 rounded-md px-3 py-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M2 6c0-1.1.9-2 2-2h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6zm2 0l8 5 8-5H4zm0 2.3v9.7h16V8.3l-8 5-8-5z"/>
+                            </svg>
+                            <input type="email" id="email" name="email" required placeholder="Email"
+                                   class="w-full focus:outline-none bg-transparent text-gray-700" />
+                        </div>
                     </div>
-
-                    {{-- <!-- Password -->
-                    <div class="flex items-center border border-blue-400 rounded-md px-3 py-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 1a5 5 0 00-5 5v3H5a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V10a1 1 0 00-1-1h-2V6a5 5 0 00-5-5zm-3 5a3 3 0 016 0v3H9V6zm3 6a1.5 1.5 0 110 3 1.5 1.5 0 010-3z"/>
-                        </svg>
-                        <input type="password" name="password" required placeholder="Password"
-                                class="w-full focus:outline-none bg-transparent text-gray-700" />
-                    </div> --}}
 
                     <!-- Password -->
-                    <div class="flex items-center border border-blue-400 rounded-md px-3 py-2 relative">
-                        <!-- Ikon Lock -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 1a5 5 0 00-5 5v3H5a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V10a1 1 0 00-1-1h-2V6a5 5 0 00-5-5zm-3 5a3 3 0 016 0v3H9V6zm3 6a1.5 1.5 0 110 3 1.5 1.5 0 010-3z"/>
-                        </svg>
-
-                        <!-- Input -->
-                        <input id="password" type="password" name="password" required placeholder="Password"
-                            class="w-full focus:outline-none bg-transparent text-gray-700 pr-8" />
-
-                        <!-- Toggle Visibility -->
-                        <button type="button" onclick="togglePassword()" class="absolute right-3 text-gray-500 focus:outline-none">
-                            <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    <div class="flex flex-col">
+                        <label for="password" class="text-gray-700 font-semibold mb-1">Password</label>
+                        <div class="flex items-center border border-blue-400 rounded-md px-3 py-2 relative">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 1a5 5 0 00-5 5v3H5a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V10a1 1 0 00-1-1h-2V6a5 5 0 00-5-5zm-3 5a3 3 0 016 0v3H9V6zm3 6a1.5 1.5 0 110 3 1.5 1.5 0 010-3z"/>
                             </svg>
-                        </button>
+                            <input id="password" type="password" name="password" required placeholder="Password"
+                                   class="w-full focus:outline-none bg-transparent text-gray-700 pr-8" />
+                            <button type="button" onclick="togglePassword()" class="absolute right-3 text-gray-500 focus:outline-none">
+                                <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
-
 
                     <!-- Button -->
                     <button type="submit"
-                        class="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 rounded-md transition">
+                            class="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 rounded-md transition">
                         Masuk
                     </button>
 

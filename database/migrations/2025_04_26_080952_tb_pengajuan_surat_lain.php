@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('pengajuan_surat_lain', function (Blueprint $table) {
             $table->id('id_pengajuan_surat_lain');
-            $table->foreignId('keluarga_id')->constrained('tb_anggota_keluarga', 'id_keluarga')->onDelete('cascade');
             $table->foreignId('tujuan_surat_id')->constrained('tb_tujuan_surat', 'id_tujuan_surat')->onDelete('cascade');
             $table->string('nomor_surat_pengajuan_lain', 225);
             $table->enum('status_pengajuan_lain', ['menunggu', 'ditolak', 'disetujui'])->default('menunggu');

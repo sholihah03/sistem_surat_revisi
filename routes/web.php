@@ -1,22 +1,27 @@
 <?php
 
-use App\Http\Controllers\Warga\RiwayatSuratController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OTPController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\DaftarController;
 use App\Http\Controllers\UploadKKController;
 use App\Http\Controllers\BuatPasswordController;
+use App\Http\Controllers\Rw\DashboardRwController;
 use App\Http\Controllers\Warga\DashboardController;
 use App\Http\Controllers\Warga\FormSuratController;
+use App\Http\Controllers\Rw\ManajemenAkunRtController;
+use App\Http\Controllers\Warga\RiwayatSuratController;
 use App\Http\Controllers\Surat\TemplateSuratController;
 use App\Http\Controllers\Warga\PengajuanSuratController;
+use App\Http\Controllers\Rt\DashboardController as RtDashboardController;
 
 Route::get('/', function () {
     return redirect()->route('login');
 });
 Route::get('/login', [LoginController::class, 'index'])->name('login');
 Route::post('/login-post', [LoginController::class, 'login'])->name('login-post');
+Route::get('logoutRw', [LoginController::class, 'logoutRw'])->name('logoutRw');
+
 Route::get('/daftar', [DaftarController::class, 'index'])->name('daftar');
 Route::post('/daftar', [DaftarController::class, 'store']);
 Route::get('/otp', [OTPController::class, 'index'])->name('otp');
@@ -32,5 +37,18 @@ Route::get('/riwayatSuratWarga', [RiwayatSuratController::class, 'index'])->name
 
 
 Route::get('/suratPengantar', [TemplateSuratController::class, 'index'])->name('suratPengantar');
+
+
+Route::get('/dashboardRt', [RtDashboardController::class, 'index'])->name('dashboardRt');
+
+
+// Route::get('/dashboardRw', [DashboardRwController::class, 'index'])->name('dashboardRw');
+Route::get('/dashboardRw', function () {
+    return view('rw.mainRw');
+})->name('dashboardRw');
+Route::get('/manajemenAkunRt', [ManajemenAkunRtController::class, 'index'])->name('manajemenAkunRt');
+Route::post('/manajemenAkunRt/store', [ManajemenAkunRtController::class, 'store'])->name('manajemenAkunRt.store');
+Route::post('/manajemenAkunRt/update/{id}', [ManajemenAkunRtController::class, 'update'])->name('manajemenAkunRt.update');
+Route::delete('/manajemenAkunRt/delete/{id}', [ManajemenAkunRtController::class, 'destroy'])->name('manajemenAkunRt.destroy');
 
 

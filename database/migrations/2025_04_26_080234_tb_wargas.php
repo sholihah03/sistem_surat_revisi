@@ -16,7 +16,8 @@ return new class extends Migration
             $table->foreignId('scan_kk_id')->nullable()->constrained('tb_scan_kk', 'id_scan')->onDelete('cascade');
             $table->string('nama_lengkap', 225);
             $table->string('email', 225);
-            $table->string('no_kk', 225);
+            $table->string('no_kk', 16);
+            $table->string('nik', 16);
             $table->string('no_hp', 225);
             $table->string('rt', 8);
             $table->string('rw', 8);
