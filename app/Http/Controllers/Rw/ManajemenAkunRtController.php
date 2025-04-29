@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Rw;
 use App\Models\Rt;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 
 class ManajemenAkunRtController extends Controller
 {
@@ -20,25 +22,37 @@ class ManajemenAkunRtController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'no_rt' => 'required|string|max:255',
-            'nama_lengkap_rt' => 'required|string|max:255',
-            'no_hp_rt' => 'required|string|max:255', // perbaiki: nama_hp_rt -> no_hp_rt
-            'email_rt' => 'required|email|max:255',
-        ]);
+{
+    $request->validate([
+        'no_rt' => 'required|string|max:255',
+        'nama_lengkap_rt' => 'required|string|max:255',
+        'no_hp_rt' => 'required|string|max:255',
+        'email_rt' => 'required|email|max:255',
+        'password' => 'required|min:5',
+    ]);
 
-        Rt::create([
-            'rw_id' => auth()->user()->id_rw,
-            'no_rt' => $request->no_rt,
-            'nama_lengkap_rt' => $request->nama_lengkap_rt,
-            'no_hp_rt' => $request->no_hp_rt, // <-- AMBIL DARI REQUEST USER
-            'email_rt' => $request->email_rt,
-            'password' => Hash::make('passworddefault'),
-        ]);
+    // Mengambil data pengguna yang sedang login menggunakan Auth Guard
+    $rw = Auth::guard('rw')->user();  // Mengambil data RW yang sedang login
 
-        return redirect()->back()->with('success', 'Akun RT berhasil ditambahkan.');
+    if (!$rw) {
+        return redirect()->route('login')->withErrors(['msg' => 'Silakan login dulu']);
     }
+
+    // Menambahkan data RT menggunakan ID RW yang sedang login
+    Rt::create([
+        'rw_id' => $rw->id_rw,
+        'no_rt' => $request->no_rt,
+        'nama_lengkap_rt' => $request->nama_lengkap_rt,
+        'no_hp_rt' => $request->no_hp_rt,
+        'email_rt' => $request->email_rt,
+        'password' => Hash::make($request->password), // Enkripsi password
+    ]);
+
+    // Menambahkan pesan sukses ke flash session
+    session()->flash('success', 'Akun RT berhasil ditambahkan!');
+
+    return redirect()->back()->with('success', 'Akun RT berhasil ditambahkan.');
+}
 
     public function update(Request $request, $id)
     {
@@ -57,6 +71,8 @@ class ManajemenAkunRtController extends Controller
             'no_hp_rt' => $request->no_hp_rt,
             'email_rt' => $request->email_rt,
         ]);
+        // Menambahkan pesan sukses ke flash session
+        session()->flash('success', 'Akun RT berhasil diperbarui!');
 
         return redirect()->back()->with('success', 'Akun RT berhasil diupdate.');
     }
@@ -66,6 +82,9 @@ class ManajemenAkunRtController extends Controller
         $rt = Rt::findOrFail($id);
         $rt->delete();
 
-        return redirect()->back()->with('success', 'Akun RT berhasil dihapus.');
+        // Menambahkan pesan sukses ke flash session
+        session()->flash('success', 'Akun RT berhasil dihapus!');
+
+        return redirect()->route('manajemenAkunRt')->with('success', 'Akun RT berhasil dihapus.');
     }
 }

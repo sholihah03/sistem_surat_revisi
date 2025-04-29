@@ -40,6 +40,22 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // custom guards
+        'rw' => [
+            'driver' => 'session',
+            'provider' => 'rws',
+        ],
+
+        'rt' => [
+            'driver' => 'session',
+            'provider' => 'rts',
+        ],
+
+        'warga' => [
+            'driver' => 'session',
+            'provider' => 'wargas',
+        ],
     ],
 
     /*
@@ -69,6 +85,22 @@ return [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
+
+        // custom providers
+        'rws' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Rw::class,
+        ],
+
+        'rts' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Rt::class,
+        ],
+
+        'wargas' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Wargas::class,
+        ],
     ],
 
     /*

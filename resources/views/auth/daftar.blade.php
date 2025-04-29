@@ -96,13 +96,16 @@
                                     class="w-full focus:outline-none bg-transparent text-gray-700" />
                             </div>
                         </div>
-
                         <!-- RT -->
                         <div>
                             <label for="rt" class="block text-sm font-semibold text-gray-700">RT</label>
                             <div class="flex items-center border border-blue-400 rounded-md px-3 py-2 mt-1">
-                                <input type="number" name="rt" id="rt" required placeholder="RT"
-                                    class="w-full focus:outline-none bg-transparent text-gray-700" />
+                                <select name="rt" id="rt" required class="w-full focus:outline-none bg-transparent text-gray-700">
+                                    <option value="">Pilih RT</option>
+                                    @foreach ($dataRT as $rt)
+                                        <option value="{{ $rt->no_rt }}">{{ $rt->no_rt }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                     </div>

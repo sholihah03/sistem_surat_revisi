@@ -6,10 +6,11 @@ use App\Models\Rw;
 use App\Models\Wargas;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Contracts\Auth\Authenticatable;
 
-class Rt extends Model
+class Rt extends Model implements Authenticatable
 {
-    use HasFactory;
+    use HasFactory, \Illuminate\Auth\Authenticatable;
 
     protected $table = 'tb_rt';
     protected $primaryKey = 'id_rt';

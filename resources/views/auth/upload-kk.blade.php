@@ -11,7 +11,7 @@
         <h2 class="text-2xl font-bold text-gray-800 text-center">Upload Kartu Keluarga</h2>
         <p class="text-sm text-center text-gray-600">Nomor KK Anda belum terdaftar. Silakan unggah scan/foto KK Anda untuk diverifikasi oleh RT.</p>
 
-        <form method="POST" action="{{ route('uploadKK.store') }}" enctype="multipart/form-data" class="space-y-4">
+        <form method="POST" action="{{ route('uploadKK.proses') }}" enctype="multipart/form-data" class="space-y-4">
             @csrf
 
             <div>
@@ -22,10 +22,41 @@
 
             <button type="submit"
                     class="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 rounded-md transition">
-                Kirim ke RT
+                Konfirmasi
             </button>
         </form>
+
+        <!-- Jika sudah diproses OCR -->
+    @if (isset($no_kk) && isset($nama_kepala_keluarga))
+    <hr>
+        <p><strong>No KK:</strong> <span id="no_kk_text">{{ $no_kk }}</span></p>
+        <p><strong>Nama Kepala Keluarga:</strong> <span id="nama_kepala_keluarga_text">{{ $nama_kepala_keluarga }}</span></p>
     </div>
+
+    <!-- Form untuk Edit Data -->
+    <form action="{{ route('uploadKK.store') }}" method="POST">
+        @csrf
+        <div class="form-group">
+            <label for="no_kk">No KK</label>
+            <input type="text" class="form-control" id="no_kk" name="no_kk" value="{{ old('no_kk', $no_kk) }}" required>
+        </div>
+        <div class="form-group">
+            <label for="nama_kepala_keluarga">Nama Kepala Keluarga</label>
+            <input type="text" class="form-control" id="nama_kepala_keluarga" name="nama_kepala_keluarga" value="{{ old('nama_kepala_keluarga', $nama_kepala_keluarga) }}" required>
+        </div>
+
+        <!-- Tambahkan field untuk alamat -->
+        <div class="form-group">
+            <label for="alamat">Alamat</label>
+            <input type="text" class="form-control" id="alamat" name="alamat" value="{{ old('alamat', $alamat ?? '') }}">
+        </div>
+        <input type="hidden" name="path" value="{{ $path }}">
+        <button type="submit" class="btn btn-success">Simpan Data</button>
+    </form>
+    @endif
+</div>
+
+
 
     <!-- Modal Error -->
     @if (session('error'))

@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\ScanKK;
-use App\Models\Alamat; // Tambahkan model Alamat
+use App\Models\Pendaftaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Alamat; // Tambahkan model Alamat
 
 class UploadKKController extends Controller
 {
@@ -14,104 +15,191 @@ class UploadKKController extends Controller
         return view('auth.upload-kk');
     }
 
-    public function store(Request $request)
+    public function proses(Request $request)
     {
         $validated = $request->validate([
             'file_kk' => 'required|mimes:jpeg,png,jpg|max:5120',
         ]);
 
         $file = $request->file('file_kk');
-        $filename = $file->getClientOriginalName();
+        $filename = uniqid('kk_') . '.' . $file->getClientOriginalExtension();
 
-        $path = $file->storeAs('uploads/kk', $filename);
+        $path = $file->storeAs('public/uploads/kk', $filename);
         $fullImagePath = storage_path('app/' . $path);
 
-        $textFolder = storage_path('app/uploads/kk_text');
-        if (!is_dir($textFolder)) {
-            mkdir($textFolder, 0777, true);
+        $outputTxtPath = storage_path('app/public/uploads/kk_text/' . pathinfo($filename, PATHINFO_FILENAME));
+        if (!file_exists(dirname($outputTxtPath))) {
+            mkdir(dirname($outputTxtPath), 0777, true);
         }
 
-        $textFilenameWithoutExt = pathinfo($filename, PATHINFO_FILENAME);
-        $outputPath = $textFolder . '/' . $textFilenameWithoutExt;
-
-        $command = 'tesseract ' . escapeshellarg($fullImagePath) . ' ' . escapeshellarg($outputPath) . ' -l ind';
-        exec($command);
-
-        $ocrResultPath = $outputPath . '.txt';
-        $ocrText = file_exists($ocrResultPath) ? file_get_contents($ocrResultPath) : '';
+        exec('tesseract ' . escapeshellarg($fullImagePath) . ' ' . escapeshellarg($outputTxtPath) . ' -l ind');
+        $ocrText = @file_get_contents($outputTxtPath . '.txt') ?: '';
 
         $ocrText = str_replace(['_', '-', '|', '—', '–', ':'], ':', $ocrText);
         $ocrText = preg_replace('/\s+/', ' ', $ocrText);
 
-        $no_kk_scan = $this->extractNoKK($ocrText);
+        $no_kk = $this->extractNoKK($ocrText);
         $nama_kepala_keluarga = $this->extractNamaKepalaKeluarga($ocrText);
 
-        if (empty($no_kk_scan)) {
-            preg_match('/No\s*[:\-]?\s*(\d{16})/', $ocrText, $matches);
-            $no_kk_scan = $matches[1] ?? '';
-        }
-
-        if (empty($nama_kepala_keluarga)) {
-            preg_match('/Nama Kepala Keluarga\s*[:\-]?\s*([A-Za-z\s\.,]+)/i', $ocrText, $matches);
-            $nama_kepala_keluarga = trim($matches[1] ?? '');
-        }
-
-        if (empty($no_kk_scan) || empty($nama_kepala_keluarga)) {
+        if (empty($no_kk) || empty($nama_kepala_keluarga)) {
             Storage::delete($path);
-            if (file_exists($ocrResultPath)) {
-                unlink($ocrResultPath);
-            }
-
-            return redirect()->back()->with('error', 'Gagal membaca data KK. Silakan upload foto yang lebih jelas.');
+            return redirect()->back()->with('error', 'Gagal membaca data KK. Silakan unggah ulang dengan gambar yang lebih jelas.');
         }
 
-        // ===== Simpan ke ScanKK =====
-        // Simpan ScanKK dengan alamat_id sebagai null dulu
-        $scanKK = ScanKK::create([
-            'nama_kepala_keluarga' => $nama_kepala_keluarga,
-            'no_kk_scan' => $no_kk_scan,
-            'path_file_kk' => $path,
-            'status_verifikasi' => 'pending', // Atau sesuaikan sesuai kebutuhan
-            'alasan_penolakan' => null,
+        return view('auth.upload-kk', compact('no_kk', 'nama_kepala_keluarga', 'path'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'no_kk' => 'required|digits:16',
+            'nama_kepala_keluarga' => 'required|string|max:255',
+            'path' => 'required|string',
         ]);
 
-        // ===== Ekstrak Data Alamat dari OCR Text =====
+        $path = $request->input('path');
+        $fullImagePath = storage_path('app/' . $path);
+        $outputTxtPath = storage_path('app/public/uploads/kk_text/' . pathinfo(basename($path), PATHINFO_FILENAME));
+        $ocrText = @file_get_contents($outputTxtPath . '.txt') ?: '';
+
         $alamatData = $this->extractAlamatData($ocrText);
 
-        // Periksa jika alamat kecuali provinsi kosong
-        $isAlamatIncomplete = empty($alamatData['nama_jalan']) || empty($alamatData['rt']) || empty($alamatData['rw']) ||
-                                empty($alamatData['kelurahan']) || empty($alamatData['kecamatan']) || empty($alamatData['kabupaten_kota']) ||
-                                empty($alamatData['kode_pos']);
-
-        // Jika data alamat tidak lengkap (kecuali provinsi), tampilkan modal error
-        if ($isAlamatIncomplete) {
+        if (empty($alamatData['nama_jalan']) || empty($alamatData['rt']) || empty($alamatData['rw']) ||
+            empty($alamatData['kelurahan']) || empty($alamatData['kecamatan']) ||
+            empty($alamatData['kabupaten_kota']) || empty($alamatData['kode_pos'])) {
             Storage::delete($path);
-            if (file_exists($ocrResultPath)) {
-                unlink($ocrResultPath);
-            }
-
-            return redirect()->back()->with('error', 'Data alamat tidak lengkap. Silakan upload foto yang lebih jelas.');
+            return redirect()->route('uploadKK')->with('error', 'Data alamat tidak lengkap. Silakan unggah ulang.');
         }
 
-        // ===== Simpan ke tb_alamat =====
         $alamat = Alamat::create([
-            'nama_jalan' => $alamatData['nama_jalan'] ?? '',
-            'rt_alamat' => $alamatData['rt'] ?? '',
-            'rw_alamat' => $alamatData['rw'] ?? '',
-            'kelurahan' => $alamatData['kelurahan'] ?? '',
-            'kecamatan' => $alamatData['kecamatan'] ?? '',
-            'kabupaten_kota' => $alamatData['kabupaten_kota'] ?? '',
-            'provinsi' => strlen($alamatData['provinsi'] ?? '') > 255 ? '' : $alamatData['provinsi'],
-            'kode_pos' => $alamatData['kode_pos'] ?? '',
+            'nama_jalan' => $alamatData['nama_jalan'],
+            'rt_alamat' => $alamatData['rt'],
+            'rw_alamat' => $alamatData['rw'],
+            'kelurahan' => $alamatData['kelurahan'],
+            'kecamatan' => $alamatData['kecamatan'],
+            'kabupaten_kota' => $alamatData['kabupaten_kota'],
+            'provinsi' => substr($alamatData['provinsi'] ?? '', 0, 255),
+            'kode_pos' => $alamatData['kode_pos'],
         ]);
 
-        // ===== Update ScanKK dengan alamat_id =====
-        $scanKK->update([
+        $scanKK = ScanKK::create([
+            'nama_kepala_keluarga' => $request->nama_kepala_keluarga,
+            'no_kk_scan' => $request->no_kk,
+            'path_file_kk' => $path,
+            'status_verifikasi' => 'pending',
             'alamat_id' => $alamat->id_alamat,
         ]);
 
-        return redirect()->route('login')->with('success', 'Upload KK berhasil!');
+        Pendaftaran::where('no_kk', $request->no_kk)->update([
+            'scan_id' => $scanKK->id_scan,
+        ]);
+
+        return redirect()->route('login')->with('success', 'Data berhasil disimpan dan menunggu verifikasi.');
     }
+
+    // public function store(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'file_kk' => 'required|mimes:jpeg,png,jpg|max:5120',
+    //     ]);
+
+    //     $file = $request->file('file_kk');
+    //     $filename = $file->getClientOriginalName();
+
+    //     $path = $file->storeAs('public/uploads/kk', $filename);
+    //     $fullImagePath = storage_path('app/' . $path);
+
+    //     $textFolder = storage_path('app/public/uploads/kk_text');
+    //     if (!is_dir($textFolder)) {
+    //         mkdir($textFolder, 0777, true);
+    //     }
+
+    //     $textFilenameWithoutExt = pathinfo($filename, PATHINFO_FILENAME);
+    //     $outputPath = $textFolder . '/' . $textFilenameWithoutExt;
+
+    //     $command = 'tesseract ' . escapeshellarg($fullImagePath) . ' ' . escapeshellarg($outputPath) . ' -l ind';
+    //     exec($command);
+
+    //     $ocrResultPath = $outputPath . '.txt';
+    //     $ocrText = file_exists($ocrResultPath) ? file_get_contents($ocrResultPath) : '';
+
+    //     $ocrText = str_replace(['_', '-', '|', '—', '–', ':'], ':', $ocrText);
+    //     $ocrText = preg_replace('/\s+/', ' ', $ocrText);
+
+    //     $no_kk_scan = $this->extractNoKK($ocrText);
+    //     $nama_kepala_keluarga = $this->extractNamaKepalaKeluarga($ocrText);
+
+    //     if (empty($no_kk_scan)) {
+    //         preg_match('/No\s*[:\-]?\s*(\d{16})/', $ocrText, $matches);
+    //         $no_kk_scan = $matches[1] ?? '';
+    //     }
+
+    //     if (empty($nama_kepala_keluarga)) {
+    //         preg_match('/Nama Kepala Keluarga\s*[:\-]?\s*([A-Za-z\s\.,]+)/i', $ocrText, $matches);
+    //         $nama_kepala_keluarga = trim($matches[1] ?? '');
+    //     }
+
+    //     if (empty($no_kk_scan) || empty($nama_kepala_keluarga)) {
+    //         Storage::delete($path);
+    //         if (file_exists($ocrResultPath)) {
+    //             unlink($ocrResultPath);
+    //         }
+
+    //         return redirect()->back()->with('error', 'Gagal membaca data KK. Silakan upload foto yang lebih jelas.');
+    //     }
+
+    //     // ===== Simpan ke ScanKK =====
+    //     // Simpan ScanKK dengan alamat_id sebagai null dulu
+    //     $scanKK = ScanKK::create([
+    //         'nama_kepala_keluarga' => $nama_kepala_keluarga,
+    //         'no_kk_scan' => $no_kk_scan,
+    //         'path_file_kk' => $path,
+    //         'status_verifikasi' => 'pending', // Atau sesuaikan sesuai kebutuhan
+    //         'alasan_penolakan' => null,
+    //     ]);
+
+    //     // ===== Ekstrak Data Alamat dari OCR Text =====
+    //     $alamatData = $this->extractAlamatData($ocrText);
+
+    //     // Periksa jika alamat kecuali provinsi kosong
+    //     $isAlamatIncomplete = empty($alamatData['nama_jalan']) || empty($alamatData['rt']) || empty($alamatData['rw']) ||
+    //                             empty($alamatData['kelurahan']) || empty($alamatData['kecamatan']) || empty($alamatData['kabupaten_kota']) ||
+    //                             empty($alamatData['kode_pos']);
+
+    //     // Jika data alamat tidak lengkap (kecuali provinsi), tampilkan modal error
+    //     if ($isAlamatIncomplete) {
+    //         Storage::delete($path);
+    //         if (file_exists($ocrResultPath)) {
+    //             unlink($ocrResultPath);
+    //         }
+
+    //         return redirect()->back()->with('error', 'Data alamat tidak lengkap. Silakan upload foto yang lebih jelas.');
+    //     }
+
+    //     // ===== Simpan ke tb_alamat =====
+    //     $alamat = Alamat::create([
+    //         'nama_jalan' => $alamatData['nama_jalan'] ?? '',
+    //         'rt_alamat' => $alamatData['rt'] ?? '',
+    //         'rw_alamat' => $alamatData['rw'] ?? '',
+    //         'kelurahan' => $alamatData['kelurahan'] ?? '',
+    //         'kecamatan' => $alamatData['kecamatan'] ?? '',
+    //         'kabupaten_kota' => $alamatData['kabupaten_kota'] ?? '',
+    //         'provinsi' => strlen($alamatData['provinsi'] ?? '') > 255 ? '' : $alamatData['provinsi'],
+    //         'kode_pos' => $alamatData['kode_pos'] ?? '',
+    //     ]);
+
+    //     // ===== Update ScanKK dengan alamat_id =====
+    //     $scanKK->update([
+    //         'alamat_id' => $alamat->id_alamat,
+    //     ]);
+
+    //     // ===== Update tb_pendaftaran dengan id_scan =====
+    //     Pendaftaran::where('no_kk', $no_kk_scan)->update([
+    //         'scan_id' => $scanKK->id_scan,
+    //     ]);
+
+    //     return redirect()->route('login')->with('success', 'Upload KK berhasil!');
+    // }
 
     private function extractNoKK($text)
     {
@@ -188,6 +276,6 @@ class UploadKKController extends Controller
 
         // Gabungkan lagi hasilnya
         return implode(' ', $filteredWords);
-    }   
-    
+    }
+
 }

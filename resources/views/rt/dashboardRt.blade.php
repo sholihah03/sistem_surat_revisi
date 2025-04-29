@@ -51,7 +51,9 @@
 
     <div class="flex min-h-screen overflow-hidden"> <!-- ADD pt-20 untuk memberi jarak navbar -->
         @include('rt.sidebarRt')
-        @include('rt.mainRt')
+        <main class="flex-1 p-4 md:p-8 overflow-x-auto">
+            @yield('content')
+        </main>
     </div>
 
     <!-- Toggle Sidebar Script -->

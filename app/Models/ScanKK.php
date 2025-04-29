@@ -31,4 +31,8 @@ class ScanKK extends Model
     {
         return $this->belongsTo(Alamat::class, 'alamat_id', 'id_alamat');
     }
+    public function pendaftaran()
+    {
+        return $this->hasMany(ScanKk::class, 'scan_id', 'id_scan');
+    }
 }

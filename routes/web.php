@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OTPController;
+use App\Http\Middleware\AuthenticateRt;
+use App\Http\Middleware\AuthenticateRw;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\DaftarController;
 use App\Http\Controllers\UploadKKController;
@@ -13,6 +15,7 @@ use App\Http\Controllers\Rw\ManajemenAkunRtController;
 use App\Http\Controllers\Warga\RiwayatSuratController;
 use App\Http\Controllers\Surat\TemplateSuratController;
 use App\Http\Controllers\Warga\PengajuanSuratController;
+use App\Http\Controllers\Rt\VerifikasiAkunWargaController;
 use App\Http\Controllers\Rt\DashboardController as RtDashboardController;
 
 Route::get('/', function () {
@@ -20,35 +23,47 @@ Route::get('/', function () {
 });
 Route::get('/login', [LoginController::class, 'index'])->name('login');
 Route::post('/login-post', [LoginController::class, 'login'])->name('login-post');
-Route::get('logoutRw', [LoginController::class, 'logoutRw'])->name('logoutRw');
+Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::get('/daftar', [DaftarController::class, 'index'])->name('daftar');
 Route::post('/daftar', [DaftarController::class, 'store']);
 Route::get('/otp', [OTPController::class, 'index'])->name('otp');
 Route::get('/buatPassword', [BuatPasswordController::class, 'index'])->name('buatPassword');
 Route::get('/uploadKK', [UploadKKController::class, 'index'])->name('uploadKK');
-Route::post('/uploadKK', [UploadKKController::class, 'store'])->name('uploadKK.store');
-
-
-Route::get('/dashboardWarga', [DashboardController::class, 'index'])->name('dashboardWarga');
-Route::get('/pengajuanSuratWarga', [PengajuanSuratController::class, 'index'])->name('pengajuanSuratWarga');
-Route::get('/formSuratWarga', [FormSuratController::class, 'index'])->name('formSuratWarga');
-Route::get('/riwayatSuratWarga', [RiwayatSuratController::class, 'index'])->name('riwayatSuratWarga');
-
+Route::post('/uploadKK-proses', [UploadKKController::class, 'proses'])->name('uploadKK.proses');
+Route::post('/uploadKK-store', [UploadKKController::class, 'store'])->name('uploadKK.store');
 
 Route::get('/suratPengantar', [TemplateSuratController::class, 'index'])->name('suratPengantar');
 
+Route::prefix('warga')->middleware('auth.warga')->group(function () {
+    Route::get('/dashboardWarga', [DashboardController::class, 'index'])->name('dashboardWarga');
+    Route::get('/pengajuanSuratWarga', [PengajuanSuratController::class, 'index'])->name('pengajuanSuratWarga');
+    Route::get('/formSuratWarga', [FormSuratController::class, 'index'])->name('formSuratWarga');
+    Route::get('/riwayatSuratWarga', [RiwayatSuratController::class, 'index'])->name('riwayatSuratWarga');
+});
 
-Route::get('/dashboardRt', [RtDashboardController::class, 'index'])->name('dashboardRt');
+
+Route::prefix('rt')->middleware(AuthenticateRt::class)->group(function () {
+    // Route::get('/dashboardRt', [RtDashboardController::class, 'index'])->name('dashboardRt');
+    Route::get('/dashboardRt', function () {
+        return view('rt.mainRt');
+    })->name('dashboardRt');
+    // Route::get('/verifikasiAkunWarga', [VerifikasiAkunWargaController::class, 'index'])->name('verifikasiAkunWarga');
+    Route::get('/verifikasiAkunWarga', [VerifikasiAkunWargaController::class, 'verifikasiAkunWarga'])->name('verifikasiAkunWarga');
+    Route::post('/verifikasiAkunWarga/{id}/disetujui', [VerifikasiAkunWargaController::class, 'disetujui'])->name('verifikasiAkunWarga.disetujui');
+    Route::post('/verifikasiAkunWarga/{id}/ditolak', [VerifikasiAkunWargaController::class, 'ditolak'])->name('verifikasiAkunWarga.ditolak');
+});
 
 
-// Route::get('/dashboardRw', [DashboardRwController::class, 'index'])->name('dashboardRw');
-Route::get('/dashboardRw', function () {
-    return view('rw.mainRw');
-})->name('dashboardRw');
-Route::get('/manajemenAkunRt', [ManajemenAkunRtController::class, 'index'])->name('manajemenAkunRt');
-Route::post('/manajemenAkunRt/store', [ManajemenAkunRtController::class, 'store'])->name('manajemenAkunRt.store');
-Route::post('/manajemenAkunRt/update/{id}', [ManajemenAkunRtController::class, 'update'])->name('manajemenAkunRt.update');
-Route::delete('/manajemenAkunRt/delete/{id}', [ManajemenAkunRtController::class, 'destroy'])->name('manajemenAkunRt.destroy');
+Route::prefix('rw')->middleware(AuthenticateRw::class)->group(function () {
+    // Route::get('/dashboardRw', [DashboardRwController::class, 'index'])->name('dashboardRw');
+    Route::get('/dashboardRw', function () {
+        return view('rw.mainRw');
+    })->name('dashboardRw');
+    Route::get('/manajemenAkunRt', [ManajemenAkunRtController::class, 'index'])->name('manajemenAkunRt');
+    Route::post('/manajemenAkunRt/store', [ManajemenAkunRtController::class, 'store'])->name('manajemenAkunRt.store');
+    Route::post('/manajemenAkunRt/update/{id}', [ManajemenAkunRtController::class, 'update'])->name('manajemenAkunRt.update');
+    Route::delete('/manajemenAkunRt/delete/{id}', [ManajemenAkunRtController::class, 'destroy'])->name('manajemenAkunRt.destroy');
+});
 
 

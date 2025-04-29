@@ -31,8 +31,7 @@ class LoginController extends Controller
                       ->first();
 
         if ($warga && Hash::check($request->password, $warga->password)) {
-            Session::put('login_data', $warga);
-            Session::put('login_as', 'warga');
+            Auth::guard('warga')->login($warga);  // Gunakan guard untuk Warga
             return redirect()->route('dashboardWarga');
         }
 
@@ -42,8 +41,7 @@ class LoginController extends Controller
                 ->first();
 
         if ($rt && Hash::check($request->password, $rt->password)) {
-            Session::put('login_data', $rt);
-            Session::put('login_as', 'rt');
+            Auth::guard('rt')->login($rt);  // Gunakan guard untuk RT
             return redirect()->route('dashboardRt');
         }
 
@@ -53,15 +51,15 @@ class LoginController extends Controller
                 ->first();
 
         if ($rw && Hash::check($request->password, $rw->password)) {
-            Session::put('login_data', $rw);
-            Session::put('login_as', 'rw');
+            Auth::guard('rw')->login($rw);  // Gunakan guard untuk RW
             return redirect()->route('dashboardRw');
         }
 
         return back()->withErrors(['login_error' => 'Nama Lengkap, Email, atau Password salah!']);
     }
 
-    public function logoutRw()
+
+    public function logout()
     {
         Session::flush();
         return redirect()->route('login');

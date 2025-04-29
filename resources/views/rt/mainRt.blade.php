@@ -1,4 +1,6 @@
-<main class="flex-1 p-4 md:p-8 overflow-x-auto">
+@extends('rt.dashboardRt')
+
+@section('content')
     <h1 class="text-2xl pt-20 md:text-3xl font-bold text-gray-800 mb-6">Selamat Datang, Ketua RT!</h1>
 
     <!-- Kartu Statistik -->
@@ -51,4 +53,4 @@
             </div>
         </div>
     </div>
-</main>
+@endsection
