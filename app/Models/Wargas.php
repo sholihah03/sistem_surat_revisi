@@ -14,7 +14,7 @@ class Wargas extends Authenticatable
     protected $primaryKey = 'id_warga';
 
     protected $fillable = [
-        'scan_id',
+        'scan_kk_id',
         'nama_lengkap',
         'email',
         'no_kk',

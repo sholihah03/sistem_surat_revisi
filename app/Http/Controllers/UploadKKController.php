@@ -15,13 +15,24 @@ class UploadKKController extends Controller
         return view('auth.upload-kk');
     }
 
+    public function konfirm(Request $request)
+{
+    return view('auth.upload-kkKonfir', [
+        'no_kk' => $request->query('no_kk'),
+        'nama_kepala_keluarga' => $request->query('nama_kepala_keluarga'),
+        'path' => $request->query('path'),
+        'alamatData' => $request->query('alamatData'),
+    ]);
+}
+
+
     public function proses(Request $request)
     {
         $validated = $request->validate([
-            'file_kk' => 'required|mimes:jpeg,png,jpg|max:5120',
+            'path_file_kk' => 'required|mimes:jpeg,png,jpg|max:5120',
         ]);
 
-        $file = $request->file('file_kk');
+        $file = $request->file('path_file_kk');
         $filename = uniqid('kk_') . '.' . $file->getClientOriginalExtension();
 
         $path = $file->storeAs('public/uploads/kk', $filename);
@@ -40,64 +51,139 @@ class UploadKKController extends Controller
 
         $no_kk = $this->extractNoKK($ocrText);
         $nama_kepala_keluarga = $this->extractNamaKepalaKeluarga($ocrText);
+        $alamatData = $this->extractAlamatData($ocrText);
 
         if (empty($no_kk) || empty($nama_kepala_keluarga)) {
             Storage::delete($path);
             return redirect()->back()->with('error', 'Gagal membaca data KK. Silakan unggah ulang dengan gambar yang lebih jelas.');
         }
 
-        return view('auth.upload-kk', compact('no_kk', 'nama_kepala_keluarga', 'path'));
+        return redirect()->route('uploadKKKonfirm', compact('no_kk', 'nama_kepala_keluarga', 'path', 'alamatData'));
     }
 
-    public function store(Request $request)
+    public function simpan(Request $request)
     {
+        // Validasi
         $request->validate([
-            'no_kk' => 'required|digits:16',
-            'nama_kepala_keluarga' => 'required|string|max:255',
+            'no_kk_scan' => 'required|string|max:50',
+            'nama_kepala_keluarga' => 'required|string|max:100',
             'path' => 'required|string',
+            'nama_jalan' => 'nullable|string|max:255',
+            'provinsi' => 'nullable|string|max:100',
+            'kabupaten_kota' => 'nullable|string|max:100',
+            'kecamatan' => 'nullable|string|max:100',
+            'desa' => 'nullable|string|max:100',
+            'rt_alamat' => 'nullable|string|max:10',
+            'rw_alamat' => 'nullable|string|max:10',
+            'kode_pos' => 'nullable|string|max:10',
         ]);
+        
+        $path_file_kk = $request->input('path'); // Path dari file KK yang sudah diunggah dan di-OCR sebelumnya
 
-        $path = $request->input('path');
-        $fullImagePath = storage_path('app/' . $path);
-        $outputTxtPath = storage_path('app/public/uploads/kk_text/' . pathinfo(basename($path), PATHINFO_FILENAME));
-        $ocrText = @file_get_contents($outputTxtPath . '.txt') ?: '';
+        // Simpan data alamat
+        $alamat = new Alamat();
+        $alamat->nama_jalan = $request->nama_jalan;
+        $alamat->provinsi = $request->provinsi;
+        $alamat->kabupaten_kota = $request->kabupaten_kota;
+        $alamat->kecamatan = $request->kecamatan;
+        $alamat->kelurahan = $request->desa;
+        $alamat->rt_alamat = $request->rt_alamat;
+        $alamat->rw_alamat = $request->rw_alamat;
+        $alamat->kode_pos = $request->kode_pos;
+        $alamat->save();  // Simpan alamat ke tb_alamat
 
-        $alamatData = $this->extractAlamatData($ocrText);
+        // Ambil alamat_id yang baru disimpan
+        $alamat_id = $alamat->id_alamat;
 
-        if (empty($alamatData['nama_jalan']) || empty($alamatData['rt']) || empty($alamatData['rw']) ||
-            empty($alamatData['kelurahan']) || empty($alamatData['kecamatan']) ||
-            empty($alamatData['kabupaten_kota']) || empty($alamatData['kode_pos'])) {
-            Storage::delete($path);
-            return redirect()->route('uploadKK')->with('error', 'Data alamat tidak lengkap. Silakan unggah ulang.');
+        // Simpan data ke tb_scan_kk
+        $scan = new ScanKK();
+        $scan->no_kk_scan = $request->no_kk_scan;
+        $scan->nama_kepala_keluarga = $request->nama_kepala_keluarga;
+        $scan->path_file_kk = $path_file_kk; // Menyimpan path file KK yang sudah di-upload
+        $scan->alamat_id = $alamat_id;  // Menyimpan alamat_id ke tb_scan_kk
+        $scan->save(); // Simpan scan data ke tb_scan_kk
+
+        return redirect()->route('login')->with('success', 'Data berhasil disimpan.');
+    }
+
+    private function extractNoKK($text)
+    {
+        preg_match('/\b\d{16}\b/', $text, $matches);
+        return $matches[0] ?? '';
+    }
+
+    private function extractNamaKepalaKeluarga($text)
+    {
+        if (preg_match('/Nama Kepala Keluarga\s*[:\-]?\s*([A-Za-z\s\.,]+)/i', $text, $matches)) {
+            $nama = trim($matches[1]);
+            $potongan = preg_split('/\b(Desa|Kelurahan|RW|RT)\b/i', $nama);
+            return trim($potongan[0]);
+        }
+        return '';
+    }
+
+    private function extractAlamatData($text)
+    {
+        $data = [];
+
+        // Nama jalan
+        if (preg_match('/Alamat\s*[:\-]?\s*(.*?)\s*(Kecamatan|RT\/RW)/i', $text, $matches)) {
+            $data['nama_jalan'] = $this->cleanText($matches[1]);
         }
 
-        $alamat = Alamat::create([
-            'nama_jalan' => $alamatData['nama_jalan'],
-            'rt_alamat' => $alamatData['rt'],
-            'rw_alamat' => $alamatData['rw'],
-            'kelurahan' => $alamatData['kelurahan'],
-            'kecamatan' => $alamatData['kecamatan'],
-            'kabupaten_kota' => $alamatData['kabupaten_kota'],
-            'provinsi' => substr($alamatData['provinsi'] ?? '', 0, 255),
-            'kode_pos' => $alamatData['kode_pos'],
-        ]);
+        // RT/RW
+        if (preg_match('/RT\/RW\s*[:\-]?\s*(\d{1,3})[\/\s]*(\d{1,3})/i', $text, $matches)) {
+            $data['rt'] = $matches[1];
+            $data['rw'] = $matches[2];
+        }
 
-        $scanKK = ScanKK::create([
-            'nama_kepala_keluarga' => $request->nama_kepala_keluarga,
-            'no_kk_scan' => $request->no_kk,
-            'path_file_kk' => $path,
-            'status_verifikasi' => 'pending',
-            'alamat_id' => $alamat->id_alamat,
-        ]);
+        // Kelurahan/Desa
+        if (preg_match('/(Desa|Kelurahan)\s*[:\-]?\s*(.*?)\s*(Kecamatan|Alamat|RT\/RW)/i', $text, $matches)) {
+            $data['kelurahan'] = $this->cleanText($matches[2]);
+        }
 
-        Pendaftaran::where('no_kk', $request->no_kk)->update([
-            'scan_id' => $scanKK->id_scan,
-        ]);
+        // Kecamatan
+        if (preg_match('/Kecamatan\s*[:\-]?\s*(.*?)\s*(Kabupaten|Kota|Kode Pos|Provinsi)/i', $text, $matches)) {
+            $data['kecamatan'] = $this->cleanText($matches[1]);
+        }
 
-        return redirect()->route('login')->with('success', 'Data berhasil disimpan dan menunggu verifikasi.');
+        // Kabupaten/Kota
+        if (preg_match('/(Kabupaten|Kota)\s*[:\-]?\s*(.*?)\s*(Kode Pos|Provinsi|$)/i', $text, $matches)) {
+            $data['kabupaten_kota'] = $this->cleanText($matches[2]);
+        }
+
+        // Provinsi
+        if (preg_match('/Provinsi\s*[:\-]?\s*(.*?)($|\n)/i', $text, $matches)) {
+            $data['provinsi'] = $this->cleanText($matches[1]);
+        }
+
+        // Kode Pos
+        if (preg_match('/Kode Pos\s*[:\-]?\s*(\d{5})/i', $text, $matches)) {
+            $data['kode_pos'] = $matches[1];
+        }
+
+        return $data;
     }
 
-    // public function store(Request $request)
+    private function cleanText($text)
+    {
+        $words = explode(' ', trim($text));
+        $filteredWords = [];
+
+        foreach ($words as $word) {
+            // Tetap simpan kata jika:
+            // - Semua huruf kapital
+            // - atau hanya huruf biasa
+            if (preg_match('/^[A-Z0-9\/]+$/', $word)) {
+                $filteredWords[] = $word;
+            }
+        }
+
+        // Gabungkan lagi hasilnya
+        return implode(' ', $filteredWords);
+    }
+
+        // public function store(Request $request)
     // {
     //     $validated = $request->validate([
     //         'file_kk' => 'required|mimes:jpeg,png,jpg|max:5120',
@@ -200,82 +286,4 @@ class UploadKKController extends Controller
 
     //     return redirect()->route('login')->with('success', 'Upload KK berhasil!');
     // }
-
-    private function extractNoKK($text)
-    {
-        preg_match('/\b\d{16}\b/', $text, $matches);
-        return $matches[0] ?? '';
-    }
-
-    private function extractNamaKepalaKeluarga($text)
-    {
-        if (preg_match('/Nama Kepala Keluarga\s*[:\-]?\s*([A-Za-z\s\.,]+)/i', $text, $matches)) {
-            $nama = trim($matches[1]);
-            $potongan = preg_split('/\b(Desa|Kelurahan|RW|RT)\b/i', $nama);
-            return trim($potongan[0]);
-        }
-        return '';
-    }
-
-    private function extractAlamatData($text)
-    {
-        $data = [];
-
-        // Nama jalan
-        if (preg_match('/Alamat\s*[:\-]?\s*(.*?)\s*(Kecamatan|RT\/RW)/i', $text, $matches)) {
-            $data['nama_jalan'] = $this->cleanText($matches[1]);
-        }
-
-        // RT/RW
-        if (preg_match('/RT\/RW\s*[:\-]?\s*(\d{1,3})[\/\s]*(\d{1,3})/i', $text, $matches)) {
-            $data['rt'] = $matches[1];
-            $data['rw'] = $matches[2];
-        }
-
-        // Kelurahan/Desa
-        if (preg_match('/(Desa|Kelurahan)\s*[:\-]?\s*(.*?)\s*(Kecamatan|Alamat|RT\/RW)/i', $text, $matches)) {
-            $data['kelurahan'] = $this->cleanText($matches[2]);
-        }
-
-        // Kecamatan
-        if (preg_match('/Kecamatan\s*[:\-]?\s*(.*?)\s*(Kabupaten|Kota|Kode Pos|Provinsi)/i', $text, $matches)) {
-            $data['kecamatan'] = $this->cleanText($matches[1]);
-        }
-
-        // Kabupaten/Kota
-        if (preg_match('/(Kabupaten|Kota)\s*[:\-]?\s*(.*?)\s*(Kode Pos|Provinsi|$)/i', $text, $matches)) {
-            $data['kabupaten_kota'] = $this->cleanText($matches[2]);
-        }
-
-        // Provinsi
-        if (preg_match('/Provinsi\s*[:\-]?\s*(.*?)($|\n)/i', $text, $matches)) {
-            $data['provinsi'] = $this->cleanText($matches[1]);
-        }
-
-        // Kode Pos
-        if (preg_match('/Kode Pos\s*[:\-]?\s*(\d{5})/i', $text, $matches)) {
-            $data['kode_pos'] = $matches[1];
-        }
-
-        return $data;
-    }
-
-    private function cleanText($text)
-    {
-        $words = explode(' ', trim($text));
-        $filteredWords = [];
-
-        foreach ($words as $word) {
-            // Tetap simpan kata jika:
-            // - Semua huruf kapital
-            // - atau hanya huruf biasa
-            if (preg_match('/^[A-Z0-9\/]+$/', $word)) {
-                $filteredWords[] = $word;
-            }
-        }
-
-        // Gabungkan lagi hasilnya
-        return implode(' ', $filteredWords);
-    }
-
 }

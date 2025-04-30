@@ -29,9 +29,11 @@ Route::get('/daftar', [DaftarController::class, 'index'])->name('daftar');
 Route::post('/daftar', [DaftarController::class, 'store']);
 Route::get('/otp', [OTPController::class, 'index'])->name('otp');
 Route::get('/buatPassword', [BuatPasswordController::class, 'index'])->name('buatPassword');
+
 Route::get('/uploadKK', [UploadKKController::class, 'index'])->name('uploadKK');
-Route::post('/uploadKK-proses', [UploadKKController::class, 'proses'])->name('uploadKK.proses');
-Route::post('/uploadKK-store', [UploadKKController::class, 'store'])->name('uploadKK.store');
+Route::get('/uploadKKKonfirm', [UploadKKController::class, 'konfirm'])->name('uploadKKKonfirm');
+Route::post('/uploadKKproses', [UploadKKController::class, 'proses'])->name('uploadKKproses');
+Route::post('/uploadKKsimpan', [UploadKKController::class, 'simpan'])->name('uploadKKsimpan');
 
 Route::get('/suratPengantar', [TemplateSuratController::class, 'index'])->name('suratPengantar');
 

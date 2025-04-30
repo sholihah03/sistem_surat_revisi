@@ -10,27 +10,22 @@
     <div class="w-full max-w-xl bg-white rounded-xl shadow-md p-6 space-y-6">
         <h2 class="text-2xl font-bold text-gray-800 text-center">Upload Kartu Keluarga</h2>
         <p class="text-sm text-center text-gray-600">Nomor KK Anda belum terdaftar. Silakan unggah scan/foto KK Anda untuk diverifikasi oleh RT.</p>
-        @if (!isset($no_kk) || !isset($nama_kepala_keluarga))
-        <form method="POST" action="{{ route('uploadKKproses') }}" enctype="multipart/form-data" class="space-y-4">
+
+        <form method="POST" action="{{ route('uploadKK.store') }}" enctype="multipart/form-data" class="space-y-4">
             @csrf
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Gambar KK</label>
-                <input type="file" name="path_file_kk" accept="image/*" required
+                <input type="file" name="file_kk" accept="image/*" required
                        class="block w-full px-3 py-2 border border-blue-400 rounded-md file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-blue-100 file:text-sm file:text-blue-700 hover:file:bg-blue-200">
             </div>
-                <button type="submit"
+
+            <button type="submit"
                     class="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 rounded-md transition">
-                    Konfirmasi
-                </button>
+                Kirim ke RT
+            </button>
         </form>
-        @endif
-
-
-
     </div>
-
-
 
     <!-- Modal Error -->
     @if (session('error'))

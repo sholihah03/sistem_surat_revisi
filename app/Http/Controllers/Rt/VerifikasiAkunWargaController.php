@@ -44,7 +44,7 @@ class VerifikasiAkunWargaController extends Controller
                 'no_hp' => $pendaftaran->no_hp,
                 'rw' => $pendaftaran->rw,
                 'rt' => $pendaftaran->rt,
-                'scan_id' => $scan->id,
+                'scan_kk_id' => $scan->id_scan,
             ]);
         }
 
