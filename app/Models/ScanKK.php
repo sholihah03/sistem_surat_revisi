@@ -33,6 +33,12 @@ class ScanKK extends Model
     }
     public function pendaftaran()
     {
-        return $this->hasMany(ScanKk::class, 'scan_id', 'id_scan');
+        return $this->hasMany(Pendaftaran::class, 'scan_id', 'id_scan');
     }
+
+    public function wargas()
+    {
+        return $this->hasMany(Wargas::class, 'scan_kk_id', 'id_scan');
+    }
+
 }

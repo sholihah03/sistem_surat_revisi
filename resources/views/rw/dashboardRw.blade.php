@@ -50,6 +50,8 @@
 
     <div class="flex min-h-screen overflow-hidden">
         @include('rw.sidebarRw')
+        <!-- Overlay for closing sidebar when clicking outside (mobile only) -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-30 z-30 hidden md:hidden"></div>
         <main class="flex-1 p-4 md:p-8 overflow-x-auto">
             @yield('content')
         </main>
@@ -59,11 +61,18 @@
     <script>
         const btn = document.getElementById('menu-button');
         const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
 
         btn.addEventListener('click', () => {
             sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
         });
-        </script>
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+        });
+    </script>
 
 </body>
 </html>

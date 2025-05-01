@@ -51,6 +51,9 @@
 
     <div class="flex min-h-screen overflow-hidden"> <!-- ADD pt-20 untuk memberi jarak navbar -->
         @include('rt.sidebarRt')
+        <!-- Overlay for closing sidebar when clicking outside (mobile only) -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-30 z-30 hidden md:hidden"></div>
+
         <main class="flex-1 p-4 md:p-8 overflow-x-auto">
             @yield('content')
         </main>
@@ -60,11 +63,49 @@
     <script>
         const btn = document.getElementById('menu-button');
         const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
 
         btn.addEventListener('click', () => {
             sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
         });
     </script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const countdownElements = document.querySelectorAll('.countdown');
+
+        countdownElements.forEach(el => {
+            const expireTime = new Date(el.getAttribute('data-expire')).getTime();
+
+            function updateCountdown() {
+                const now = new Date().getTime();
+                const distance = expireTime - now;
+
+                if (distance < 0) {
+                    el.innerHTML = "<span class='text-red-600 font-semibold'>Kadaluarsa</span>";
+                    return;
+                }
+
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                el.innerHTML = `${hours} jam ${minutes} menit ${seconds} detik`;
+            }
+
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        });
+    });
+    </script>
+
+
 
 </body>
 </html>

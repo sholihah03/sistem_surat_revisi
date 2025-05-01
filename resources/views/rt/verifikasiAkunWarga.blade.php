@@ -1,44 +1,75 @@
 @extends('rt.dashboardRt')
 
 @section('content')
-
 <div class="container mx-auto p-4 mb-6 pt-20">
     <h1 class="text-2xl font-bold mb-6">Verifikasi Akun Warga</h1>
 
-    @foreach ($pendingData as $item)
-    <div class="bg-white shadow-md rounded-lg p-4 mb-6 border border-gray-200">
-        <div class="flex flex-col md:flex-row gap-4">
-            <div class="md:w-1/2">
-                <p><strong>Nama Kepala Keluarga:</strong> {{ $item->nama_kepala_keluarga }}</p>
-                <p><strong>No KK:</strong> {{ $item->no_kk_scan }}</p>
-                <p><strong>Alamat:</strong></p>
-                <ul class="ml-4 list-disc">
-                    <li>{{ $item->alamat->nama_jalan ?? '-' }}</li>
-                    <li>RT/RW: {{ $item->alamat->rt_alamat ?? '-' }}/{{ $item->alamat->rw_alamat ?? '-' }}</li>
-                    <li>Kelurahan: {{ $item->alamat->kelurahan ?? '-' }}</li>
-                    <li>Kecamatan: {{ $item->alamat->kecamatan ?? '-' }}</li>
-                    <li>Kab/Kota: {{ $item->alamat->kabupaten_kota ?? '-' }}</li>
-                    <li>Provinsi: {{ $item->alamat->provinsi ?? '-' }}</li>
-                    <li>Kode Pos: {{ $item->alamat->kode_pos ?? '-' }}</li>
-                </ul>
+    <p class="mb-6 text-sm md:text-base text-gray-700">
+        Halaman ini memungkinkan Anda untuk memverifikasi akun warga yang telah mendaftar. Silakan periksa detail mereka dan ambil tindakan yang sesuai. <strong>Penting!</strong> Akun harus diverifikasi dalam waktu 24 jam. Jika tidak, warga akan diminta untuk mengunggah ulang dokumen mereka.
+    </p>
+
+    <div class="bg-white bg-opacity-80 p-4 md:p-6 rounded-xl shadow w-full">
+        <div class="overflow-x-auto">
+            <div class="min-w-full inline-block align-middle overflow-x-auto">
+                <div class="overflow-x-auto border rounded-lg">
+                    <table class="min-w-full text-xs md:text-sm text-gray-700">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-2 md:px-4 py-2 text-left">No</th>
+                                <th class="px-2 md:px-4 py-2 text-left">Nama Warga</th>
+                                <th class="px-2 md:px-4 py-2 text-left">Nama Kepala Keluarga</th>
+                                <th class="px-2 md:px-4 py-2 text-left">No KK</th>
+                                <th class="px-2 md:px-4 py-2 text-left">Alamat</th>
+                                <th class="px-2 md:px-4 py-2 text-left">Waktu Dikirim</th>
+                                <th>Sisa Waktu</th>
+                                <th class="px-2 md:px-4 py-2 text-left">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 text-gray-900">
+                            @forelse ($pendingData as $index => $item)
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-2 md:px-4 py-2 whitespace-nowrap">{{ $index + 1 }}</td>
+                                <td class="px-2 md:px-4 py-2 whitespace-nowrap">
+                                    {{ $item->pendaftaran->first()->nama_lengkap ?? '-' }}
+                                </td>
+                                <td class="px-2 md:px-4 py-2 whitespace-nowrap">{{ $item->nama_kepala_keluarga }}</td>
+                                <td class="px-2 md:px-4 py-2 whitespace-nowrap">{{ $item->no_kk_scan }}</td>
+                                <td class="px-2 md:px-4 py-2 whitespace-nowrap">
+                                    {{ $item->alamat->nama_jalan ?? '-' }},<br>
+                                    RT {{ $item->alamat->rt_alamat ?? '-' }}/RW {{ $item->alamat->rw_alamat ?? '-' }},<br>
+                                    Kel. {{ $item->alamat->kelurahan ?? '-' }},
+                                    Kec. {{ $item->alamat->kecamatan ?? '-' }}
+                                </td>
+                                <td class="px-2 md:px-4 py-2 whitespace-nowrap">
+                                    {{ $item->created_at->format('d-m-Y H:i') }} <!-- Format waktu -->
+                                </td>
+                                <td class="px-2 md:px-4 py-2 whitespace-nowrap text-sm min-w-[120px] text-red-600 font-semibold">
+                                    <span class="countdown" data-expire="{{ $item->created_at->addHours(24) }}"></span>
+                                </td>
+                                <td class="px-2 md:px-4 py-2 whitespace-nowrap">
+                                    <a href="{{ route('detailVerifikasiAkunWarga', $item->id_scan) }}"
+                                    class="inline-block bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 text-xs md:text-sm">
+                                        Lihat Detail
+                                    </a>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="px-2 md:px-4 py-3 text-center text-gray-500">
+                                    <p>✨ Tidak ada data verifikasi saat ini. Pastikan Anda memeriksa lagi nanti! ✨</p>
+                                    <p class="text-sm text-gray-600">Jika ada warga baru yang mendaftar, mereka akan muncul di sini untuk verifikasi lebih lanjut.</p>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="md:w-1/2">
-                {{-- str_replace('public/', '', $item->path_file_kk) menghapus public/ dari path yang disimpan di database. --}}
-                <img src="{{ asset('storage/' . str_replace('public/', '', $item->path_file_kk)) }}" alt="Foto KK" class="w-80 h-auto border border-red-500" />
-            </div>
-        </div>
-        <div class="mt-4 flex gap-3">
-            <form method="POST" action="{{ route('verifikasiAkunWarga.disetujui', $item->id_scan) }}">
-                @csrf
-                <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Setujui</button>
-            </form>
-            <form method="POST" action="{{ route('verifikasiAkunWarga.ditolak', $item->id_scan) }}">
-                @csrf
-                <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Tolak</button>
-            </form>
         </div>
     </div>
-    @endforeach
-</div>
 
+    <div class="mt-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800">
+        <strong>PERHATIAN:</strong> Anda harus segera memverifikasi akun-akun ini dalam waktu 24 jam. Jika tidak, akun-akun tersebut akan diminta untuk mengunggah ulang dokumen mereka. Pastikan tidak ada yang terlewat!
+    </div>
+</div>
 @endsection

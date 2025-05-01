@@ -50,10 +50,11 @@ Route::prefix('rt')->middleware(AuthenticateRt::class)->group(function () {
     Route::get('/dashboardRt', function () {
         return view('rt.mainRt');
     })->name('dashboardRt');
-    // Route::get('/verifikasiAkunWarga', [VerifikasiAkunWargaController::class, 'index'])->name('verifikasiAkunWarga');
-    Route::get('/verifikasiAkunWarga', [VerifikasiAkunWargaController::class, 'verifikasiAkunWarga'])->name('verifikasiAkunWarga');
+    Route::get('/verifikasiAkunWarga', [VerifikasiAkunWargaController::class, 'index'])->name('verifikasiAkunWarga');
+    Route::get('/detailVerifikasiAkunWarga/{id}', [VerifikasiAkunWargaController::class, 'detailVerifikasiAkunWarga'])->name('detailVerifikasiAkunWarga');
     Route::post('/verifikasiAkunWarga/{id}/disetujui', [VerifikasiAkunWargaController::class, 'disetujui'])->name('verifikasiAkunWarga.disetujui');
     Route::post('/verifikasiAkunWarga/{id}/ditolak', [VerifikasiAkunWargaController::class, 'ditolak'])->name('verifikasiAkunWarga.ditolak');
+    Route::get('/historiVerifikasiAkunWarga', [VerifikasiAkunWargaController::class, 'historiVerifikasiAkunWarga'])->name('historiVerifikasiAkunWarga');
 });
 
 
