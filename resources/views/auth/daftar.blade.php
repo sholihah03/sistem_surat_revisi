@@ -103,7 +103,7 @@
                                 <select name="rt" id="rt" required class="w-full focus:outline-none bg-transparent text-gray-700">
                                     <option value="">Pilih RT</option>
                                     @foreach ($dataRT as $rt)
-                                        <option value="{{ $rt->no_rt }}">{{ $rt->no_rt }}</option>
+                                    <option value="{{ $rt->id_rt }}">RT {{ $rt->no_rt }} - {{ $rt->nama_lengkap_rt ?? 'Tanpa Ketua' }}</option>
                                     @endforeach
                                 </select>
                             </div>

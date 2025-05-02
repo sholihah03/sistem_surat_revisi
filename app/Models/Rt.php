@@ -39,4 +39,14 @@ class Rt extends Model implements Authenticatable
     {
         return $this->hasMany(Wargas::class, 'rt_id', 'id_rt');
     }
+
+    public function pendaftarans()
+    {
+        return $this->hasMany(Pendaftaran::class, 'rt_id', 'id_rt');
+    }
+
+    public function kadaluwarsa()
+    {
+        return $this->hasMany(Kadaluwarsa::class, 'rt_id', 'id_rt');
+    }
 }

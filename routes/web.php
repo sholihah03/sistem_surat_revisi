@@ -13,6 +13,7 @@ use App\Http\Controllers\Warga\DashboardController;
 use App\Http\Controllers\Warga\FormSuratController;
 use App\Http\Controllers\Rw\ManajemenAkunRtController;
 use App\Http\Controllers\Warga\RiwayatSuratController;
+use App\Http\Controllers\Rt\HistoriAkunWargaController;
 use App\Http\Controllers\Surat\TemplateSuratController;
 use App\Http\Controllers\Warga\PengajuanSuratController;
 use App\Http\Controllers\Rt\VerifikasiAkunWargaController;
@@ -54,7 +55,8 @@ Route::prefix('rt')->middleware(AuthenticateRt::class)->group(function () {
     Route::get('/detailVerifikasiAkunWarga/{id}', [VerifikasiAkunWargaController::class, 'detailVerifikasiAkunWarga'])->name('detailVerifikasiAkunWarga');
     Route::post('/verifikasiAkunWarga/{id}/disetujui', [VerifikasiAkunWargaController::class, 'disetujui'])->name('verifikasiAkunWarga.disetujui');
     Route::post('/verifikasiAkunWarga/{id}/ditolak', [VerifikasiAkunWargaController::class, 'ditolak'])->name('verifikasiAkunWarga.ditolak');
-    Route::get('/historiVerifikasiAkunWarga', [VerifikasiAkunWargaController::class, 'historiVerifikasiAkunWarga'])->name('historiVerifikasiAkunWarga');
+    Route::get('/historiVerifikasiAkunWarga', [HistoriAkunWargaController::class, 'historiVerifikasiAkunWarga'])->name('historiVerifikasiAkunWarga');
+    Route::get('/historiAkunKadaluwarsa', [HistoriAkunWargaController::class, 'historiKadaluwarsa'])->name('historiAkunKadaluwarsa');
 });
 
 

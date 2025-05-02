@@ -28,12 +28,33 @@
         <!-- Right section -->
         <div class="flex items-center gap-4">
             <!-- Notification Icon -->
-            <button class="relative">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700 hover:text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C8.67 6.165 8 7.388 8 9v5.159c0 .538-.214 1.055-.595 1.436L6 17h5m4 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
-            <span class="absolute top-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white bg-red-500"></span>
-            </button>
+            <div class="relative group">
+                <button class="relative focus:outline-none">
+                    <!-- Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700 hover:text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C8.67 6.165 8 7.388 8 9v5.159c0 .538-.214 1.055-.595 1.436L6 17h5m4 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+
+                    <!-- Badge jika ada pending -->
+                    @if($pendingCount > 0)
+                    <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full px-1">
+                        {{ $pendingCount }}
+                    </span>
+                    @endif
+                </button>
+
+                <!-- Dropdown isi notifikasi -->
+                @if($pendingCount > 0)
+                <div class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg z-50 hidden group-hover:block">
+                    <div class="p-4 text-sm text-gray-800">
+                        <p class="font-semibold">🔔 Notifikasi</p>
+                        <hr class="my-2">
+                        <p class="text-sm">Ada {{ $pendingCount }} akun warga baru yang menunggu verifikasi.</p>
+                        <a href="{{ route('verifikasiAkunWarga') }}" class="mt-2 inline-block text-blue-600 hover:underline text-sm">Lihat Detail</a>
+                    </div>
+                </div>
+                @endif
+            </div>
 
             <!-- Profile Icon -->
             <button class="rounded-full overflow-hidden w-8 h-8 bg-blue-100 hover:ring-2 hover:ring-blue-400">

@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Rt;
 
 use App\Models\ScanKK;
 use App\Models\Wargas;
+use App\Models\Kadaluwarsa;
 use App\Models\Pendaftaran;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Service\NotificationService;
 
 class VerifikasiAkunWargaController extends Controller
 {
@@ -18,6 +20,43 @@ class VerifikasiAkunWargaController extends Controller
 
         return view('rt.verifikasiAkunWarga', compact('pendingData'));
     }
+
+    // public function index()
+    // {
+    //     $pendingData = ScanKK::with(['alamat', 'pendaftaran'])
+    //         ->where('status_verifikasi', 'pending')
+    //         ->get();
+
+    //     // Hitung jumlah data pending
+    //     $pendingCount = $pendingData->count();
+
+    //     // Kirim notifikasi ke RT jika ada data verifikasi pending
+    //     foreach ($pendingData as $data) {
+    //         $rt = $data->pendaftaran->first()->rt; // Ambil data RT dari relasi
+
+    //         if ($rt) {
+    //             $rtEmail = $rt->email;       // Email RT dari tabel `rt`
+    //             $rtNoHp = $rt->no_hp;        // No HP RT dari tabel `rt`
+    //             $webLink = route('verifikasiAkunWarga');
+
+    //             // Format nomor HP ke awalan '62'
+    //             if (substr($rtNoHp, 0, 1) == '0') {
+    //                 $rtNoHp = '62' . substr($rtNoHp, 1);
+    //             }
+
+    //             // Kirim email & WA
+    //             $subject = "Notifikasi Verifikasi Warga Baru";
+    //             $content = "Ada warga baru yang perlu diverifikasi. Klik <a href='{$webLink}'>di sini</a>.";
+    //             NotificationService::kirimEmailBrevo($rtEmail, $subject, $content);
+
+    //             $message = "Ada warga baru yang perlu diverifikasi. Klik link ini: {$webLink}";
+    //             NotificationService::kirimWAWablas($rtNoHp, $message);
+    //         }
+    //     }
+
+    //     return view('rt.verifikasiAkunWarga', compact('pendingData', 'pendingCount'));
+    // }
+
 
     public function detailVerifikasiAkunWarga()
     {
@@ -63,6 +102,8 @@ class VerifikasiAkunWargaController extends Controller
         return redirect()->route('verifikasiAkunWarga')->with('success', 'Akun berhasil disetujui.');
     }
 
+
+
         public function ditolak(Request $request, $id)
         {
             $scan = ScanKK::findOrFail($id);
@@ -106,6 +147,12 @@ class VerifikasiAkunWargaController extends Controller
             $historiData = $historiData->get();
 
             return view('rt.historiVerifikasiAkunWarga', compact('historiData'));
+        }
+
+        public function historiKadaluwarsa()
+        {
+            $dataKadaluwarsa = Kadaluwarsa::orderBy('created_at', 'desc')->get();
+            return view('rt.historiAkunKadaluwarsa', compact('dataKadaluwarsa'));
         }
 
 

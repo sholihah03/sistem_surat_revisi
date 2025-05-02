@@ -7,7 +7,7 @@
 <!-- Menampilkan pesan sukses jika ada -->
 @if(session('success'))
     <div id="successModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <div class="bg-white rounded-lg shadow-lg p-8 relative w-[520px] text-center animate-scale">
+        <div class="bg-white rounded-lg shadow-lg p-6 sm:p-8 relative w-[90%] max-w-md sm:max-w-lg text-center animate-scale">
             <!-- Tombol Close -->
             <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
 
@@ -31,7 +31,7 @@
 
 <!-- Modal Konfirmasi Hapus -->
 <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-30 hidden justify-center items-center z-50">
-    <div class="bg-white rounded-lg p-6 w-full max-w-md relative text-center">
+    <div class="bg-white rounded-lg p-6 sm:p-8 w-full max-w-sm sm:max-w-md md:max-w-lg relative text-center mx-4">
         <div class="flex justify-center mb-4">
             <!-- Ikon tanda seru -->
             <svg class="w-16 h-16 text-red-500" fill="none" stroke="currentColor" stroke-width="1.5"

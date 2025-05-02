@@ -119,6 +119,87 @@ class UploadKKController extends Controller
         return redirect()->route('login')->with('success', 'Data berhasil disimpan.');
     }
 
+//     private function extractNoKK($text)
+// {
+//     // Menangkap nomor KK dengan panjang 16 digit
+//     preg_match('/No[-\s]?\d{16}/i', $text, $matches);
+//     return isset($matches[0]) ? preg_replace('/[^0-9]/', '', $matches[0]) : '';
+// }
+
+// private function extractNamaKepalaKeluarga($text)
+// {
+//     // Menangkap nama kepala keluarga setelah "Nama Kepala Keluarga" dan berbagai variasi yang mungkin muncul di OCR
+//     if (preg_match('/Nama Kepala Keluarga\s*[:\-]?\s*([A-Za-z\s\.,]+)/i', $text, $matches)) {
+//         $nama = trim($matches[1]);
+//         // Menghindari kesalahan pemisahan setelah "Desa" atau "Kelurahan"
+//         $potongan = preg_split('/\b(Desa|Kelurahan|RT|RW|Kecamatan)\b/i', $nama);
+//         return trim($potongan[0]);
+//     }
+//     return '';
+// }
+
+// private function extractAlamatData($text)
+// {
+//     $data = [];
+
+//     // Menangkap Nama Jalan/Alamat dengan menangani kemungkinan variasi seperti "NMA De Alamat"
+//     if (preg_match('/(Alamat|NMA De Alamat)\s*[:\-]?\s*(.*?)\s*(Kecamatan|RT\/RW)/i', $text, $matches)) {
+//         $data['nama_jalan'] = $this->cleanText($matches[2]);
+//     }
+
+//     // Menangkap RT/RW
+//     if (preg_match('/RT\/RW\s*[:\-]?\s*(\d{1,3})[\/\s]*(\d{1,3})/i', $text, $matches)) {
+//         $data['rt'] = $matches[1];
+//         $data['rw'] = $matches[2];
+//     }
+
+//     // Menangkap Desa/Kelurahan
+//     if (preg_match('/(Desa|Kelurahan)\s*[:\-]?\s*(.*?)\s*(Kecamatan|Alamat|RT\/RW)/i', $text, $matches)) {
+//         $data['kelurahan'] = $this->cleanText($matches[2]);
+//     }
+
+//     // Menangkap Kecamatan
+//     if (preg_match('/Kecamatan\s*[:\-]?\s*(.*?)\s*(Kabupaten|Kota|Kode Pos|Provinsi)/i', $text, $matches)) {
+//         $data['kecamatan'] = $this->cleanText($matches[1]);
+//     }
+
+//     // Menangkap Kabupaten/Kota
+//     if (preg_match('/(Kabupaten|Kota)\s*[:\-]?\s*(.*?)\s*(Kode Pos|Provinsi|$)/i', $text, $matches)) {
+//         $data['kabupaten_kota'] = $this->cleanText($matches[2]);
+//     }
+
+//     // Menangkap Provinsi
+//     if (preg_match('/Provinsi\s*[:\-]?\s*(.*?)($|\n)/i', $text, $matches)) {
+//         $data['provinsi'] = $this->cleanText($matches[1]);
+//     }
+
+//     // Menangkap Kode Pos
+//     if (preg_match('/Kode Pos\s*[:\-]?\s*(\d{5})/i', $text, $matches)) {
+//         $data['kode_pos'] = $matches[1];
+//     }
+
+//     return $data;
+// }
+
+// private function cleanText($text)
+// {
+//     // Membersihkan teks, hanya menyimpan kata yang relevan
+//     $words = explode(' ', trim($text));
+//     $filteredWords = [];
+
+//     foreach ($words as $word) {
+//         // Tetap simpan kata jika:
+//         // - Semua huruf kapital
+//         // - atau hanya huruf biasa
+//         if (preg_match('/^[A-Z0-9\/]+$/', $word)) {
+//             $filteredWords[] = $word;
+//         }
+//     }
+
+//     // Gabungkan lagi hasilnya
+//     return implode(' ', $filteredWords);
+// }
+
 
     private function extractNoKK($text)
     {

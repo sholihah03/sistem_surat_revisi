@@ -17,7 +17,7 @@
                 onclick="document.getElementById('submenu-verifikasi').classList.toggle('hidden')">
                 👤 Verifikasi Akun
             </button>
-            <div id="submenu-verifikasi" class="mt-1 space-y-1 {{ request()->routeIs('verifikasiAkunWarga') || request()->routeIs('historiVerifikasi') ? '' : 'hidden' }}">
+            <div id="submenu-verifikasi" class="mt-1 space-y-1 {{ request()->routeIs('verifikasiAkunWarga') || request()->routeIs('historiVerifikasiAkunWarga') || request()->routeIs('historiAkunKadaluwarsa') ? '' : 'hidden' }}">
                 <a href="{{ route('verifikasiAkunWarga') }}"
                    class="block pl-8 py-1.5 rounded-lg font-medium text-sm transition-all duration-200
                           hover:bg-green-100 hover:text-green-700
@@ -29,6 +29,12 @@
                           hover:bg-green-100 hover:text-green-700
                           {{ request()->routeIs('historiVerifikasiAkunWarga') ? 'bg-green-100 text-green-700' : 'text-gray-700' }}">
                     Histori Verifikasi
+                </a>
+                <a href="{{ route('historiAkunKadaluwarsa') }}"
+                   class="block pl-8 py-1.5 rounded-lg font-medium text-sm transition-all duration-200
+                          hover:bg-green-100 hover:text-green-700
+                          {{ request()->routeIs('historiAkunKadaluwarsa') ? 'bg-green-100 text-green-700' : 'text-gray-700' }}">
+                    Histori Akun Kadaluwarsa
                 </a>
             </div>
         </div>
