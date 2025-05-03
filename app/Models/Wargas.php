@@ -15,13 +15,13 @@ class Wargas extends Authenticatable
 
     protected $fillable = [
         'scan_kk_id',
+        'rt_id',
+        'rw_id',
         'nama_lengkap',
         'email',
         'no_kk',
         'nik',
         'no_hp',
-        'rt',
-        'rw',
         'otp_code',
         'otp_expired_at',
         'status_verifikasi',
@@ -44,5 +44,15 @@ class Wargas extends Authenticatable
     public function scan_Kk()
     {
         return $this->belongsTo(ScanKK::class, 'scan_id', 'id_scan');
+    }
+
+    public function rt()
+    {
+        return $this->belongsTo(Rt::class, 'rt_id', 'id_rt');
+    }
+
+    public function rw()
+    {
+        return $this->belongsTo(Rt::class, 'rw_id', 'id_rw');
     }
 }

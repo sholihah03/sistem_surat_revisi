@@ -92,8 +92,12 @@
                         <div>
                             <label for="rw" class="block text-sm font-semibold text-gray-700">RW</label>
                             <div class="flex items-center border border-blue-400 rounded-md px-3 py-2 mt-1">
-                                <input type="text" name="rw" id="rw" value="007" readonly placeholder="RW"
-                                    class="w-full focus:outline-none bg-transparent text-gray-700" />
+                                <select name="rw" id="rw" required class="w-full focus:outline-none bg-transparent text-gray-700">
+                                    <option value="">Pilih RW</option>
+                                    @foreach ($dataRW as $rw)
+                                        <option value="{{ $rw->id_rw }}">RW {{ $rw->no_rw }} - {{ $rw->nama_lengkap_rw ?? 'Tanpa Ketua' }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                         <!-- RT -->

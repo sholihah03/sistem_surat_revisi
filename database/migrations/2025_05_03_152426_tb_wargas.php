@@ -6,21 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('tb_wargas', function (Blueprint $table) {
             $table->id('id_warga');
             $table->foreignId('scan_kk_id')->nullable()->constrained('tb_scan_kk', 'id_scan')->onDelete('cascade');
+            $table->foreignId('rt_id')->nullable()->constrained('tb_rt', 'id_rt')->onDelete('cascade');
+            $table->foreignId('rw_id')->nullable()->constrained('tb_rw', 'id_rw')->onDelete('cascade');
             $table->string('nama_lengkap', 225);
             $table->string('email', 225);
             $table->string('no_kk', 16);
             $table->string('nik', 16);
             $table->string('no_hp', 225);
-            $table->string('rt', 8);
-            $table->string('rw', 8);
             $table->string('otp_code', 225)->nullable();
             $table->dateTime('otp_expired_at')->nullable();
             $table->boolean('status_verifikasi')->default(false);

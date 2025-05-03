@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tb_kadaluwarsa', function (Blueprint $table) {
-            $table->id('id_akadaluwarsa');
+            $table->id('id_kadaluwarsa');
             $table->foreignId('rt_id')->constrained('tb_rt', 'id_rt')->onDelete('cascade');
+            $table->foreignId('rw_id')->constrained('tb_rw', 'id_rw')->onDelete('cascade');
             $table->string('nama_kepala_keluarga', 225);
             $table->string('path_file_kk', 225);
             $table->string('nama_lengkap');
@@ -21,7 +22,6 @@ return new class extends Migration
             $table->string('nik', 16)->unique();
             $table->string('no_hp', 13);
             $table->string('email')->unique();
-            $table->string('rw', 3)->default('007');
             $table->string('nama_jalan', 225);
             $table->string('kelurahan', 225);
             $table->string('kecamatan', 225);
@@ -37,6 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('tb_kadaluwarsa');
     }
 };

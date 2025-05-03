@@ -5,15 +5,20 @@
     <title>Notifikasi Verifikasi</title>
 </head>
 <body>
-    <h3>Hai RT,</h3>
-    <p>Ada pendaftaran warga baru atas nama <strong>{{ $nama }}</strong>.</p>
-    <p>Silakan verifikasi akun tersebut sebelum <strong>{{ $batasWaktu }}</strong>.</p>
+    <p>Yth. Ketua RT {{ $pendaftaran->rt->no_rt ?? '-' }},</p>
+    <p>Ada pendaftaran warga baru dengan Nama Warga: <strong>{{ $pendaftaran->nama_lengkap }}</strong> yang sudah mengunggah KK dan menunggu verifikasi.</p>
+
+    <p>Silakan verifikasi dalam waktu 24 jam melalui link berikut:</p>
+
     <p>
-        Klik tombol di bawah ini untuk langsung menuju halaman verifikasi:
+        {{-- <a href="{{ route('verifikasi.pendaftaran', ['id' => $pendaftaran->id]) }}">
+            Verifikasi Sekarang
+        </a> --}}
+        <a href="{{ route('verifikasiAkunWarga')}}">
+            Verifikasi Sekarang
+        </a>
     </p>
-    <p>
-        <a href="{{ $link }}" style="background: #4CAF50; color: white; padding: 10px 20px; text-decoration: none;">Verifikasi Sekarang</a>
-    </p>
+
     <p>Terima kasih.</p>
 </body>
 </html>

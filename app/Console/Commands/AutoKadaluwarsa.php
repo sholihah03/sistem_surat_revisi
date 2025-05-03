@@ -2,13 +2,15 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Models\ScanKK;
-use App\Models\Pendaftaran;
-use App\Models\Alamat;
-use App\Models\Kadaluwarsa;
 use Carbon\Carbon;
+use App\Models\Alamat;
+use App\Models\ScanKK;
+use App\Models\Kadaluwarsa;
+use App\Models\Pendaftaran;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\VerifikasiAkunKadaluwarsa;
 
 class AutoKadaluwarsa extends Command
 {
@@ -61,6 +63,12 @@ class AutoKadaluwarsa extends Command
                     'provinsi' => $alamat?->provinsi,
                     'kode_pos' => $alamat?->kode_pos,
                 ]);
+
+                if ($pendaftaran && $pendaftaran->email) {
+                    Mail::to($pendaftaran->email)->send(
+                        new VerifikasiAkunKadaluwarsa($pendaftaran->nama_lengkap)
+                    );
+                }
 
                 // Hapus data dari tb_pendaftaran dan tb_alamat
                 if ($pendaftaran) $pendaftaran->delete();

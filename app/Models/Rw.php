@@ -32,6 +32,21 @@ class Rw extends Model implements Authenticatable
         return $this->hasMany(Rt::class, 'rw_id', 'id_rw');
     }
 
+    public function wargas()
+    {
+        return $this->hasMany(Wargas::class, 'rt_id', 'id_rt');
+    }
+
+    public function pendaftarans()
+    {
+        return $this->hasMany(Pendaftaran::class, 'rt_id', 'id_rt');
+    }
+
+    public function kadaluwarsa()
+    {
+        return $this->hasMany(Kadaluwarsa::class, 'rt_id', 'id_rt');
+    }
+
     // Metode untuk autentikasi
     public function getAuthIdentifierName()
     {

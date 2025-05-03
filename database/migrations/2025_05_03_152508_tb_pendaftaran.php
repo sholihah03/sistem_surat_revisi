@@ -15,12 +15,12 @@ return new class extends Migration
             $table->id('id_pendaftaran');
             $table->foreignId('scan_id')->nullable()->constrained('tb_scan_kk', 'id_scan')->onDelete('cascade');
             $table->foreignId('rt_id')->nullable()->constrained('tb_rt', 'id_rt')->onDelete('cascade');
+            $table->foreignId('rw_id')->nullable()->constrained('tb_rw', 'id_rw')->onDelete('cascade');
             $table->string('nama_lengkap');
             $table->string('no_kk', 16);
             $table->string('nik', 16)->unique();
             $table->string('no_hp', 13);
             $table->string('email')->unique();
-            $table->string('rw', 3)->default('007');
 
             $table->timestamps();
         });

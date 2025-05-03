@@ -14,6 +14,7 @@ class Kadaluwarsa extends Model
 
     protected $fillable = [
         'rt_id',
+        'rw_id',
         'nama_kepala_keluarga',
         'path_file_kk',
         'nama_lengkap',
@@ -21,7 +22,6 @@ class Kadaluwarsa extends Model
         'nik',
         'no_hp',
         'email',
-        'rw',
         'nama_jalan',
         'kelurahan',
         'kecamatan',
@@ -33,5 +33,10 @@ class Kadaluwarsa extends Model
     public function rtss()
     {
         return $this->belongsTo(Rt::class, 'rt_id', 'id_rt');
+    }
+
+    public function rwss()
+    {
+        return $this->belongsTo(Rt::class, 'rw_id', 'id_rw');
     }
 }

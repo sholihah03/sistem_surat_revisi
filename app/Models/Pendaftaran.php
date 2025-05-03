@@ -15,12 +15,12 @@ class Pendaftaran extends Model
     protected $fillable = [
         'scan_id',
         'rt_id',
+        'rw_id',
         'nama_lengkap',
         'no_kk',
         'nik',
         'no_hp',
         'email',
-        'rw',
     ];
 
     public function scanKk()
@@ -28,8 +28,13 @@ class Pendaftaran extends Model
         return $this->belongsTo(ScanKK::class, 'scan_id', 'id_scan');
     }
 
-    public function rts()
+    public function rt()
     {
         return $this->belongsTo(Rt::class, 'rt_id', 'id_rt');
+    }
+
+    public function rw()
+    {
+        return $this->belongsTo(Rw::class, 'rw_id', 'id_rw');
     }
 }

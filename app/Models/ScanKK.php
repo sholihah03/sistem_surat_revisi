@@ -22,11 +22,6 @@ class ScanKK extends Model
         'alasan_penolakan',
     ];
 
-    // public function warga()
-    // {
-    //     return $this->belongsTo(Wargas::class, 'warga_id', 'id_warga');
-    // }
-
     public function alamat()
     {
         return $this->belongsTo(Alamat::class, 'alamat_id', 'id_alamat');

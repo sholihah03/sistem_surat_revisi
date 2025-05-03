@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NotifikasiVerifikasiAkun;
 use App\Models\ScanKK;
 use App\Models\Pendaftaran;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Alamat; // Tambahkan model Alamat
 
@@ -112,8 +114,12 @@ class UploadKKController extends Controller
         $pendaftaran = Pendaftaran::where('no_kk', $request->no_kk_scan)->first();
 
         if ($pendaftaran) {
-            $pendaftaran->scan_id = $scan_id; // Menyimpan scan_id ke tb_pendaftaran
-            $pendaftaran->save(); // Simpan perubahan ke tb_pendaftaran
+            $pendaftaran->scan_id = $scan_id;
+            $pendaftaran->save();
+
+            if ($pendaftaran->rt && $pendaftaran->rt->email_rt) {
+                Mail::to($pendaftaran->rt->email_rt)->send(new NotifikasiVerifikasiAkun($pendaftaran));
+            }
         }
 
         return redirect()->route('login')->with('success', 'Data berhasil disimpan.');

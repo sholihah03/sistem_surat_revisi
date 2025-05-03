@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Pendaftaran;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -10,20 +11,16 @@ class NotifikasiVerifikasiAkun extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $nama;
-    public $batasWaktu;
-    public $link;
+    public $pendaftaran;
 
-    public function __construct($nama, $batasWaktu, $link)
+    public function __construct(Pendaftaran $pendaftaran)
     {
-        $this->nama = $nama;
-        $this->batasWaktu = $batasWaktu;
-        $this->link = $link;
+        $this->pendaftaran = $pendaftaran;
     }
 
     public function build()
     {
-        return $this->subject('🔔 Notifikasi Verifikasi Akun Warga Baru')
-            ->view('email.notifikasiVerifikasiAkunWarga');
+        return $this->subject('Verifikasi Pendaftaran Warga Baru')
+                    ->view('email.notifikasiVerifikasiAkunWarga');
     }
 }
