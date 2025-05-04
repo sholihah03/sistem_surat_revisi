@@ -1,5 +1,5 @@
 <h2>Halo, {{ $nama }}</h2>
-<p>Akun Anda telah <strong>disetujui</strong>.</p>
+<p>Berikut Kode OTP Baru Anda</p>
 
 <p><strong>Kode OTP Anda:</strong></p>
 <h3 style="font-size: 28px;">{{ $otp }}</h3>

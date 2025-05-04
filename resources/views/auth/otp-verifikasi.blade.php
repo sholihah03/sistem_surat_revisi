@@ -5,14 +5,7 @@
     <title>Verifikasi OTP</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {{-- buat hilangin panah di type number --}}
-    {{-- <style>
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-    </style> --}}
+
 </head>
 <body class="min-h-screen bg-gray-50 flex items-center justify-center px-4" style="background-image: url('{{ asset('images/background login.png') }}')">
 
@@ -20,7 +13,12 @@
         <h2 class="text-2xl font-bold text-center text-gray-800">Verifikasi Kode OTP</h2>
         <p class="text-center text-sm text-gray-600">Kode telah dikirim ke WhatsApp dan Email Anda.</p>
 
-        <form method="POST" action="" class="space-y-4">
+        <form method="POST" action="{{ route('otp.verifikasi') }}" class="space-y-4">
+            @if (session('success'))
+                <div class="bg-green-100 text-green-700 p-2 rounded mb-3 text-sm">
+                    {{ session('success') }}
+                </div>
+            @endif
             @csrf
 
             <!-- OTP Input -->
@@ -86,6 +84,39 @@
             if (e.key === "Backspace" && input.value === '' && i > 0) {
                 inputs[i - 1].focus();
             }
+            });
+        });
+
+        resendBtn.addEventListener('click', () => {
+            resendBtn.disabled = true;
+            resendBtn.textContent = 'Mengirim...';
+
+            fetch('{{ route('otp.kirimUlang') }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    countdown = 60;
+                    resendBtn.textContent = 'Kirim Ulang OTP (60 detik)';
+                    const interval = setInterval(() => {
+                        countdown--;
+                        timerEl.textContent = countdown;
+
+                        if (countdown <= 0) {
+                            clearInterval(interval);
+                            resendBtn.disabled = false;
+                            resendBtn.textContent = 'Kirim Ulang OTP';
+                        }
+                    }, 1000);
+                } else {
+                    resendBtn.textContent = 'Gagal Kirim';
+                }
             });
         });
     </script>

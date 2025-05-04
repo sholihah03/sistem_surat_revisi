@@ -15,11 +15,15 @@ class VerifikasiAkunDitolak extends Mailable
 
     public $nama;
     public $alasan;
+    public $loginUrl;
 
-    public function __construct($nama, $alasan)
+
+    public function __construct($nama, $alasan, $loginUrl)
     {
         $this->nama = $nama;
         $this->alasan = $alasan;
+        $this->loginUrl = $loginUrl;
+
     }
 
     public function build()

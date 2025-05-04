@@ -6,6 +6,7 @@ use App\Http\Middleware\AuthenticateRt;
 use App\Http\Middleware\AuthenticateRw;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\DaftarController;
+use App\Http\Middleware\AuthenticateWarga;
 use App\Http\Controllers\UploadKKController;
 use App\Http\Controllers\BuatPasswordController;
 use App\Http\Controllers\Rw\DashboardRwController;
@@ -28,8 +29,13 @@ Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::get('/daftar', [DaftarController::class, 'index'])->name('daftar');
 Route::post('/daftar', [DaftarController::class, 'store']);
+
 Route::get('/otp', [OTPController::class, 'index'])->name('otp');
+Route::post('/otp/verifikasi', [OTPController::class, 'verifikasi'])->name('otp.verifikasi');
+Route::post('/otp/kirim-ulang', [OTPController::class, 'kirimUlang'])->name('otp.kirimUlang');
+
 Route::get('/buatPassword', [BuatPasswordController::class, 'index'])->name('buatPassword');
+Route::post('/buatPassword', [BuatPasswordController::class, 'store'])->name('buatPassword.store');
 
 Route::get('/uploadKK', [UploadKKController::class, 'index'])->name('uploadKK');
 Route::get('/uploadKKKonfirm', [UploadKKController::class, 'konfirm'])->name('uploadKKKonfirm');
@@ -38,7 +44,7 @@ Route::post('/uploadKKsimpan', [UploadKKController::class, 'simpan'])->name('upl
 
 Route::get('/suratPengantar', [TemplateSuratController::class, 'index'])->name('suratPengantar');
 
-Route::prefix('warga')->middleware('auth.warga')->group(function () {
+Route::prefix('warga')->middleware(AuthenticateWarga::class)->group(function () {
     Route::get('/dashboardWarga', [DashboardController::class, 'index'])->name('dashboardWarga');
     Route::get('/pengajuanSuratWarga', [PengajuanSuratController::class, 'index'])->name('pengajuanSuratWarga');
     Route::get('/formSuratWarga', [FormSuratController::class, 'index'])->name('formSuratWarga');

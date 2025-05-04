@@ -11,10 +11,7 @@
     <p>Silakan verifikasi dalam waktu 24 jam melalui link berikut:</p>
 
     <p>
-        {{-- <a href="{{ route('verifikasi.pendaftaran', ['id' => $pendaftaran->id]) }}">
-            Verifikasi Sekarang
-        </a> --}}
-        <a href="{{ route('verifikasiAkunWarga')}}">
+        <a href="{{ route('verifikasiAkunWarga')}}" style="background: #3490dc; padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px;">
             Verifikasi Sekarang
         </a>
     </p>

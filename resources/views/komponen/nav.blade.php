@@ -14,7 +14,7 @@
         <button class="hover:opacity-80 hover:scale-110 transition-all duration-200">
           <img src="{{ asset('images/profile2.png') }}" class="w-6 h-6" alt="Profile" />
         </button>
-        <a href="#" class="text-base no-underline font-semibold hover:scale-105 hover:text-gray-200 transition-all duration-200">
+        <a href="{{ route('logout') }}" class="text-base no-underline font-semibold hover:scale-105 hover:text-gray-200 transition-all duration-200">
             Logout</a>
       </div>
 

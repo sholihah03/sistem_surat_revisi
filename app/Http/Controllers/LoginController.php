@@ -59,9 +59,20 @@ class LoginController extends Controller
     }
 
 
-    public function logout()
+    public function logout(Request $request)
     {
-        Session::flush();
+        if (Auth::guard('warga')->check()) {
+            Auth::guard('warga')->logout();
+        } elseif (Auth::guard('rt')->check()) {
+            Auth::guard('rt')->logout();
+        } elseif (Auth::guard('rw')->check()) {
+            Auth::guard('rw')->logout();
+        }
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
         return redirect()->route('login');
     }
+
 }

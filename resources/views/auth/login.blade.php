@@ -16,8 +16,8 @@
     <div class="min-h-screen flex items-center justify-center px-4">
         <div class="flex flex-col md:flex-row items-center bg-transparent w-full max-w-6xl">
 
-        <!-- Modal -->
-        @if(session('success'))
+        <!-- Modal Upload KK-->
+        @if(session('success_upload_kk'))
         <div id="successModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div class="bg-white rounded-lg shadow-lg p-8 relative w-[520px] text-center animate-scale">
                 <!-- Tombol Close -->
@@ -68,6 +68,37 @@
         }
         </style>
         @endif
+
+        @if(session('success_buat_password'))
+        <div id="passwordSuccessModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div class="bg-white rounded-lg shadow-lg p-8 relative w-[520px] text-center animate-scale">
+                <button onclick="closePasswordModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+
+                <div class="flex justify-center mb-6">
+                    <img src="https://img.icons8.com/color/96/000000/ok--v1.png" alt="Success Icon" class="w-20 h-20">
+                </div>
+
+                <h2 class="text-2xl font-bold mb-4 text-gray-800 whitespace-nowrap">
+                    Password Berhasil Dibuat!
+                </h2>
+
+                <p class="text-gray-600 mb-8 text-base leading-relaxed">
+                    Sekarang kamu bisa login menggunakan password baru kamu. Silakan isi form login di bawah ini.
+                </p>
+
+                <button onclick="closePasswordModal()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg">
+                    Tutup
+                </button>
+            </div>
+        </div>
+
+        <script>
+            function closePasswordModal() {
+                document.getElementById('passwordSuccessModal').style.display = 'none';
+            }
+        </script>
+        @endif
+
 
 
             <!-- Form Login -->

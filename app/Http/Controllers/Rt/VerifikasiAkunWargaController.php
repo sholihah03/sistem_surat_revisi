@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Rt;
 
+use App\Models\Otp;
 use App\Models\ScanKK;
 use App\Models\Wargas;
 use App\Models\Kadaluwarsa;
 use App\Models\Pendaftaran;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use App\Mail\VerifikasiAkunDitolak;
 use App\Http\Controllers\Controller;
 use App\Service\NotificationService;
@@ -42,34 +44,48 @@ class VerifikasiAkunWargaController extends Controller
         $scan->save();
 
         // Ambil semua pendaftaran yang sesuai
-    // $pendaftaranList = Pendaftaran::where('scan_id', $scan->id)->get();
-    $pendaftaranList = Pendaftaran::where('scan_id', $scan->id_scan)->get();
+        $pendaftaranList = Pendaftaran::where('scan_id', $scan->id_scan)->get();
 
 
-    foreach ($pendaftaranList as $pendaftaran) {
-        // Cek duplikat ke tb_wargas agar tidak double insert
-        $sudahAda = Wargas::where('nik', $pendaftaran->nik)->orWhere('email', $pendaftaran->email)->first();
-        if (!$sudahAda) {
-            Wargas::create([
-                'no_kk' => $pendaftaran->no_kk,
-                'nik' => $pendaftaran->nik,
-                'nama_lengkap' => $pendaftaran->nama_lengkap,
-                'email' => $pendaftaran->email,
-                'no_hp' => $pendaftaran->no_hp,
-                'rw_id' => $pendaftaran->rw_id,
-                'rt_id' => $pendaftaran->rt_id,
-                'scan_kk_id' => $scan->id_scan,
-            ]);
+        foreach ($pendaftaranList as $pendaftaran) {
+            // Cek duplikat ke tb_wargas agar tidak double insert
+            $sudahAda = Wargas::where('nik', $pendaftaran->nik)->orWhere('email', $pendaftaran->email)->first();
+            if (!$sudahAda) {
+                // Buat data warga
+                $warga = Wargas::create([
+                    'no_kk' => $pendaftaran->no_kk,
+                    'nik' => $pendaftaran->nik,
+                    'nama_lengkap' => $pendaftaran->nama_lengkap,
+                    'email' => $pendaftaran->email,
+                    'no_hp' => $pendaftaran->no_hp,
+                    'rw_id' => $pendaftaran->rw_id,
+                    'rt_id' => $pendaftaran->rt_id,
+                    'scan_kk_id' => $scan->id_scan,
+                ]);
+
+                // ✅ Generate OTP
+                $otp = random_int(100000, 999999);
+                $expiredAt = Carbon::now()->addSeconds(60);
+
+                Otp::create([
+                    'warga_id' => $warga->id_warga,
+                    'kode_otp' => $otp,
+                    'expired_at' => $expiredAt,
+                    'jenis_otp' => 'register',
+                ]);
+
+                Mail::to($warga->email)->send(new VerifikasiAkunDisetujui($warga->nama_lengkap,
+                    $otp,
+                    route('otp')
+                ));
+            }
+
+            // Hapus data pendaftaran setelah dipindah
+            $pendaftaran->delete();
         }
-        Mail::to($pendaftaran->email)->send(new VerifikasiAkunDisetujui($pendaftaran->nama_lengkap));
-
-        // Hapus data pendaftaran setelah dipindah
-        $pendaftaran->delete();
-    }
 
         return redirect()->route('verifikasiAkunWarga')->with('success', 'Akun berhasil disetujui.');
     }
-
 
 
         public function ditolak(Request $request, $id)
@@ -84,7 +100,11 @@ class VerifikasiAkunWargaController extends Controller
             $pendaftaran = $scan->pendaftaran->first(); // Ambil 1 orang untuk notifikasi
             if ($pendaftaran) {
                 Mail::to($pendaftaran->email)->send(
-                    new VerifikasiAkunDitolak($pendaftaran->nama_lengkap, $request->alasan_penolakan)
+                    new VerifikasiAkunDitolak(
+                        $pendaftaran->nama_lengkap,
+                        $request->alasan_penolakan,
+                        route('login')
+                    )
                 );
             }
 

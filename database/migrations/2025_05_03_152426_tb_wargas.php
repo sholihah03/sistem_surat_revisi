@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('nik', 16);
             $table->string('no_hp', 225);
             $table->string('otp_code', 225)->nullable();
-            $table->dateTime('otp_expired_at')->nullable();
             $table->boolean('status_verifikasi')->default(false);
             $table->string('remember_token', 225)->nullable();
             $table->string('password', 225)->nullable();

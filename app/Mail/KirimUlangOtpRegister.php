@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class VerifikasiAkunDisetujui extends Mailable
+class KirimUlangOtpRegister extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -26,7 +26,7 @@ class VerifikasiAkunDisetujui extends Mailable
 
     public function build()
     {
-        return $this->subject('Akun Anda Telah Diverifikasi')
-                    ->view('email.verifikasiAkunDisetujui');
+        return $this->subject('Kode OTP Verifikasi Akun')
+                    ->view('email.kirimUlangOtpRegister');
     }
 }

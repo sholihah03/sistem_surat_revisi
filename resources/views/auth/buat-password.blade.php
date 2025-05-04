@@ -12,7 +12,12 @@
         <h2 class="text-2xl font-bold text-center text-gray-800">Buat Password</h2>
         <p class="text-center text-sm text-gray-600">Silakan buat password untuk akun Anda. Password ini akan digunakan untuk login ke sistem selanjutnya.</p>
 
-        <form method="POST" action="" class="space-y-4">
+        <form method="POST" action="{{ route('buatPassword.store') }}" class="space-y-4">
+            @if (session('success'))
+                <div class="bg-green-100 text-green-700 p-2 rounded mb-3 text-sm">
+                    {{ session('success') }}
+                </div>
+            @endif
             @csrf
 
             <!-- Password -->
@@ -52,6 +57,9 @@
                     </button>
                 </div>
             </div>
+
+            <!-- Hidden ID -->
+            <input type="hidden" name="id_warga" value="{{ $id_warga }}">
 
             <!-- Submit -->
             <button type="submit"

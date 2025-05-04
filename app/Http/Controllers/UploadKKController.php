@@ -122,7 +122,7 @@ class UploadKKController extends Controller
             }
         }
 
-        return redirect()->route('login')->with('success', 'Data berhasil disimpan.');
+        return redirect()->route('login')->with('success_upload_kk', 'Data berhasil disimpan.');
     }
 
 //     private function extractNoKK($text)

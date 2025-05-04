@@ -16,10 +16,8 @@ return new class extends Migration
             $table->foreignId('warga_id')->constrained('tb_wargas', 'id_warga')->onDelete('cascade');
             $table->string('kode_otp', 6);
             $table->dateTime('expired_at');
-            $table->boolean('sudah_dipakai')->default(false);
+            $table->boolean('is_used')->default(false); // Menandai apakah OTP sudah dipakai
             $table->enum('jenis_otp', ['register', 'login', 'reset_password']);
-            $table->boolean('isValid')->default(false);
-            $table->boolean('pakai')->default(false);
             $table->timestamps();
         });
     }
