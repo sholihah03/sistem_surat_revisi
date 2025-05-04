@@ -43,6 +43,7 @@ Route::post('/uploadKKproses', [UploadKKController::class, 'proses'])->name('upl
 Route::post('/uploadKKsimpan', [UploadKKController::class, 'simpan'])->name('uploadKKsimpan');
 
 Route::get('/suratPengantar', [TemplateSuratController::class, 'index'])->name('suratPengantar');
+Route::get('/suratPengantar2', [TemplateSuratController::class, 'index2'])->name('suratPengantar2');
 
 Route::prefix('warga')->middleware(AuthenticateWarga::class)->group(function () {
     Route::get('/dashboardWarga', [DashboardController::class, 'index'])->name('dashboardWarga');

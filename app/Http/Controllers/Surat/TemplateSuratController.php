@@ -10,4 +10,8 @@ class TemplateSuratController extends Controller
     public function index(){
         return view('surat.templateSurat');
     }
+
+    public function index2(){
+        return view('surat.tempalteSuratPengantar');
+    }
 }
