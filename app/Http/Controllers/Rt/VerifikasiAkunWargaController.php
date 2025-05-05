@@ -76,8 +76,14 @@ class VerifikasiAkunWargaController extends Controller
 
                 Mail::to($warga->email)->send(new VerifikasiAkunDisetujui($warga->nama_lengkap,
                     $otp,
-                    route('otp')
+                    route('otp', ['email' => $warga->email])
                 ));
+
+                 // Simpan email ke session
+                session(['email_warga' => $warga->email]);
+            } else {
+                // Jika sudah ada, ambil data warga untuk disimpan ke session
+                session(['email_warga' => $sudahAda->email]);
             }
 
             // Hapus data pendaftaran setelah dipindah

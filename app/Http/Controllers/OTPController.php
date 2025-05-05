@@ -7,14 +7,19 @@ use App\Models\Wargas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Mail\KirimUlangOtpRegister;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class OTPController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $email = $request->query('email');  // Pastikan email dikirim sebagai query parameter
+        session(['email_warga' => $email]);
+
         return view('auth.otp-verifikasi');
     }
+
 
     public function verifikasi(Request $request)
     {
@@ -48,45 +53,38 @@ class OTPController extends Controller
 
     public function kirimUlang(Request $request)
     {
-        // Ambil warga yang terakhir kali dikirimi OTP
-        $lastOtp = Otp::where('jenis_otp', 'register')
-                      ->where('is_used', false) // Hanya yang belum dipakai
-                      ->latest()
-                      ->first();
+        $email = session('email_warga'); // Ambil email dari session
 
-        if (!$lastOtp) {
-            return response()->json(['error' => 'Tidak ditemukan OTP yang dapat dikirim ulang.'], 404);
+        if (!$email) {
+            return response()->json(['message' => 'Email tidak ditemukan di sesi.'], 400);
         }
 
-        $warga = Wargas::find($lastOtp->warga_id);
+        $warga = Wargas::where('email', $email)->first();
         if (!$warga) {
-            return response()->json(['error' => 'Data warga tidak ditemukan.'], 404);
+            return response()->json(['message' => 'Warga tidak ditemukan.'], 404);
         }
 
-        // Tandai OTP lama yang belum dipakai sebagai tidak berlaku
-        $lastOtp->is_used = true;
-        $lastOtp->save();
+        // Generate OTP baru
+        $otpBaru = random_int(100000, 999999);
+        $expiredAt = now()->addSeconds(60);
 
-        // Buat OTP baru
-        $newOtp = random_int(100000, 999999);
+        // Simpan ke database
         Otp::create([
-            'warga_id'   => $warga->id_warga,
-            'kode_otp'   => $newOtp,
-            'expired_at' => Carbon::now()->addSeconds(60),
-            'jenis_otp'  => 'register',
-            'is_used'    => false, // default
+            'warga_id' => $warga->id_warga,
+            'kode_otp' => $otpBaru,
+            'expired_at' => $expiredAt,
+            'jenis_otp' => 'register',
         ]);
 
-        // Kirim ulang email
-        Mail::to($warga->email)->send(
-            new KirimUlangOtpRegister(
-                $warga->nama_lengkap,
-                $newOtp,
-                route('otp')
-            )
-        );
+        // Kirim email OTP
+        Mail::to($warga->email)->send(new \App\Mail\VerifikasiAkunDisetujui(
+            $warga->nama_lengkap,
+            $otpBaru,
+            route('otp', ['email' => $warga->email])
+        ));
 
-        return response()->json(['success' => 'OTP baru telah dikirim.']);
+        return response()->json(['message' => 'Kode OTP telah dikirim ulang.']);
     }
+
 
 }

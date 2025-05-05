@@ -56,9 +56,26 @@ class UploadKKController extends Controller
         $alamatData = $this->extractAlamatData($ocrText);
 
         if (empty($no_kk) || empty($nama_kepala_keluarga)) {
-            Storage::delete($path);
-            return redirect()->back()->with('error', 'Gagal membaca data KK. Silakan unggah ulang dengan gambar yang lebih jelas.');
-        }
+            // Simpan path file ke session
+            session(['failed_kk_path' => $path]);
+
+            // Hitung jumlah kegagalan dari session
+            $failCount = session('upload_kk_fail', 0) + 1;
+            session(['upload_kk_fail' => $failCount]);
+
+            if ($failCount >= 3) {
+                // Reset count agar tidak berulang terus
+                session()->forget('upload_kk_fail');
+
+                return redirect()->route('uploadKKManual') // Ganti dengan rute halaman manual
+                    ->with('error_gagal_unggah', 'Anda telah gagal mengunggah KK sebanyak 3 kali. Silakan isi data secara manual.');
+            }
+
+                return redirect()->back()->with('error', 'Gagal membaca data KK. Silakan unggah ulang dengan gambar yang lebih jelas.');
+            }
+
+        // Reset hitungan jika berhasil
+        session()->forget('upload_kk_fail');
 
         return redirect()->route('uploadKKKonfirm', compact('no_kk', 'nama_kepala_keluarga', 'path', 'alamatData'));
     }

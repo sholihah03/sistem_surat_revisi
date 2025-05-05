@@ -52,6 +52,7 @@
                 <button type="button" id="resendBtn" class="text-blue-600 hover:underline text-sm font-medium mt-1 disabled:opacity-50" disabled>
                     Kirim Ulang OTP (<span id="timer">60</span> detik)
                 </button>
+                <p id="resend-message" class="text-sm text-green-600 mt-1 hidden">Kode OTP telah dikirim ulang.</p>
             </div>
         </form>
     </div>
@@ -60,11 +61,11 @@
         let countdown = 60;
         const timerEl = document.getElementById('timer');
         const resendBtn = document.getElementById('resendBtn');
+        const message = document.getElementById('resend-message');
 
         const interval = setInterval(() => {
             countdown--;
             timerEl.textContent = countdown;
-
             if (countdown <= 0) {
                 clearInterval(interval);
                 resendBtn.disabled = false;
@@ -72,54 +73,44 @@
             }
         }, 1000);
 
-        const inputs = document.querySelectorAll('.otp-input');
-        inputs.forEach((input, i) => {
-            input.addEventListener('input', () => {
-            if (input.value.length === 1 && i < inputs.length - 1) {
-                inputs[i + 1].focus();
-            }
-            });
-
-            input.addEventListener('keydown', (e) => {
-            if (e.key === "Backspace" && input.value === '' && i > 0) {
-                inputs[i - 1].focus();
-            }
-            });
-        });
-
         resendBtn.addEventListener('click', () => {
             resendBtn.disabled = true;
             resendBtn.textContent = 'Mengirim...';
 
-            fetch('{{ route('otp.kirimUlang') }}', {
+            fetch('{{ route("otp.kirimUlang") }}', {
                 method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
                 body: JSON.stringify({})
             })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
-                if (data.success) {
-                    countdown = 60;
-                    resendBtn.textContent = 'Kirim Ulang OTP (60 detik)';
-                    const interval = setInterval(() => {
-                        countdown--;
-                        timerEl.textContent = countdown;
+                message.classList.remove('hidden');
+                message.textContent = data.message;
 
-                        if (countdown <= 0) {
-                            clearInterval(interval);
-                            resendBtn.disabled = false;
-                            resendBtn.textContent = 'Kirim Ulang OTP';
-                        }
-                    }, 1000);
-                } else {
-                    resendBtn.textContent = 'Gagal Kirim';
-                }
+                // Reset timer
+                countdown = 60;
+                timerEl.textContent = countdown;
+                resendBtn.textContent = 'Kirim Ulang OTP (60 detik)';
+                resendBtn.disabled = true;
+
+                setInterval(() => {
+                    countdown--;
+                    timerEl.textContent = countdown;
+                    if (countdown <= 0) {
+                        resendBtn.disabled = false;
+                        resendBtn.textContent = 'Kirim Ulang OTP';
+                    }
+                }, 1000);
+            })
+            .catch(error => {
+                console.error('Error:', error);
             });
         });
     </script>
+
 
 </body>
 </html>

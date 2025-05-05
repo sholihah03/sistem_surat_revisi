@@ -10,6 +10,7 @@ use App\Http\Middleware\AuthenticateWarga;
 use App\Http\Controllers\UploadKKController;
 use App\Http\Controllers\BuatPasswordController;
 use App\Http\Controllers\Rw\DashboardRwController;
+use App\Http\Controllers\UploadKKManualController;
 use App\Http\Controllers\Warga\DashboardController;
 use App\Http\Controllers\Warga\FormSuratController;
 use App\Http\Controllers\Rw\ManajemenAkunRtController;
@@ -42,8 +43,10 @@ Route::get('/uploadKKKonfirm', [UploadKKController::class, 'konfirm'])->name('up
 Route::post('/uploadKKproses', [UploadKKController::class, 'proses'])->name('uploadKKproses');
 Route::post('/uploadKKsimpan', [UploadKKController::class, 'simpan'])->name('uploadKKsimpan');
 
+Route::get('/uploadKKManual', [UploadKKManualController::class, 'index'])->name('uploadKKManual');
+Route::post('/uploadKKManualSimpan', [UploadKKManualController::class, 'uploadKKSimpan'])->name('uploadKKManualSimpan');
+
 Route::get('/suratPengantar', [TemplateSuratController::class, 'index'])->name('suratPengantar');
-Route::get('/suratPengantar2', [TemplateSuratController::class, 'index2'])->name('suratPengantar2');
 
 Route::prefix('warga')->middleware(AuthenticateWarga::class)->group(function () {
     Route::get('/dashboardWarga', [DashboardController::class, 'index'])->name('dashboardWarga');

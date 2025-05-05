@@ -11,6 +11,21 @@
     <div class="bg-white w-full max-w-md rounded-xl shadow-lg p-6 space-y-5">
         <h2 class="text-2xl font-bold text-center text-gray-800">Buat Password</h2>
         <p class="text-center text-sm text-gray-600">Silakan buat password untuk akun Anda. Password ini akan digunakan untuk login ke sistem selanjutnya.</p>
+        @if ($errors->any())
+        <div class="bg-red-100 text-red-700 p-2 rounded mb-3 text-sm">
+            <ul class="list-disc pl-5">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="bg-red-100 text-red-700 p-2 rounded mb-3 text-sm">
+            {{ session('error') }}
+        </div>
+    @endif
 
         <form method="POST" action="{{ route('buatPassword.store') }}" class="space-y-4">
             @if (session('success'))

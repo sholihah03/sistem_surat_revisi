@@ -83,7 +83,7 @@
                 </h2>
 
                 <p class="text-gray-600 mb-8 text-base leading-relaxed">
-                    Sekarang kamu bisa login menggunakan password baru kamu. Silakan isi form login di bawah ini.
+                    Sekarang kamu bisa login menggunakan password baru kamu. Silakan isi form login berikut ini.
                 </p>
 
                 <button onclick="closePasswordModal()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg">
@@ -144,7 +144,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 1a5 5 0 00-5 5v3H5a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V10a1 1 0 00-1-1h-2V6a5 5 0 00-5-5zm-3 5a3 3 0 016 0v3H9V6zm3 6a1.5 1.5 0 110 3 1.5 1.5 0 010-3z"/>
                             </svg>
-                            <input id="password" type="password" name="password" required placeholder="Password"
+                            <input id="password" type="password" name="password" required placeholder="Password" required minlength="6" maxlength="6"
                                    class="w-full focus:outline-none bg-transparent text-gray-700 pr-8" />
                             <button type="button" onclick="togglePassword()" class="absolute right-3 text-gray-500 focus:outline-none">
                                 <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

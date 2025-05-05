@@ -30,18 +30,7 @@ class BuatPasswordController extends Controller
             return redirect()->back()->with('error', 'Kode OTP belum diverifikasi.');
         }
 
-        // Cek apakah OTP sudah kadaluarsa atau sudah digunakan
-        $otpData = Otp::where('kode_otp', $warga->otp_code)
-                      ->where('warga_id', $warga->id_warga)
-                      ->where('expired_at', '>=', now())
-                      ->where('is_used', true) // Pastikan OTP sudah digunakan
-                      ->first();
-
-        if (!$otpData) {
-            return redirect()->back()->with('error', 'Kode OTP tidak valid atau sudah kadaluarsa.');
-        }
-
-        // Simpan password baru
+        // Jika kode OTP sudah terisi, lanjutkan untuk menyimpan password
         $warga->password = Hash::make($request->password);
         $warga->save();
 
