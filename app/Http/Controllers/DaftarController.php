@@ -52,12 +52,28 @@ class DaftarController extends Controller
             return redirect()->route('login');
         }
 
-            // Mengecek apakah nama_lengkap sudah terdaftar di Wargas
-        $wargaByName = Wargas::where('nama_lengkap', $request->nama_lengkap)->first();
+        // Cek apakah nik sudah terdaftar
+        $nikExists = Wargas::where('nik', $request->nik)->exists();
+        if ($nikExists) {
+            return back()->withErrors(['daftar_error' => 'NIK sudah terdaftar, gunakan NIK lain'])->withInput();
+        }
 
+        // Cek apakah no_hp sudah terdaftar
+        $hpExists = Wargas::where('no_hp', $request->no_hp)->exists();
+        if ($hpExists) {
+            return back()->withErrors(['daftar_error' => 'Nomor WhatsApp sudah terdaftar. gunakan Nomor WhatsApp lain'])->withInput();
+        }
+
+        // Cek apakah email sudah terdaftar
+        $emailExists = Wargas::where('email', $request->email)->exists();
+        if ($emailExists) {
+            return back()->withErrors(['daftar_error' => 'Email sudah terdaftar, gunakan Email lain'])->withInput();
+        }
+
+        // Mengecek apakah nama_lengkap sudah terdaftar di Wargas
+        $wargaByName = Wargas::where('nama_lengkap', $request->nama_lengkap)->first();
         if ($wargaByName) {
-            // Jika nama lengkap sudah terdaftar, arahkan ke halaman login
-            return redirect()->route('login');
+            return back()->withErrors(['daftar_error' => 'Nama lengkap sudah terdaftar, gunakan Nama Lengkap lain'])->withInput();
         }
         // Menyimpan data pendaftaran dengan id_rt yang sesuai
         $rt = DB::table('tb_rt')->where('no_rt', $request->rt)->first(); // Ambil id_rt berdasarkan no_rt

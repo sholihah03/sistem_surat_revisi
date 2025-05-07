@@ -30,9 +30,13 @@ class LoginController extends Controller
                       ->where('email', $request->email)
                       ->first();
 
-        if ($warga && Hash::check($request->password, $warga->password)) {
-            Auth::guard('warga')->login($warga);  // Gunakan guard untuk Warga
-            return redirect()->route('dashboardWarga');
+        if ($warga) {
+            if (Hash::check($request->password, $warga->password)) {
+                Auth::guard('warga')->login($warga);
+                return redirect()->route('dashboardWarga');
+            } else {
+                return back()->withErrors(['login_error' => 'Password salah, silakan coba lagi!'])->withInput();
+            }
         }
 
         // Coba cari di RT
@@ -40,9 +44,13 @@ class LoginController extends Controller
                 ->where('email_rt', $request->email)
                 ->first();
 
-        if ($rt && Hash::check($request->password, $rt->password)) {
-            Auth::guard('rt')->login($rt);  // Gunakan guard untuk RT
-            return redirect()->route('dashboardRt');
+        if ($rt) {
+            if (Hash::check($request->password, $rt->password)) {
+                Auth::guard('rt')->login($rt);
+                return redirect()->route('dashboardRt');
+            } else {
+                return back()->withErrors(['login_error' => 'Password salah, silakan coba lagi!'])->withInput();
+            }
         }
 
         // Coba cari di RW
@@ -50,13 +58,19 @@ class LoginController extends Controller
                 ->where('email_rw', $request->email)
                 ->first();
 
-        if ($rw && Hash::check($request->password, $rw->password)) {
-            Auth::guard('rw')->login($rw);  // Gunakan guard untuk RW
-            return redirect()->route('dashboardRw');
+        if ($rw) {
+            if (Hash::check($request->password, $rw->password)) {
+                Auth::guard('rw')->login($rw);
+                return redirect()->route('dashboardRw');
+            } else {
+                return back()->withErrors(['login_error' => 'Password salah, silakan coba lagi!'])->withInput();
+            }
         }
 
-        return back()->withErrors(['login_error' => 'Nama Lengkap, Email, atau Password salah!']);
+        // Jika tidak ditemukan di ketiga tabel
+        return back()->withErrors(['login_error' => 'Akun belum terdaftar, silakan daftar terlebih dahulu!'])->withInput();
     }
+
 
 
     public function logout(Request $request)

@@ -18,6 +18,13 @@
         }
         }
     </script>
+
+    <style>
+        @media print {
+            @page { size: A4; margin: 1in; }
+            body { margin: 0; }
+        }
+    </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-green-100 via-white to-yellow-100 font-inter">
     <!-- Navbar -->

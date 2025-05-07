@@ -1,17 +1,11 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Surat Pengantar</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @media print {
-            @page { size: A4; margin: 1in; }
-            body { margin: 0; }
-        }
-    </style>
-</head>
+@extends('rw.dashboardRw')
+
+@section('content')
+    <h1 class="text-2xl pt-20 md:text-3xl font-bold text-gray-800 mb-6">Template Surat Pengantar</h1>
 <body class="flex justify-center bg-gray-100 py-10 print:bg-white">
+    <div class="absolute top-4 left-4">
+        <a href="javascript:history.back()" class="text-blue-600 font-bold">Kembali</a>
+    </div>
     <div class="bg-white p-10 w-full max-w-[794px] text-[14px] leading-relaxed font-serif relative shadow-md">
         <!-- Header -->
         <div class="text-center border-b border-black pb-2 mb-2">
@@ -109,5 +103,4 @@
             <p class="text-[10px] mt-1">Scan untuk verifikasi surat</p>
         </div>
     </div>
-</body>
-</html>
+@endsection

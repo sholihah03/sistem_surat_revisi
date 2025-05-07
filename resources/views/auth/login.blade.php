@@ -100,7 +100,6 @@
         @endif
 
 
-
             <!-- Form Login -->
             <div class="bg-white rounded-2xl shadow-xl p-10 w-full md:w-1/2">
                 <h2 class="text-xl font-bold text-center text-black mb-6 leading-relaxed">
@@ -108,6 +107,24 @@
                     SISTEM ADMINISTRASI SURAT <br>
                     RT/RW DIGITAL
                 </h2>
+
+                        <!-- Pesan Error -->
+                    @if ($errors->any())
+                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded">
+                        <ul class="list-disc pl-5 space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <!-- Pesan Error dari Session (contoh: email atau password salah) -->
+                @if (session('login_error'))
+                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded">
+                        <p>{{ session('login_error') }}</p>
+                    </div>
+                @endif
 
                 <form action="{{ route('login-post') }}" method="POST" class="space-y-4">
                     @csrf

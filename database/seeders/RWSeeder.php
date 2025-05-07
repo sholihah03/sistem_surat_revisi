@@ -20,7 +20,7 @@ class RWSeeder extends Seeder
                 'nama_lengkap_rw' => 'Ketua RW 007',
                 'email_rw' => 'rw007@gmail.com',
                 'no_hp_rw' => '081234567890',
-                'password' => Hash::make('rw007'),
+                'password' => Hash::make('rw_007'),
                 'ttd_digital' => null,
                 'ttd_digital_bersih' => null,
                 'login' => false,
