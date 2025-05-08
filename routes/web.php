@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\TujuanSuratController;
+use App\Http\Controllers\Rw\TujuanSuratController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OTPController;
 use App\Http\Middleware\AuthenticateRt;
@@ -81,20 +81,9 @@ Route::prefix('rw')->middleware(AuthenticateRw::class)->group(function () {
     Route::post('/manajemenAkunRt/update/{id}', [ManajemenAkunRtController::class, 'update'])->name('manajemenAkunRt.update');
     Route::delete('/manajemenAkunRt/delete/{id}', [ManajemenAkunRtController::class, 'destroy'])->name('manajemenAkunRt.destroy');
     Route::get('/tujuanSurat', [TujuanSuratController::class, 'index'])->name('tujuanSurat');
-// Tampilkan form untuk membuat tujuan surat
-Route::get('tujuan-surat/create', [TujuanSuratController::class, 'create'])->name('tujuanSurat.create');
-
-// Simpan tujuan surat baru
-Route::post('tujuan-surat', [TujuanSuratController::class, 'store'])->name('tujuanSurat.store');
-
-// Tampilkan form untuk mengedit tujuan surat
-Route::get('tujuan-surat/{id}/edit', [TujuanSuratController::class, 'edit'])->name('tujuanSurat.edit');
-
-// Perbarui tujuan surat yang sudah ada
-Route::put('tujuan-surat/{id}', [TujuanSuratController::class, 'update'])->name('tujuanSurat.update');
-
-// Hapus tujuan surat
-Route::delete('tujuan-surat/{id}', [TujuanSuratController::class, 'destroy'])->name('tujuanSurat.destroy');
+    Route::post('/tujuanSurat/store', [TujuanSuratController::class, 'store'])->name('tujuanSurat.store');
+    Route::put('/tujuanSurat/update/{id}', [TujuanSuratController::class, 'update'])->name('tujuanSurat.update');
+    Route::delete('/tujuanSurat/delete/{id}', [TujuanSuratController::class, 'destroy'])->name('tujuanSurat.destroy');
 
 });
 

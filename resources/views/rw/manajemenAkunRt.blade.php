@@ -52,27 +52,42 @@
     </div>
 </div>
 
-
-<div class="flex justify-end md:grid-cols-3 gap-6 mb-8">
-    <button onclick="openAddModal()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow">
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+{{-- <div class="flex justify-end md:grid-cols-3 gap-6 mb-8"> --}}
+    <button onclick="openAddModal()" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 mb-4 rounded-lg shadow">
         ➕ Tambah Akun RT
     </button>
+{{-- </div> --}}
+    <!-- Form Search -->
+    <form method="GET" action="{{ route('manajemenAkunRt') }}" class="relative w-full sm:w-80">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+        </span>
+        <input type="text" name="search" id="searchInput"
+            value="{{ request('search') }}"
+            placeholder="Cari No RT atau Nama RT..."
+            class="pl-10 pr-4 py-2 border rounded w-full focus:outline-none focus:ring-2 focus:ring-green-400" />
+    </form>
 </div>
 
 <!-- Tabel Daftar Akun RT -->
-<div class="bg-white rounded-xl shadow p-4 overflow-x-auto">
-    <table class="min-w-full text-sm text-gray-700">
-        <thead class="bg-green-100">
-            <tr>
-                <th class="px-4 py-2 text-left">No</th>
-                <th class="px-4 py-2 text-left">Rt</th>
-                <th class="px-4 py-2 text-left">Nama RT</th>
-                <th class="px-4 py-2 text-left">Nomer WhatsApp</th>
-                <th class="px-4 py-2 text-left">Email</th>
-                <th class="px-4 py-2 text-left">Aksi</th>
+<div class="overflow-x-auto max-h-[500px] overflow-y-auto border rounded-lg shadow">
+    <table class="min-w-full bg-white border rounded shadow">
+        <thead>
+            <tr class="bg-green-100 text-left">
+                <th class="px-4 py-2">No</th>
+                <th class="px-4 py-2">Rt</th>
+                <th class="px-4 py-2">Nama RT</th>
+                <th class="px-4 py-2">Nomer WhatsApp</th>
+                <th class="px-4 py-2">Email</th>
+                <th class="px-4 py-2">Aksi</th>
             </tr>
         </thead>
-        <tbody class="divide-y divide-gray-200">
+        <tbody>
             @forelse ($rts as $index => $rt)
                 <tr class="hover:bg-gray-50">
                     <td class="px-4 py-2">{{ $index + 1 }}</td>
@@ -82,10 +97,10 @@
                     <td class="px-4 py-2">{{ $rt->email_rt }}</td>
                     <td class="px-4 py-2">
                         <div class="flex flex-wrap gap-2">
-                            <button onclick="openEditModal('{{ $rt->id_rt }}', '{{ $rt->no_rt }}', '{{ $rt->nama_lengkap_rt }}', '{{ $rt->no_hp_rt }}', '{{ $rt->email_rt }}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">Edit</button>
+                            <button onclick="openEditModal('{{ $rt->id_rt }}', '{{ $rt->no_rt }}', '{{ $rt->nama_lengkap_rt }}', '{{ $rt->no_hp_rt }}', '{{ $rt->email_rt }}')" class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600">Edit</button>
 
                             <div class="flex flex-wrap gap-2">
-                                <button onclick="openDeleteModal('{{ $rt->id_rt }}', 'RT {{ $rt->no_rt }}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs">
+                                <button onclick="openDeleteModal('{{ $rt->id_rt }}', 'RT {{ $rt->no_rt }}')" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">
                                     Hapus
                                 </button>
                             </div>

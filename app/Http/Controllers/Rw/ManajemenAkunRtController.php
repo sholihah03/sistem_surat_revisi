@@ -11,15 +11,21 @@ use Illuminate\Support\Facades\Session;
 
 class ManajemenAkunRtController extends Controller
 {
-
-    // public function index(){
-    //     return view('rw.manajemenAkunRt');
-    // }
-    public function index()
+    public function index(Request $request)
     {
-        $rts = Rt::all();
+        $query = Rt::query();
+
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where('no_rt', 'like', "%{$search}%")
+                  ->orWhere('nama_lengkap_rt', 'like', "%{$search}%");
+        }
+
+        $rts = $query->get();
+
         return view('rw.manajemenAkunRt', compact('rts'));
     }
+
 
     public function store(Request $request)
 {
