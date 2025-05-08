@@ -58,57 +58,107 @@
     </div>
 
     <script>
-        let countdown = 60;
-        const timerEl = document.getElementById('timer');
-        const resendBtn = document.getElementById('resendBtn');
-        const message = document.getElementById('resend-message');
+            let countdown = 60;
+    let interval; // Ubah dari const ke let
 
-        const interval = setInterval(() => {
+    const timerEl = document.getElementById('timer');
+    const resendBtn = document.getElementById('resendBtn');
+    const message = document.getElementById('resend-message');
+
+    function startCountdown() {
+        clearInterval(interval); // hentikan interval sebelumnya jika ada
+        countdown = 60;
+        timerEl.textContent = countdown;
+        resendBtn.disabled = true;
+        resendBtn.textContent = `Kirim Ulang OTP (${countdown} detik)`;
+
+        interval = setInterval(() => {
             countdown--;
             timerEl.textContent = countdown;
+            resendBtn.textContent = `Kirim Ulang OTP (${countdown} detik)`;
             if (countdown <= 0) {
                 clearInterval(interval);
                 resendBtn.disabled = false;
                 resendBtn.textContent = 'Kirim Ulang OTP';
             }
         }, 1000);
+    }
 
-        resendBtn.addEventListener('click', () => {
-            resendBtn.disabled = true;
-            resendBtn.textContent = 'Mengirim...';
+    // Jalankan countdown saat halaman pertama kali dimuat
+    startCountdown();
 
-            fetch('{{ route("otp.kirimUlang") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({})
-            })
-            .then(res => res.json())
-            .then(data => {
-                message.classList.remove('hidden');
-                message.textContent = data.message;
+    resendBtn.addEventListener('click', () => {
+        resendBtn.disabled = true;
+        resendBtn.textContent = 'Mengirim...';
 
-                // Reset timer
-                countdown = 60;
-                timerEl.textContent = countdown;
-                resendBtn.textContent = 'Kirim Ulang OTP (60 detik)';
-                resendBtn.disabled = true;
+        fetch('{{ route("otp.kirimUlang") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({})
+        })
+        .then(res => res.json())
+        .then(data => {
+            message.classList.remove('hidden');
+            message.textContent = data.message;
 
-                setInterval(() => {
-                    countdown--;
-                    timerEl.textContent = countdown;
-                    if (countdown <= 0) {
-                        resendBtn.disabled = false;
-                        resendBtn.textContent = 'Kirim Ulang OTP';
-                    }
-                }, 1000);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+            // Mulai ulang countdown
+            startCountdown();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            resendBtn.disabled = false;
+            resendBtn.textContent = 'Kirim Ulang OTP';
         });
+    });
+
+            // Ambil semua input dengan class 'otp-input'
+    const inputs = document.querySelectorAll('.otp-input');
+
+    inputs.forEach((input, index) => {
+        input.addEventListener('input', (e) => {
+            const value = e.target.value;
+
+            // Jika paste 6 digit sekaligus
+            if (value.length === 6) {
+                for (let i = 0; i < 6; i++) {
+                    inputs[i].value = value[i];
+                }
+                inputs[5].focus();
+                return;
+            }
+
+            // Jika hanya satu digit, langsung pindah ke kolom berikutnya
+            if (value.length === 1 && index < inputs.length - 1) {
+                inputs[index + 1].focus();
+            }
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                inputs[index - 1].focus();
+            }
+        });
+
+        // Optional: Select input saat fokus
+        input.addEventListener('focus', () => {
+            input.select();
+        });
+    });
+
+    // Deteksi paste dari clipboard
+    document.querySelector('.flex').addEventListener('paste', function (e) {
+        const paste = (e.clipboardData || window.clipboardData).getData('text');
+        if (paste.length === 6 && /^\d+$/.test(paste)) {
+            for (let i = 0; i < 6; i++) {
+                inputs[i].value = paste[i];
+            }
+            inputs[5].focus();
+        }
+        e.preventDefault();
+    });
     </script>
 
 
