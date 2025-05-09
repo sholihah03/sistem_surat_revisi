@@ -24,42 +24,94 @@
   @include('komponen.nav')
 
   <div x-data="{ showModal: false, tujuan: '', untuk: '', keluarga: '' }"
-       class="max-w-5xl mx-auto space-y-6 pt-8 px-6">
+       class="pt-8 px-6">
 
-       <!-- Breadcrumb (Tengah) -->
-<nav class="max-w-5xl mx-auto pt-6 px-6 text-sm text-gray-600 text-center">
-    <ol class="inline-flex items-center space-x-2 justify-center">
-      <li><a href="{{ route('dashboardWarga') }}" class="text-blue-600 no-underline">Home</a></li>
-      <li>/</li>
-      <li class="text-gray-800 font-medium">Pengajuan Surat</li>
-    </ol>
-  </nav>
+    <!-- Breadcrumb (Tengah) -->
+    <nav class="pt-6 px-6 text-sm text-gray-600 text-center">
+      <ol class="inline-flex items-center space-x-2 justify-center">
+        <li><a href="{{ route('dashboardWarga') }}" class="text-blue-600 no-underline">Home</a></li>
+        <li>/</li>
+        <li class="text-gray-800 font-medium">Pengajuan Surat</li>
+      </ol>
+    </nav>
 
     <!-- Heading -->
-    <div class="text-center">
-      <h1 class="text-4xl font-bold text-gray-800 mb-2">Pengajuan Surat Pengantar</h1>
-      <p class="text-gray-600 text-lg">Silakan pilih jenis surat yang ingin diajukan</p>
+    <div class="text-center mb-4">
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">Pengajuan Surat Pengantar</h1>
+      <p class="text-gray-600 text-lg">Pilih jenis surat yang ingin diajukan</p>
     </div>
 
-    <!-- Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <template x-for="item in ['Surat Domisili', 'Surat Keterangan Usaha', 'Surat Tidak Mampu', 'Surat Izin Keramaian', 'Surat Keterangan Penghasilan', 'Lainnya', 'Surat Pengantar Kesehatan', 'Surat Rekomendasi Kerja']" :key="item">
-        <div class="bg-white/70 backdrop-blur-md border border-gray-200 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition transform hover:-translate-y-1">
-          <h2 class="text-xl font-semibold text-gray-800 mb-2" x-text="item"></h2>
-          <p class="text-gray-600 text-sm mb-4">Klik untuk mulai pengajuan surat ini.</p>
-          <div class="flex justify-end">
-            <button
-              @click="tujuan = item; showModal = true; untuk = ''; keluarga = ''"
-              class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
-            >
-              Ajukan
-            </button>
-          </div>
+    <!-- Search and Button -->
+    <div class="flex justify-between mb-8">
+      <!-- Form Search -->
+      <form method="GET" action="{{ route('pengajuanSuratWarga') }}" class="relative w-full sm:w-80">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+        </span>
+        <input type="text" name="search" id="searchInput"
+               value="{{ request('search') }}"
+               placeholder="Cari nama tujuan atau nomor surat..."
+               class="pl-10 pr-4 py-2 border rounded w-full focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+      </form>
+
+      <!-- Button Tidak Ada Jenis Pengajuan -->
+      <div class="flex justify-end">
+        <button
+          class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition"
+          @click="tujuan = 'Lainnya'; showModal = true; untuk = ''; keluarga = ''">
+          Tidak Ada Jenis Pengajuan yang Cocok
+        </button>
+      </div>
+    </div>
+
+    <!-- Dua Kolom: Populer dan Lainnya -->
+    <div class="flex flex-wrap lg:flex-nowrap gap-6 mb-8">
+      <!-- Tujuan Populer -->
+      <div class="w-full lg:w-1/2 space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-800">Tujuan Populer</h2>
+        <div class="space-y-4 max-h-[550px] overflow-y-auto pr-2">
+          @foreach($tujuanSurat->where('status_populer', true)->take(20) as $item)
+            <div class="bg-white border border-yellow-400 p-4 rounded-xl shadow-lg flex justify-between items-center">
+              <div class="flex flex-col">
+                <h3 class="text-lg font-semibold text-gray-800">{{ $item->nama_tujuan }}</h3>
+                <p class="text-gray-600 text-sm">{{ Str::limit($item->deskripsi ?? 'Deskripsi tidak tersedia', 100) }}</p>
+              </div>
+              <button
+                @click="tujuan = '{{ $item->nama_tujuan }}'; showModal = true; untuk = ''; keluarga = ''"
+                class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+                Ajukan
+              </button>
+            </div>
+          @endforeach
         </div>
-      </template>
+      </div>
+
+      <!-- Tujuan Lainnya -->
+      <div class="w-full lg:w-1/2 space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-800">Tujuan Lainnya</h2>
+        <div class="space-y-4 max-h-[550px] overflow-y-auto pr-2">
+          @foreach($tujuanSurat->where('status_populer', false)->take(20) as $item)
+            <div class="bg-white border border-gray-300 p-4 rounded-xl shadow-md flex justify-between items-center">
+              <div class="flex flex-col">
+                <h3 class="text-lg font-semibold text-gray-800">{{ $item->nama_tujuan }}</h3>
+                <p class="text-gray-600 text-sm">{{ Str::limit($item->deskripsi ?? 'Deskripsi tidak tersedia', 100) }}</p>
+              </div>
+              <button
+                @click="tujuan = '{{ $item->nama_tujuan }}'; showModal = true; untuk = ''; keluarga = ''"
+                class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+                Ajukan
+              </button>
+            </div>
+          @endforeach
+        </div>
+      </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Modal untuk Surat Pengantar -->
     <div x-show="showModal" x-cloak
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 scale-90"
@@ -70,47 +122,101 @@
          class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center px-4">
 
       <div @click.away="showModal = false"
-           class="bg-white/80 backdrop-blur-xl border border-gray-300 shadow-2xl rounded-2xl p-6 w-full max-w-lg">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">Ajukan: <span x-text="tujuan"></span></h2>
+           class="bg-white/80 backdrop-blur-xl border border-gray-300 shadow-2xl rounded-xl p-6 w-full max-w-lg">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Template Surat Pengantar</h2>
 
-        <!-- Pilih Untuk -->
-        <div class="mb-4">
-          <label class="block text-gray-700 mb-1 font-medium">Pengajuan Untuk</label>
-          <select x-model="untuk" class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300">
-            <option value="">-- Pilih --</option>
-            <option value="sendiri">Diri Sendiri</option>
-            <option value="keluarga">Anggota Keluarga</option>
-          </select>
+        <!-- Konten Surat -->
+        <div class="text-center border-b border-black pb-2 mb-2">
+            <div class="flex items-start justify-between">
+                <div class="w-24">
+                    <img src="{{ asset('images/Logo_Indramayu.png') }}" alt="Logo" class="w-full">
+                </div>
+                <div class="flex-1 text-center">
+                    <h1 class="font-bold text-lg uppercase">Pemerintah Kabupaten Indramayu</h1>
+                    <h2 class="font-bold text-md uppercase">Kecamatan Indramayu</h2>
+                    <h3 class="font-bold uppercase">Kelurahan Margadadi</h3>
+                    <p class="text-sm">Jl. May Sastra Atmaja Nomor : 47 Tlp. (0234) 273 301 Kode Pos 45211</p>
+                    <p class="text-sm">e-mail : kelurahanmargadadi.indramayu@gmail.com</p>
+                    <h4 class="font-bold uppercase tracking-widest mt-1">INDRAMAYU</h4>
+                </div>
+            </div>
         </div>
 
-        <!-- Pilih Anggota Keluarga -->
-        <div x-show="untuk === 'keluarga'" class="mb-4" x-transition>
-          <label class="block text-gray-700 mb-1 font-medium">Anggota Keluarga</label>
-          <select x-model="keluarga" class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300">
-            <option value="">-- Pilih --</option>
-            <option value="Ayah">Ayah</option>
-            <option value="Ibu">Ibu</option>
-            <option value="Adik">Adik</option>
-          </select>
+        <div class="text-right mb-4">
+            <p>Kepada</p>
+            <p>Yth. Lurah Margadadi</p>
+            <p>di_</p>
+            <p class="underline">TEMPAT</p>
         </div>
 
-        <!-- Form -->
-        <div x-show="untuk && (untuk === 'sendiri' || keluarga)" x-transition>
-          <div class="mb-4">
-            <label class="block text-gray-700 font-medium mb-1">Alamat</label>
-            <textarea class="w-full px-4 py-2 border rounded-lg" rows="3" placeholder="Tulis alamat lengkap..."></textarea>
-          </div>
-
-          <div class="mb-4">
-            <label class="block text-gray-700 font-medium mb-1">Tanggal Permohonan</label>
-            <input type="date" class="w-full px-4 py-2 border rounded-lg"/>
-          </div>
-
-          <button class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
-            Kirim Permohonan
-          </button>
+        <div class="text-center mb-2">
+            <h2 class="font-bold tracking-widest underline">SURAT PENGANTAR</h2>
+            <p>Nomor : ......................................</p>
         </div>
 
+        <p class="mb-4">Yang bertanda tangan di bawah ini, Ketua RT .......... RW .......... Kelurahan Margadadi Kecamatan Indramayu Kabupaten Indramayu, Memberikan Pengantar Kepada :</p>
+
+        <!-- Data Pengaju -->
+        <div class="pl-6">
+            <div class="flex">
+                <p class="w-52">Nama</p>
+                <p>: ...............................................................</p>
+            </div>
+            <div class="flex">
+                <p class="w-52">Tempat/ Tanggal Lahir</p>
+                <p>: ...............................................................</p>
+            </div>
+            <div class="flex">
+                <p class="w-52">Nomor KTP</p>
+                <p>: ...............................................................</p>
+            </div>
+            <div class="flex">
+                <p class="w-52">Status Perkawinan</p>
+                <p>: Kawin / Belum / Janda / Duda</p>
+            </div>
+            <div class="flex">
+                <p class="w-52">Kebangsaan/ Agama</p>
+                <p>: ...............................................................</p>
+            </div>
+            <div class="flex">
+                <p class="w-52">Pekerjaan</p>
+                <p>: ...............................................................</p>
+            </div>
+            <div class="flex">
+                <p class="w-52">Alamat</p>
+                <p>: ...............................................................</p>
+            </div>
+            <div class="flex">
+                <p class="w-52">Untuk/ Maksud/ Tujuan</p>
+                <p>: ...............................................................</p>
+            </div>
+        </div>
+
+        <p class="mt-4">Demikian Surat Pengantar ini, untuk dipergunakan sebagaimana mestinya.</p>
+
+        <!-- Tanda tangan -->
+        <div class="flex justify-between mt-6">
+            <div class="text-center">
+                <p>Mengetahui,</p>
+                <p class="font-bold">Ketua RW</p>
+                <br><br><br>
+                <p>( ............................................. )</p>
+            </div>
+            <div class="text-center">
+                <p>Indramayu ........................................</p>
+                <p class="font-bold">Ketua RT</p>
+                <br><br><br>
+                <p>( ............................................. )</p>
+            </div>
+        </div>
+
+        <!-- QR Code -->
+        <div class="absolute bottom-10 right-10 text-center">
+            <img src="" alt="QR Code" class="w-24 h-24 mx-auto">
+            <p class="text-[10px] mt-1">Scan untuk verifikasi surat</p>
+        </div>
+
+        <!-- Tombol Tutup Modal -->
         <button @click="showModal = false" class="mt-4 text-gray-600 hover:text-gray-800 text-sm w-full text-center">
           Batal / Kembali
         </button>

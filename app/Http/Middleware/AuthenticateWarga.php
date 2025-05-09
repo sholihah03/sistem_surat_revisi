@@ -17,7 +17,7 @@ class AuthenticateWarga
     public function handle($request, Closure $next)
     {
         if (!Auth::guard('warga')->check()) {
-            return redirect()->route('login')->withErrors(['error' => 'Anda harus login sebagai RW.']);
+            return redirect()->route('login')->withErrors(['error' => 'Anda harus login sebagai WARGA.']);
         }
         return $next($request);
     }

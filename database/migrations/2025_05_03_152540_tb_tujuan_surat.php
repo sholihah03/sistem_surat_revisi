@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nama_tujuan', 225);
             $table->text('deskripsi')->nullable();
             $table->string('nomor_surat', 100);
+            $table->boolean('status_populer')->default(false);
             $table->timestamps();
         });
     }

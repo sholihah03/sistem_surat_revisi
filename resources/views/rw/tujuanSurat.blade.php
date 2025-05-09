@@ -46,12 +46,13 @@
 <!-- Tabel Tujuan Surat -->
 <div class="overflow-x-auto max-h-[500px] overflow-y-auto border rounded-lg shadow">
     <table class="min-w-full bg-white border rounded shadow">
-        <thead>
-            <tr class="bg-green-100 text-left">
+        <thead class="bg-green-100 sticky top-0 z-10">
+            <tr class="text-left">
                 <th class="px-4 py-2">No</th>
                 <th class="px-4 py-2">Nama Tujuan</th>
                 <th class="px-4 py-2">Deskripsi</th>
                 <th class="px-4 py-2">Nomor Surat</th>
+                <th class="px-4 py-2">Populer</th>
                 <th class="px-4 py-2">Aksi</th>
             </tr>
         </thead>
@@ -63,8 +64,11 @@
                     <td class="px-4 py-2">{{ $tujuan->deskripsi }}</td>
                     <td class="px-4 py-2">{{ $tujuan->nomor_surat }}</td>
                     <td class="px-4 py-2">
+                        {{ $tujuan->status_populer ? 'Populer' : 'Biasa' }}
+                    </td>
+                    <td class="px-4 py-2">
                         <div class="flex flex-wrap gap-2">
-                            <button onclick="openEditModal('{{ $tujuan->id_tujuan_surat }}', '{{ $tujuan->nama_tujuan }}', `{{ $tujuan->deskripsi }}`, '{{ $tujuan->nomor_surat }}')" class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600">Edit</button>
+                            <button onclick="openEditModal('{{ $tujuan->id_tujuan_surat }}', '{{ $tujuan->nama_tujuan }}', `{{ $tujuan->deskripsi }}`, '{{ $tujuan->nomor_surat }}', '{{ $tujuan->status_populer }}')" class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600">Edit</button>
                             <button onclick="openDeleteModal('{{ $tujuan->id_tujuan_surat }}', '{{ $tujuan->nama_tujuan }}')" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Hapus</button>
                         </div>
                     </td>
@@ -104,6 +108,13 @@
                 <label class="block mb-1 text-sm font-medium">Nomor Surat</label>
                 <input type="text" name="nomor_surat" class="w-full border rounded px-3 py-2" required>
             </div>
+            <div class="mb-4">
+                <label class="block mb-1 text-sm font-medium">Status Populer</label>
+                <select name="status_populer" class="w-full border rounded px-3 py-2" required>
+                    <option value="0">Biasa</option>
+                    <option value="1">Populer</option>
+                </select>
+            </div>
             <div class="flex justify-end space-x-2">
                 <button type="button" onclick="closeAddModal()" class="text-gray-600 hover:text-gray-800">Batal</button>
                 <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Simpan</button>
@@ -129,6 +140,13 @@
             <div class="mb-4">
                 <label class="block mb-1 text-sm font-medium">Nomor Surat</label>
                 <input id="editNomorSurat" name="nomor_surat" class="w-full border rounded px-3 py-2" required>
+            </div>
+            <div class="mb-4">
+                <label class="block mb-1 text-sm font-medium">Status Populer</label>
+                <select id="editStatusPopuler" name="status_populer" class="w-full border rounded px-3 py-2" required>
+                    <option value="0">Biasa</option>
+                    <option value="1">Populer</option>
+                </select>
             </div>
             <div class="flex justify-end space-x-2">
                 <button type="button" onclick="closeEditModal()" class="text-gray-600 hover:text-gray-800">Batal</button>
@@ -162,12 +180,13 @@
         document.getElementById('addModal').classList.add('hidden');
     }
 
-    function openEditModal(id, nama, deskripsi, nomor) {
+    function openEditModal(id, nama, deskripsi, nomor, status_populer) {
         const form = document.getElementById('editForm');
         form.action = `/rw/tujuanSurat/update/${id}`;
         document.getElementById('editNama').value = nama;
         document.getElementById('editDeskripsi').value = deskripsi;
         document.getElementById('editNomorSurat').value = nomor;
+        document.getElementById('editStatusPopuler').value = status_populer;
         document.getElementById('editModal').classList.remove('hidden');
         document.getElementById('editModal').classList.add('flex');
     }

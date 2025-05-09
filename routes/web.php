@@ -52,6 +52,7 @@ Route::get('/suratPengantar', [TemplateSuratController::class, 'index'])->name('
 Route::prefix('warga')->middleware(AuthenticateWarga::class)->group(function () {
     Route::get('/dashboardWarga', [DashboardController::class, 'index'])->name('dashboardWarga');
     Route::get('/pengajuanSuratWarga', [PengajuanSuratController::class, 'index'])->name('pengajuanSuratWarga');
+    Route::get('/formPengajuanSuratWarga', [PengajuanSuratController::class, 'formPengajuanSurat'])->name('formPengajuanSurat');
     Route::get('/formSuratWarga', [FormSuratController::class, 'index'])->name('formSuratWarga');
     Route::get('/riwayatSuratWarga', [RiwayatSuratController::class, 'index'])->name('riwayatSuratWarga');
 });

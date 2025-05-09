@@ -17,7 +17,7 @@ class AuthenticateRt
     public function handle($request, Closure $next)
     {
         if (!Auth::guard('rt')->check()) {
-            return redirect()->route('login')->withErrors(['error' => 'Anda harus login sebagai RW.']);
+            return redirect()->route('login')->withErrors(['error' => 'Anda harus login sebagai RT.']);
         }
         return $next($request);
     }

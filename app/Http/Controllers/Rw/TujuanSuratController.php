@@ -30,9 +30,15 @@ class TujuanSuratController extends Controller
             'nama_tujuan' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
             'nomor_surat' => 'required|string|max:100',
+            'status_populer' => 'required|boolean',
         ]);
 
-        TujuanSurat::create($request->all());
+        TujuanSurat::create([
+            'nama_tujuan' => $request->nama_tujuan,
+            'deskripsi' => $request->deskripsi,
+            'nomor_surat' => $request->nomor_surat,
+            'status_populer' => $request->status_populer,
+        ]);
 
         return redirect()->back()->with('success', 'Tujuan surat berhasil ditambahkan.');
     }

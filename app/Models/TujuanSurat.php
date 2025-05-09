@@ -16,5 +16,6 @@ class TujuanSurat extends Model
         'nama_tujuan',
         'deskripsi',
         'nomor_surat',
+        'status_populer'
     ];
 }

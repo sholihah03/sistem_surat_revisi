@@ -55,7 +55,7 @@
         </div>
     </header>
 
-    <div class="flex min-h-screen overflow-hidden">
+    <div class="flex md:pl-64 min-h-screen overflow-hidden">
         @include('rw.sidebarRw')
         <!-- Overlay for closing sidebar when clicking outside (mobile only) -->
         <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-30 z-30 hidden md:hidden"></div>
