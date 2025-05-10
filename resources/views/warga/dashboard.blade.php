@@ -78,16 +78,6 @@
                     </div>
                 </div>
 
-                {{-- <div class="carousel-item active position-relative">
-                    <img src="{{ asset('images/layananMasyarakat2.jpg') }}" class="d-block w-100 custom-carousel-img" alt="Slide 1">
-                    <div class="carousel-caption carousel-text bg-teal-600 bg-opacity-50 rounded px-3 py-2">
-                        <h5 class="text-white font-bold text-xl md:text-2xl">Selamat Datang, Warga!</h5>
-                        <p class="text-white text-xs md:text-sm mt-1">
-                        Gunakan sistem ini untuk mengelola surat pengantar secara digital, cepat, dan mudah.
-                        </p>
-                    </div>
-                </div> --}}
-
                 <!-- Slide 2 -->
                 <div class="carousel-item">
                     <img src="{{ asset('images/layananMasyarakat3.png') }}" class="d-block w-100 custom-carousel-img" alt="Slide 2">
@@ -116,23 +106,32 @@
 <!-- Fitur Card dan Histori Tabel dalam Kotak dengan Opacity -->
 <div class="max-w-7xl mx-auto mt-6 px-4 py-6 bg-white bg-opacity-18 rounded-lg">
     <!-- Fitur Card -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <!-- Card Ajukan Surat -->
-        <div class="feature-card bg-blue-100 p-6 rounded-xl shadow border-l-4 border-blue-500 ">
-          <h2 class="text-lg font-semibold mb-2">📝 Ajukan Surat Pengantar</h2>
-          <p class="text-sm text-gray-600 mb-3">Mulai proses pengajuan surat Anda untuk berbagai keperluan.</p>
-          <a href="{{ route('pengajuanSuratWarga') }}" class="inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors duration-300 transform transition-transform duration-300 hover:scale-105">
-            Ajukan Sekarang
-          </a>
+        <div class="feature-card bg-blue-100 p-6 rounded-xl shadow border-l-4 border-blue-500">
+            <h2 class="text-lg font-semibold mb-2">📝 Ajukan Surat Pengantar</h2>
+            <p class="text-sm text-gray-600 mb-3">Mulai proses pengajuan surat Anda untuk berbagai keperluan.</p>
+            <a href="{{ route('pengajuanSuratWarga') }}" class="inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors duration-300 transform transition-transform duration-300 hover:scale-105">
+                Ajukan Sekarang
+            </a>
         </div>
 
         <!-- Card Riwayat Surat -->
-        <div class="feature-card bg-teal-100 p-6 rounded-xl shadow border-l-4 border-teal-500 ">
-          <h2 class="text-lg font-semibold mb-2">📄 Riwayat Surat</h2>
-          <p class="text-sm text-gray-600 mb-3">Lihat status surat yang telah diajukan.</p>
-          <a href="{{ route('riwayatSuratWarga') }}" class="inline-block bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600 transition-colors duration-300 transform transition-transform duration-300 hover:scale-105">
-            Lihat Sekarang
-          </a>
+        <div class="feature-card bg-teal-100 p-6 rounded-xl shadow border-l-4 border-teal-500">
+            <h2 class="text-lg font-semibold mb-2">📄 Riwayat Surat</h2>
+            <p class="text-sm text-gray-600 mb-3">Lihat status surat yang telah diajukan.</p>
+            <a href="{{ route('riwayatSuratWarga') }}" class="inline-block bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600 transition-colors duration-300 transform transition-transform duration-300 hover:scale-105">
+                Lihat Sekarang
+            </a>
+        </div>
+
+        <!-- Card Histori Surat -->
+        <div class="feature-card bg-pink-100 p-6 rounded-xl shadow border-l-4 border-pink-500">
+            <h2 class="text-lg font-semibold mb-2">📜 Histori Surat</h2>
+            <p class="text-sm text-gray-600 mb-3">Cek riwayat dan status pengajuan surat yang sudah disetujui atau ditolak.</p>
+            <a href="{{ route('historiSuratWarga') }}" class="inline-block bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600 transition-colors duration-300 transform transition-transform duration-300 hover:scale-105">
+                Lihat Histori
+            </a>
         </div>
     </div>
 
@@ -140,41 +139,41 @@
     <div>
         <h3 class="text-xl font-bold text-gray-800 mb-4">📂 Status Pengajuan Surat</h3>
         <div class="overflow-x-auto bg-white rounded-lg shadow p-4">
-          <table class="min-w-full text-sm text-gray-700">
-            <thead class="bg-gray-100 border-b">
-              <tr>
-                <th class="px-4 py-2 text-left">Tanggal</th>
-                <th class="px-4 py-2 text-left">Tujuan Surat</th>
-                <th class="px-4 py-2 text-left">Status</th>
-                <th class="px-4 py-2 text-left">Aksi</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-              <tr class="hover:bg-gray-50 transition-colors duration-200">
-                <td class="px-4 py-2">2025-04-01</td>
-                <td class="px-4 py-2">Surat Domisili</td>
-                <td class="px-4 py-2">
-                  <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Disetujui</span>
-                </td>
-                <td class="px-4 py-2">
-                  <a href="{{ route('riwayatSuratWarga') }}" class="text-blue-500 hover:underline">Lihat</a>
-                </td>
-              </tr>
-              <tr class="hover:bg-gray-50 transition-colors duration-200">
-                <td class="px-4 py-2">2025-03-20</td>
-                <td class="px-4 py-2">Keterangan Usaha</td>
-                <td class="px-4 py-2">
-                  <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">Menunggu</span>
-                </td>
-                <td class="px-4 py-2">
-                  <a href="{{ route('riwayatSuratWarga') }}" class="text-blue-500 hover:underline">Lihat</a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+            <table class="min-w-full text-sm text-gray-700">
+                <thead class="bg-gray-100 border-b">
+                    <tr>
+                        <th class="px-4 py-2 text-left">Tanggal</th>
+                        <th class="px-4 py-2 text-left">Tujuan Surat</th>
+                        <th class="px-4 py-2 text-left">Status</th>
+                        <th class="px-4 py-2 text-left">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    @foreach($pengajuanSurat as $surat)
+                        <tr class="hover:bg-gray-50 transition-colors duration-200">
+                            <td class="px-4 py-2">{{ $surat->created_at->format('Y-m-d') }}</td>
+                            <td class="px-4 py-2">{{ $surat->tujuan_surat }}</td>
+                            <td class="px-4 py-2">
+                                @if($surat->status === 'Disetujui')
+                                    <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Disetujui</span>
+                                @elseif($surat->status === 'Menunggu')
+                                    <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">Menunggu</span>
+                                @elseif($surat->status === 'Ditolak')
+                                    <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">Ditolak</span>
+                                @else
+                                    <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded">Belum Diproses</span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-2">
+                                <a href="{{ route('riwayatSuratWarga') }}" class="text-blue-500 hover:underline">Lihat</a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
-      </div>
-  </div>
+    </div>
+</div>
 
   <div class="max-w-7xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-md">
     <h2 class="text-2xl font-bold mb-4 text-gray-800">❓ Pertanyaan yang Sering Diajukan (FAQ)</h2>

@@ -8,7 +8,7 @@ use App\Models\TujuanSurat;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class PengajunSurat extends Model
+class PengajuanSurat extends Model
 {
     use HasFactory;
 
@@ -20,6 +20,8 @@ class PengajunSurat extends Model
         'tujuan_surat_id',
         'scan_kk_id',
         'status',
+        'tempat_lahir',
+        'tanggal_lahir',
         'pekerjaan',
         'agama',
         'alasan_penolakan_pengajuan',

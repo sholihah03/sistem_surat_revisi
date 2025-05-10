@@ -20,6 +20,31 @@
 
 <body class="min-h-screen bg-gradient-to-br from-blue-100 via-white to-pink-100">
 
+    @if(session('success_form'))
+    <div x-data="{ open: true }" x-show="open" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div class="bg-white rounded-lg shadow-lg p-6 sm:p-8 w-[90%] max-w-md text-center">
+        <div class="flex justify-center mb-4">
+          <img src="https://img.icons8.com/color/96/000000/ok--v1.png" alt="Success" class="w-20 h-20">
+        </div>
+
+        <h2 class="text-xl font-bold mb-4 text-gray-800">
+          {{ session('success_form') }}
+        </h2>
+
+        <p class="text-sm text-gray-600 mb-6">
+            Pengajuan surat Anda telah berhasil dikirim. Silakan tunggu maksimal 3 hari kerja.
+            Jika dalam waktu tersebut Anda belum menerima notifikasi melalui email bahwa surat telah selesai diproses,
+            segera hubungi ketua RT setempat untuk konfirmasi lebih lanjut.
+        </p>
+
+        <button @click="open = false" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded">
+          Tutup
+        </button>
+      </div>
+    </div>
+    @endif
+
+
   <!-- Navbar -->
   @include('komponen.nav')
 
@@ -60,11 +85,10 @@
 
       <!-- Button Tidak Ada Jenis Pengajuan -->
       <div class="flex justify-end">
-        <button
-          class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition"
-          @click="tujuan = 'Lainnya'; showModal = true; untuk = ''; keluarga = ''">
-          Tidak Ada Jenis Pengajuan yang Cocok
-        </button>
+        <a href="{{ route('formPengajuanSuratLain') }}"
+            class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+            Tidak Ada Jenis Pengajuan yang Cocok
+         </a>
       </div>
     </div>
 
@@ -80,11 +104,10 @@
                 <h3 class="text-lg font-semibold text-gray-800">{{ $item->nama_tujuan }}</h3>
                 <p class="text-gray-600 text-sm">{{ Str::limit($item->deskripsi ?? 'Deskripsi tidak tersedia', 100) }}</p>
               </div>
-              <button
-                @click="tujuan = '{{ $item->nama_tujuan }}'; showModal = true; untuk = ''; keluarga = ''"
+              <a href="{{ route('formPengajuanSurat', ['tujuan' => $item->nama_tujuan, 'id' => $item->id_tujuan_surat]) }}"
                 class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
                 Ajukan
-              </button>
+             </a>
             </div>
           @endforeach
         </div>
@@ -100,126 +123,13 @@
                 <h3 class="text-lg font-semibold text-gray-800">{{ $item->nama_tujuan }}</h3>
                 <p class="text-gray-600 text-sm">{{ Str::limit($item->deskripsi ?? 'Deskripsi tidak tersedia', 100) }}</p>
               </div>
-              <button
-                @click="tujuan = '{{ $item->nama_tujuan }}'; showModal = true; untuk = ''; keluarga = ''"
+              <a href="{{ route('formPengajuanSurat', ['tujuan' => $item->nama_tujuan, 'id' => $item->id_tujuan_surat]) }}"
                 class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
                 Ajukan
-              </button>
+             </a>
             </div>
           @endforeach
         </div>
-      </div>
-    </div>
-
-    <!-- Modal untuk Surat Pengantar -->
-    <div x-show="showModal" x-cloak
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0 scale-90"
-         x-transition:enter-end="opacity-100 scale-100"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100 scale-100"
-         x-transition:leave-end="opacity-0 scale-90"
-         class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center px-4">
-
-      <div @click.away="showModal = false"
-           class="bg-white/80 backdrop-blur-xl border border-gray-300 shadow-2xl rounded-xl p-6 w-full max-w-lg">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">Template Surat Pengantar</h2>
-
-        <!-- Konten Surat -->
-        <div class="text-center border-b border-black pb-2 mb-2">
-            <div class="flex items-start justify-between">
-                <div class="w-24">
-                    <img src="{{ asset('images/Logo_Indramayu.png') }}" alt="Logo" class="w-full">
-                </div>
-                <div class="flex-1 text-center">
-                    <h1 class="font-bold text-lg uppercase">Pemerintah Kabupaten Indramayu</h1>
-                    <h2 class="font-bold text-md uppercase">Kecamatan Indramayu</h2>
-                    <h3 class="font-bold uppercase">Kelurahan Margadadi</h3>
-                    <p class="text-sm">Jl. May Sastra Atmaja Nomor : 47 Tlp. (0234) 273 301 Kode Pos 45211</p>
-                    <p class="text-sm">e-mail : kelurahanmargadadi.indramayu@gmail.com</p>
-                    <h4 class="font-bold uppercase tracking-widest mt-1">INDRAMAYU</h4>
-                </div>
-            </div>
-        </div>
-
-        <div class="text-right mb-4">
-            <p>Kepada</p>
-            <p>Yth. Lurah Margadadi</p>
-            <p>di_</p>
-            <p class="underline">TEMPAT</p>
-        </div>
-
-        <div class="text-center mb-2">
-            <h2 class="font-bold tracking-widest underline">SURAT PENGANTAR</h2>
-            <p>Nomor : ......................................</p>
-        </div>
-
-        <p class="mb-4">Yang bertanda tangan di bawah ini, Ketua RT .......... RW .......... Kelurahan Margadadi Kecamatan Indramayu Kabupaten Indramayu, Memberikan Pengantar Kepada :</p>
-
-        <!-- Data Pengaju -->
-        <div class="pl-6">
-            <div class="flex">
-                <p class="w-52">Nama</p>
-                <p>: ...............................................................</p>
-            </div>
-            <div class="flex">
-                <p class="w-52">Tempat/ Tanggal Lahir</p>
-                <p>: ...............................................................</p>
-            </div>
-            <div class="flex">
-                <p class="w-52">Nomor KTP</p>
-                <p>: ...............................................................</p>
-            </div>
-            <div class="flex">
-                <p class="w-52">Status Perkawinan</p>
-                <p>: Kawin / Belum / Janda / Duda</p>
-            </div>
-            <div class="flex">
-                <p class="w-52">Kebangsaan/ Agama</p>
-                <p>: ...............................................................</p>
-            </div>
-            <div class="flex">
-                <p class="w-52">Pekerjaan</p>
-                <p>: ...............................................................</p>
-            </div>
-            <div class="flex">
-                <p class="w-52">Alamat</p>
-                <p>: ...............................................................</p>
-            </div>
-            <div class="flex">
-                <p class="w-52">Untuk/ Maksud/ Tujuan</p>
-                <p>: ...............................................................</p>
-            </div>
-        </div>
-
-        <p class="mt-4">Demikian Surat Pengantar ini, untuk dipergunakan sebagaimana mestinya.</p>
-
-        <!-- Tanda tangan -->
-        <div class="flex justify-between mt-6">
-            <div class="text-center">
-                <p>Mengetahui,</p>
-                <p class="font-bold">Ketua RW</p>
-                <br><br><br>
-                <p>( ............................................. )</p>
-            </div>
-            <div class="text-center">
-                <p>Indramayu ........................................</p>
-                <p class="font-bold">Ketua RT</p>
-                <br><br><br>
-                <p>( ............................................. )</p>
-            </div>
-        </div>
-
-        <!-- QR Code -->
-        <div class="absolute bottom-10 right-10 text-center">
-            <img src="" alt="QR Code" class="w-24 h-24 mx-auto">
-            <p class="text-[10px] mt-1">Scan untuk verifikasi surat</p>
-        </div>
-
-        <!-- Tombol Tutup Modal -->
-        <button @click="showModal = false" class="mt-4 text-gray-600 hover:text-gray-800 text-sm w-full text-center">
-          Batal / Kembali
-        </button>
       </div>
     </div>
   </div>

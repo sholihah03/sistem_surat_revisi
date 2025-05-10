@@ -43,7 +43,7 @@ class Wargas extends Authenticatable
 
     public function scan_Kk()
     {
-        return $this->belongsTo(ScanKK::class, 'scan_id', 'id_scan');
+        return $this->belongsTo(ScanKK::class, 'scan_kk_id', 'id_scan');
     }
 
     public function rt()
@@ -53,6 +53,6 @@ class Wargas extends Authenticatable
 
     public function rw()
     {
-        return $this->belongsTo(Rt::class, 'rw_id', 'id_rw');
+        return $this->belongsTo(Rw::class, 'rw_id', 'id_rw');
     }
 }

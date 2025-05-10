@@ -13,10 +13,14 @@ return new class extends Migration
     {
         Schema::create('tb_pengajuan_surat_lain', function (Blueprint $table) {
             $table->id('id_pengajuan_surat_lain');
-            $table->foreignId('tujuan_surat_id')->constrained('tb_tujuan_surat', 'id_tujuan_surat')->onDelete('cascade');
-            $table->string('nomor_surat_pengajuan_lain', 225);
+            $table->foreignId('warga_id')->constrained('tb_wargas', 'id_warga')->onDelete('cascade');
+            $table->foreignId('scan_kk_id')->constrained('tb_scan_kk', 'id_scan')->onDelete('cascade');
+            $table->string('nomor_surat_pengajuan_lain', 225)->nullable();
             $table->enum('status_pengajuan_lain', ['menunggu', 'ditolak', 'disetujui'])->default('menunggu');
-            $table->string('pekerjaan_pengaju_lain', 8)->nullable();
+            $table->string('tujuan_manual', 225)->nullable();
+            $table->string('tempat_lahir_pengaju_lain', 225)->nullable();
+            $table->date('tanggal_lahir_pengaju_lain')->nullable();
+            $table->string('pekerjaan_pengaju_lain', 255)->nullable();
             $table->string('agama_pengaju_lain', 225)->nullable();
             $table->text('alasan_penolakan_pengajuan_lain')->nullable();
             $table->enum('status_perkawinan_pengaju_lain', ['kawin', 'belum', 'janda', 'duda'])->nullable();
