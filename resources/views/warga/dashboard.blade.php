@@ -120,7 +120,7 @@
         <div class="feature-card bg-teal-100 p-6 rounded-xl shadow border-l-4 border-teal-500">
             <h2 class="text-lg font-semibold mb-2">📄 Riwayat Surat</h2>
             <p class="text-sm text-gray-600 mb-3">Lihat status surat yang telah diajukan.</p>
-            <a href="{{ route('riwayatSuratWarga') }}" class="inline-block bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600 transition-colors duration-300 transform transition-transform duration-300 hover:scale-105">
+            <a href="{{ route('riwayatSurat') }}" class="inline-block bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600 transition-colors duration-300 transform transition-transform duration-300 hover:scale-105">
                 Lihat Sekarang
             </a>
         </div>
@@ -139,6 +139,9 @@
     <div>
         <h3 class="text-xl font-bold text-gray-800 mb-4">📂 Status Pengajuan Surat</h3>
         <div class="overflow-x-auto bg-white rounded-lg shadow p-4">
+            @if($pengajuanSurat->isEmpty())
+                <p class="text-center text-gray-600">Belum ada pengajuan surat.</p>
+            @else
             <table class="min-w-full text-sm text-gray-700">
                 <thead class="bg-gray-100 border-b">
                     <tr>
@@ -171,6 +174,7 @@
                     @endforeach
                 </tbody>
             </table>
+            @endif
         </div>
     </div>
 </div>

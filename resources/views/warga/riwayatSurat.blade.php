@@ -128,7 +128,7 @@
                     <li>✅ Diserahkan ke RW: {{ $item->updated_at->addDay()->format('Y-m-d') }}</li>
                     <li>✅ RW Menyetujui: {{ $item->updated_at->addDays(2)->format('Y-m-d') }}</li>
                   @elseif ($item->status === 'ditolak')
-                    <li>❌ Ditolak oleh RT</li>
+                    <li>❌ Ditolak oleh RT pada {{ $item->created_at->format('Y-m-d') }}</li>
                     <li class="text-red-600 font-semibold">Alasan: {{ $item->alasan_penolakan_pengajuan }}</li>
                   @endif
                 </ul>

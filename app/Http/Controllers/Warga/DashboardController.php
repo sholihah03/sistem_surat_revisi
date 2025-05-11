@@ -11,24 +11,28 @@ use Illuminate\Support\Facades\Auth;
 class DashboardController extends Controller
 {
     public function index(){
-        // Ambil data pengajuan surat dari tb_pengajuan_surat berdasarkan warga_id
-        $pengajuanSurat = PengajuanSurat::where('warga_id', Auth::guard('warga')->id()) // Gunakan guard warga
-                                        ->orWhere('status', '!=', 'Ditolak') // Sesuaikan statusnya jika perlu
-                                        ->get();
+        $wargaId = Auth::guard('warga')->id();
 
-        $pengajuanSuratLain = PengajuanSuratLain::where('warga_id', Auth::guard('warga')->id()) // Gunakan guard warga
-                                                ->orWhere('status_pengajuan_lain', '!=', 'Ditolak') // Sesuaikan statusnya jika perlu
-                                                ->get();
+        $pengajuanSurat = PengajuanSurat::where(function ($query) use ($wargaId) {
+                                    $query->where('warga_id', $wargaId)
+                                          ->where('status', '!=', 'Ditolak');
+                                })->get();
 
+        $pengajuanSuratLain = PengajuanSuratLain::where(function ($query) use ($wargaId) {
+                                        $query->where('warga_id', $wargaId)
+                                              ->where('status_pengajuan_lain', '!=', 'Ditolak');
+                                    })->get();
+
+        // Handle tujuan_manual
         $pengajuanSuratLain->transform(function($item) {
-            $item->tujuan_surat = $item->tujuan_surat ?? $item->tujuan_manual; // Jika tujuan_surat kosong, gunakan tujuan_manual
+            $item->tujuan_surat = $item->tujuan_surat ?? $item->tujuan_manual;
             return $item;
         });
-        
-        // Gabungkan kedua data pengajuan surat
+
+        // Gabungkan data
         $pengajuanSurat = $pengajuanSurat->merge($pengajuanSuratLain);
 
-        // Kirim data ke view dashboard
         return view('warga.dashboard', compact('pengajuanSurat'));
     }
+
 }

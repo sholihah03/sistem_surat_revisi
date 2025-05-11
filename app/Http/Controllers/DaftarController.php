@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NotifikasiVerifikasiAkun;
 use Illuminate\Support\Facades\Validator;
+use App\Mail\KirimOTPYangKartuKeluargaSudahAda;
 
 class DaftarController extends Controller
 {
@@ -25,7 +26,6 @@ class DaftarController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi input yang diterima
         $request->validate([
             'no_kk' => 'required|numeric',
             'nik' => 'required|numeric',
@@ -36,62 +36,71 @@ class DaftarController extends Controller
             'rt' => 'required|numeric',
         ]);
 
-        // Mengecek apakah no_kk sudah terdaftar di ScanKK
         $scanKK = ScanKK::where('no_kk_scan', $request->no_kk)->first();
 
+        // Cek data duplikat di Wargas
+        if (Wargas::where('email', $request->email)->exists()) {
+            return back()->withErrors(['daftar_error' => 'Email sudah terdaftar'])->withInput();
+        }
+
+        if (Wargas::where('nik', $request->nik)->exists()) {
+            return back()->withErrors(['daftar_error' => 'NIK sudah terdaftar'])->withInput();
+        }
+
+        if (Wargas::where('no_hp', $request->no_hp)->exists()) {
+            return back()->withErrors(['daftar_error' => 'Nomor WhatsApp sudah terdaftar'])->withInput();
+        }
+
+        if (Wargas::where('nama_lengkap', $request->nama_lengkap)->exists()) {
+            return back()->withErrors(['daftar_error' => 'Nama lengkap sudah terdaftar'])->withInput();
+        }
+
+        $rt = DB::table('tb_rt')->where('id_rt', $request->rt)->first();
+        $rw = DB::table('tb_rw')->where('id_rw', $request->rw)->first();
+
+        // ✅ Jika KK sudah discan → langsung ke tb_wargas
         if ($scanKK) {
-            // Jika no_kk sudah terdaftar, arahkan ke halaman login
-            return redirect()->route('otp');
+            $warga = Wargas::create([
+                'scan_kk_id' => $scanKK->id_scan,
+                'rt_id' => $rt->id_rt,
+                'rw_id' => $rw->id_rw,
+                'nama_lengkap' => $request->nama_lengkap,
+                'no_kk' => $request->no_kk,
+                'nik' => $request->nik,
+                'email' => $request->email,
+                'no_hp' => $request->no_hp,
+                'status_verifikasi' => false,
+            ]);
+
+            // ✅ Simpan OTP untuk warga baru
+            $otp = rand(100000, 999999);
+            DB::table('tb_otp')->insert([
+                'warga_id' => $warga->id_warga,
+                'kode_otp' => $otp,
+                'expired_at' => now()->addSeconds(60),
+                'created_at' => now(),
+            ]);
+
+            // ✅ Kirim OTP via email
+            Mail::to($warga->email)->send(new KirimOTPYangKartuKeluargaSudahAda($otp, $warga->nama_lengkap));
+
+            return redirect()->route('otp')->with('success', 'Kode OTP telah dikirim ke email Anda.');
         }
 
-        // Mengecek apakah email sudah terdaftar di Wargas
-        $warga = Wargas::where('email', $request->email)->first();
-
-        if ($warga) {
-            // Jika sudah terdaftar, arahkan ke halaman login
-            return redirect()->route('login');
-        }
-
-        // Cek apakah nik sudah terdaftar
-        $nikExists = Wargas::where('nik', $request->nik)->exists();
-        if ($nikExists) {
-            return back()->withErrors(['daftar_error' => 'NIK sudah terdaftar, gunakan NIK lain'])->withInput();
-        }
-
-        // Cek apakah no_hp sudah terdaftar
-        $hpExists = Wargas::where('no_hp', $request->no_hp)->exists();
-        if ($hpExists) {
-            return back()->withErrors(['daftar_error' => 'Nomor WhatsApp sudah terdaftar. gunakan Nomor WhatsApp lain'])->withInput();
-        }
-
-        // Cek apakah email sudah terdaftar
-        $emailExists = Wargas::where('email', $request->email)->exists();
-        if ($emailExists) {
-            return back()->withErrors(['daftar_error' => 'Email sudah terdaftar, gunakan Email lain'])->withInput();
-        }
-
-        // Mengecek apakah nama_lengkap sudah terdaftar di Wargas
-        $wargaByName = Wargas::where('nama_lengkap', $request->nama_lengkap)->first();
-        if ($wargaByName) {
-            return back()->withErrors(['daftar_error' => 'Nama lengkap sudah terdaftar, gunakan Nama Lengkap lain'])->withInput();
-        }
-        // Menyimpan data pendaftaran dengan id_rt yang sesuai
-        $rt = DB::table('tb_rt')->where('no_rt', $request->rt)->first(); // Ambil id_rt berdasarkan no_rt
-        $rw = DB::table('tb_rw')->where('no_rw', $request->rw)->first(); // Ambil id_rt berdasarkan no_rt
-
+        // ❌ Jika KK belum discan → simpan ke tb_pendaftaran
         Pendaftaran::create([
             'no_kk' => $request->no_kk,
             'nik' => $request->nik,
             'nama_lengkap' => $request->nama_lengkap,
             'email' => $request->email,
             'no_hp' => $request->no_hp,
-            'rw_id' => $request->rw,
-            'rt_id' => $request->rt,
+            'rw_id' => $rw->id_rw,
+            'rt_id' => $rt->id_rt,
         ]);
 
-        // Jika kondisi di atas tidak terpenuhi, arahkan kembali ke uploadKK untuk menunggu verifikasi
-        return redirect()->route('uploadKK');
+        return redirect()->route('uploadKK')->with('info', 'Data Anda sedang diverifikasi. Silakan upload Kartu Keluarga.');
     }
+
 
 
 }

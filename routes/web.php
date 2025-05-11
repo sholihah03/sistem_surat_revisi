@@ -8,6 +8,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\DaftarController;
 use App\Http\Middleware\AuthenticateWarga;
 use App\Http\Controllers\UploadKKController;
+use App\Http\Controllers\Rt\BankDataController;
 use App\Http\Controllers\BuatPasswordController;
 use App\Http\Controllers\Rw\DashboardRwController;
 use App\Http\Controllers\Rw\TujuanSuratController;
@@ -20,8 +21,10 @@ use App\Http\Controllers\Warga\HistoriSuratController;
 use App\Http\Controllers\Warga\RiwayatSuratController;
 use App\Http\Controllers\Rt\HistoriAkunWargaController;
 use App\Http\Controllers\Surat\TemplateSuratController;
+use App\Http\Controllers\Rt\RiwayatSuratWargaController;
 use App\Http\Controllers\Warga\PengajuanSuratController;
 use App\Http\Controllers\Rt\VerifikasiAkunWargaController;
+use App\Http\Controllers\Rw\ManajemenSuratWargaController;
 use App\Http\Controllers\Rt\DashboardController as RtDashboardController;
 
 Route::get('/', function () {
@@ -59,10 +62,9 @@ Route::prefix('warga')->middleware(AuthenticateWarga::class)->group(function () 
     Route::get('/formPengajuanSuratLain', [PengajuanSuratController::class, 'formPengajuanSuratLain'])->name('formPengajuanSuratLain');
     Route::post('/formPengajuanSuratLainStore', [PengajuanSuratController::class, 'formPengajuanSuratLainStore'])->name('formPengajuanSuratLainStore');
     Route::get('/formSuratWarga', [FormSuratController::class, 'index'])->name('formSuratWarga');
-    Route::get('/riwayatSuratWarga', [RiwayatSuratController::class, 'index'])->name('riwayatSuratWarga');
+    Route::get('/riwayatSurat', [RiwayatSuratController::class, 'index'])->name('riwayatSurat');
     Route::get('/historiSuratWarga', [HistoriSuratController::class, 'index'])->name('historiSuratWarga');
 });
-
 
 Route::prefix('rt')->middleware(AuthenticateRt::class)->group(function () {
     // Route::get('/dashboardRt', [RtDashboardController::class, 'index'])->name('dashboardRt');
@@ -77,6 +79,8 @@ Route::prefix('rt')->middleware(AuthenticateRt::class)->group(function () {
     Route::get('/historiAkunKadaluwarsa', [HistoriAkunWargaController::class, 'historiKadaluwarsa'])->name('historiAkunKadaluwarsa');
     Route::get('/verifikasiSurat', [VerifikasiSuratController::class, 'index'])->name('verifikasiSurat');
     Route::post('/verifikasiSuratProses', [VerifikasiSuratController::class, 'proses'])->name('verifikasiSuratProses');
+    Route::get('/riwayatSuratWarga', [RiwayatSuratWargaController::class, 'index'])->name('riwayatSuratWarga');
+    Route::get('/bankDataKk', [BankDataController::class, 'index'])->name('bankDataKk');
 });
 
 
@@ -93,7 +97,7 @@ Route::prefix('rw')->middleware(AuthenticateRw::class)->group(function () {
     Route::post('/tujuanSurat/store', [TujuanSuratController::class, 'store'])->name('tujuanSurat.store');
     Route::put('/tujuanSurat/update/{id}', [TujuanSuratController::class, 'update'])->name('tujuanSurat.update');
     Route::delete('/tujuanSurat/delete/{id}', [TujuanSuratController::class, 'destroy'])->name('tujuanSurat.destroy');
-
+    Route::get('/manajemenSuratWarga', [ManajemenSuratWargaController::class, 'index'])->name('manajemenSuratWarga');
 });
 
 

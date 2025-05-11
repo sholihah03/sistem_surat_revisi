@@ -55,7 +55,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="px-2 md:px-4 py-3 text-center text-gray-500">
+                                <td colspan="8" class="px-2 md:px-4 py-3 text-center text-gray-500">
                                     <p>✨ Tidak ada data verifikasi saat ini. Pastikan Anda memeriksa lagi nanti! ✨</p>
                                     <p class="text-sm text-gray-600">Jika ada warga baru yang mendaftar, mereka akan muncul di sini untuk verifikasi lebih lanjut.</p>
                                 </td>

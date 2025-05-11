@@ -41,26 +41,26 @@
 
         {{-- Verifikasi Surat --}}
         <a href="{{ route('verifikasiSurat') }}"
-           class="px-4 py-2 rounded-lg font-medium transition-all duration-200
-                  hover:bg-blue-100 hover:text-blue-700 hover:shadow-md
-                  {{ request()->routeIs('verifikasiSurat') ? 'bg-blue-200 text-blue-700' : 'text-gray-700' }}">
+            class="px-4 py-2 rounded-lg font-medium transition-all duration-200
+                    hover:bg-blue-100 hover:text-blue-700 hover:shadow-md
+                    {{ request()->routeIs('verifikasiSurat') ? 'bg-blue-200 text-blue-700' : 'text-gray-700' }}">
             📝 Verifikasi Surat
         </a>
 
-        {{-- Bank Data KK --}}
-        <a href="#"
-           class="px-4 py-2 rounded-lg font-medium transition-all duration-200
-                  hover:bg-blue-100 hover:text-blue-700 hover:shadow-md
-                  {{ request()->routeIs('bankDataKK') ? 'bg-blue-200 text-blue-700' : 'text-gray-700' }}">
-            📂 Bank Data KK
+        {{-- Riwayat Surat --}}
+        <a href="{{ route('riwayatSuratWarga') }}"
+            class="px-4 py-2 rounded-lg font-medium transition-all duration-200
+                hover:bg-blue-100 hover:text-blue-700 hover:shadow-md
+                {{ request()->routeIs('riwayatSuratWarga') ? 'bg-blue-200 text-blue-700' : 'text-gray-700' }}">
+            📜 Riwayat Surat
         </a>
 
-        {{-- Riwayat Surat --}}
-        <a href="#"
+        {{-- Bank Data KK --}}
+        <a href="{{ route('bankDataKk') }}"
            class="px-4 py-2 rounded-lg font-medium transition-all duration-200
                   hover:bg-blue-100 hover:text-blue-700 hover:shadow-md
-                  {{ request()->routeIs('riwayatSurat') ? 'bg-blue-200 text-blue-700' : 'text-gray-700' }}">
-            📜 Riwayat Surat
+                  {{ request()->routeIs('bankDataKk') ? 'bg-blue-200 text-blue-700' : 'text-gray-700' }}">
+            📂 Bank Data KK
         </a>
 
         {{-- Logout --}}

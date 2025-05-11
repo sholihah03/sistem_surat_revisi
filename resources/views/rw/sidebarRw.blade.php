@@ -2,7 +2,7 @@
     <nav class="flex flex-col gap-4 text-gray-700 pt-20 p-6">
     <a href="{{ route('dashboardRw') }}" class="px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 hover:bg-green-100 hover:text-green-700 hover:shadow-md active:bg-green-200">🏠 Dashboard</a>
     <a href="{{ route('manajemenAkunRt') }}" class="px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 hover:bg-green-100 hover:text-green-700 hover:shadow-md active:bg-green-200">👥 Manajemen Akun RT</a>
-    <a href="#" class="px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 hover:bg-green-100 hover:text-green-700 hover:shadow-md active:bg-green-200">📄 Manajemen Surat</a>
+    <a href="{{ route('manajemenSuratWarga') }}" class="px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 hover:bg-green-100 hover:text-green-700 hover:shadow-md active:bg-green-200">📄 Manajemen Surat</a>
     <a href="{{ route('suratPengantar') }}" class="px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 hover:bg-green-100 hover:text-green-700 hover:shadow-md active:bg-green-200">🖋️ Template Surat</a>
     <a href="{{ route('tujuanSurat') }}" class="px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 hover:bg-green-100 hover:text-green-700 hover:shadow-md active:bg-green-200">📬 Kelola Tujuan Surat</a>
     <a href="#" class="px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 hover:bg-green-100 hover:text-green-700 hover:shadow-md active:bg-green-200">📜 Riwayat Surat</a>

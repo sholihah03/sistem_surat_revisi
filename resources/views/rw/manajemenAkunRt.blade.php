@@ -2,8 +2,6 @@
 
 @section('content')
 <h1 class="text-2xl pt-20 md:text-3xl font-bold text-gray-800 mb-6">Manajemen Akun RT</h1>
-<!-- Tombol Tambah Akun -->
-
 <!-- Menampilkan pesan sukses jika ada -->
 @if(session('success'))
     <div id="successModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">

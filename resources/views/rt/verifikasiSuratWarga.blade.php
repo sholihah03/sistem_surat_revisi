@@ -29,7 +29,7 @@
 
                 @if ($jumlahData === 0)
                     <tr>
-                        <td colspan="5" class="p-4 text-center text-gray-500">Data pengajuan belum ada.</td>
+                        <td colspan="11" class="p-4 text-center text-gray-500">Data pengajuan belum ada.</td>
                     </tr>
                 @else
                     @foreach($pengajuanSurat as $surat)

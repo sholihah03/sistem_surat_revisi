@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <title>Dashboard RT</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -27,35 +28,54 @@
 
         <!-- Right section -->
         <div class="flex items-center gap-4">
-            <!-- Notification Icon -->
-            <div class="relative group">
-                <button class="relative focus:outline-none">
-                    <!-- Icon -->
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700 hover:text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C8.67 6.165 8 7.388 8 9v5.159c0 .538-.214 1.055-.595 1.436L6 17h5m4 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            <!-- Icon Notifikasi -->
+            <div x-data="{ open: false }" class="relative">
+                <!-- Tombol Notifikasi -->
+                <button @click="open = !open" class="relative focus:outline-none">
+                    <!-- Icon Lonceng -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700 hover:text-blue-700" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C8.67 6.165 8 7.388 8 9v5.159c0 .538-.214 1.055-.595 1.436L6 17h5m4 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>
 
-                    <!-- Badge jika ada pending -->
-                    @if($pendingCount > 0)
+                    <!-- Badge Notifikasi -->
+                    @if($totalNotif > 0)
                     <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full px-1">
-                        {{ $pendingCount }}
+                        {{ $totalNotif }}
                     </span>
                     @endif
                 </button>
 
-                <!-- Dropdown isi notifikasi -->
-                @if($pendingCount > 0)
-                <div class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg z-50 hidden group-hover:block">
+                <!-- Isi Dropdown Notifikasi -->
+                <div x-show="open" @click.outside="open = false" x-transition
+                    class="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-lg z-50">
                     <div class="p-4 text-sm text-gray-800">
                         <p class="font-semibold">🔔 Notifikasi</p>
                         <hr class="my-2">
-                        <p class="text-sm">Ada {{ $pendingCount }} akun warga baru yang menunggu verifikasi.</p>
-                        <a href="{{ route('verifikasiAkunWarga') }}" class="mt-2 inline-block text-blue-600 hover:underline text-sm">Lihat Detail</a>
+
+                        @if($pendingCount > 0)
+                            <p class="text-sm mb-1">- {{ $pendingCount }} akun warga baru menunggu verifikasi.</p>
+                            <a href="{{ route('verifikasiAkunWarga') }}" class="text-blue-600 hover:underline text-sm">Lihat Akun</a><br>
+                        @endif
+
+                        @if($pendingSuratCount > 0)
+                            <p class="text-sm mt-2">- {{ $pendingSuratCount }} pengajuan surat tujuan populer menunggu pemeriksaan.</p>
+                            <a href="{{ route('verifikasiSurat') }}" class="text-blue-600 hover:underline text-sm">Cek Surat Populer</a><br>
+                        @endif
+
+                        @if($pendingSuratLainCount > 0)
+                            <p class="text-sm mt-2">- {{ $pendingSuratLainCount }} pengajuan surat lain menunggu pemeriksaan.</p>
+                            <a href="{{ route('verifikasiSurat') }}" class="text-blue-600 hover:underline text-sm">Cek Surat Lain</a>
+                        @endif
+
+                        <!-- Menampilkan pesan jika tidak ada notifikasi -->
+                        @if($pendingCount == 0 && $pendingSuratCount == 0 && $pendingSuratLainCount == 0)
+                            <p class="text-sm text-gray-500 mt-2">Tidak ada notifikasi.</p>
+                        @endif
                     </div>
                 </div>
-                @endif
             </div>
-
             <!-- Profile Icon -->
             <button class="rounded-full overflow-hidden w-8 h-8 bg-blue-100 hover:ring-2 hover:ring-blue-400">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full text-blue-700 p-1" fill="currentColor" viewBox="0 0 24 24">
