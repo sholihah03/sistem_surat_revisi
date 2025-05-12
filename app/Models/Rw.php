@@ -19,9 +19,9 @@ class Rw extends Model implements Authenticatable
         'email_rw',
         'no_hp_rw',
         'password',
+        'profile_rw',
         'ttd_digital',
         'ttd_digital_bersih',
-        'login',
     ];
 
     protected $hidden = ['password'];

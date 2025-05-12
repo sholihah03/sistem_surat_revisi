@@ -21,9 +21,9 @@ class RWSeeder extends Seeder
                 'email_rw' => 'rw007@gmail.com',
                 'no_hp_rw' => '081234567890',
                 'password' => Hash::make('rw_007'),
+                'profile_rw' => null,
                 'ttd_digital' => null,
                 'ttd_digital_bersih' => null,
-                'login' => false,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]

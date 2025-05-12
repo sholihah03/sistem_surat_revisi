@@ -22,10 +22,9 @@ class Rt extends Model implements Authenticatable
         'email_rt',
         'no_hp_rt',
         'password',
+        'profile_rt',
         'ttd_digital',
         'ttd_digital_bersih',
-        'login',
-        'verifikasiSurat',
     ];
 
     protected $hidden = ['password'];

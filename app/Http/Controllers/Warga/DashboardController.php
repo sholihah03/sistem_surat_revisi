@@ -12,6 +12,7 @@ class DashboardController extends Controller
 {
     public function index(){
         $wargaId = Auth::guard('warga')->id();
+        $warga = Auth::guard('warga')->user();
 
         $pengajuanSurat = PengajuanSurat::where(function ($query) use ($wargaId) {
                                     $query->where('warga_id', $wargaId)
@@ -32,7 +33,7 @@ class DashboardController extends Controller
         // Gabungkan data
         $pengajuanSurat = $pengajuanSurat->merge($pengajuanSuratLain);
 
-        return view('warga.dashboard', compact('pengajuanSurat'));
+        return view('warga.dashboard', compact('pengajuanSurat', 'warga'));
     }
 
 }

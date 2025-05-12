@@ -106,6 +106,42 @@
 
 <script>
 function showModal(aksi, id, jenis) {
+    if (aksi === 'setuju' && jenis === 'biasa') {
+        // Buat form dinamis dan langsung submit
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = "{{ route('verifikasiSuratProses') }}";
+
+        const csrf = document.createElement('input');
+        csrf.type = 'hidden';
+        csrf.name = '_token';
+        csrf.value = '{{ csrf_token() }}';
+        form.appendChild(csrf);
+
+        const inputId = document.createElement('input');
+        inputId.type = 'hidden';
+        inputId.name = 'id';
+        inputId.value = id;
+        form.appendChild(inputId);
+
+        const inputJenis = document.createElement('input');
+        inputJenis.type = 'hidden';
+        inputJenis.name = 'jenis';
+        inputJenis.value = jenis;
+        form.appendChild(inputJenis);
+
+        const inputAksi = document.createElement('input');
+        inputAksi.type = 'hidden';
+        inputAksi.name = 'aksi';
+        inputAksi.value = aksi;
+        form.appendChild(inputAksi);
+
+        document.body.appendChild(form);
+        form.submit();
+        return;
+    }
+
+    // Reset input dan tampilkan modal untuk selain "biasa disetujui"
     document.getElementById('formId').value = id;
     document.getElementById('formAksi').value = aksi;
     document.getElementById('formJenis').value = jenis;
@@ -121,6 +157,7 @@ function showModal(aksi, id, jenis) {
 
     document.getElementById('modal').classList.remove('hidden');
 }
+
 
 function closeModal() {
     document.getElementById('modal').classList.add('hidden');

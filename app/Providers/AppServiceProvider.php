@@ -5,7 +5,7 @@ namespace App\Providers;
 use App\Models\PengajuanSurat;
 use App\Models\PengajuanSuratLain;
 use App\Models\ScanKK;
-use App\Services\OCRService;
+use App\Service\OCRService;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -33,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
             ->count();
 
             $totalNotif = $pendingCount + $pendingSuratCount + $pendingSuratLainCount;
-            
+
             $view->with([
                 'pendingCount' => $pendingCount,
                 'pendingSuratCount' => $pendingSuratCount,

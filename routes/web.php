@@ -10,6 +10,8 @@ use App\Http\Middleware\AuthenticateWarga;
 use App\Http\Controllers\UploadKKController;
 use App\Http\Controllers\Rt\BankDataController;
 use App\Http\Controllers\BuatPasswordController;
+use App\Http\Controllers\Rt\ProfileRtController;
+use App\Http\Controllers\Rt\TtdDigitalController;
 use App\Http\Controllers\Rw\DashboardRwController;
 use App\Http\Controllers\Rw\TujuanSuratController;
 use App\Http\Controllers\UploadKKManualController;
@@ -67,10 +69,7 @@ Route::prefix('warga')->middleware(AuthenticateWarga::class)->group(function () 
 });
 
 Route::prefix('rt')->middleware(AuthenticateRt::class)->group(function () {
-    // Route::get('/dashboardRt', [RtDashboardController::class, 'index'])->name('dashboardRt');
-    Route::get('/dashboardRt', function () {
-        return view('rt.mainRt');
-    })->name('dashboardRt');
+    Route::get('/dashboardRt', [RtDashboardController::class, 'indexMain'])->name('dashboardRt');
     Route::get('/verifikasiAkunWarga', [VerifikasiAkunWargaController::class, 'index'])->name('verifikasiAkunWarga');
     Route::get('/detailVerifikasiAkunWarga/{id}', [VerifikasiAkunWargaController::class, 'detailVerifikasiAkunWarga'])->name('detailVerifikasiAkunWarga');
     Route::post('/verifikasiAkunWarga/{id}/disetujui', [VerifikasiAkunWargaController::class, 'disetujui'])->name('verifikasiAkunWarga.disetujui');
@@ -81,6 +80,11 @@ Route::prefix('rt')->middleware(AuthenticateRt::class)->group(function () {
     Route::post('/verifikasiSuratProses', [VerifikasiSuratController::class, 'proses'])->name('verifikasiSuratProses');
     Route::get('/riwayatSuratWarga', [RiwayatSuratWargaController::class, 'index'])->name('riwayatSuratWarga');
     Route::get('/bankDataKk', [BankDataController::class, 'index'])->name('bankDataKk');
+    Route::get('/scanTtdRt', [TtdDigitalController::class, 'index'])->name('scanTtdRt');
+    Route::post('/scanTtdRtUpload', [TtdDigitalController::class, 'store'])->name('scanTtdRtUpload');
+    Route::get('/profileRt', [ProfileRtController::class, 'index'])->name('profileRt');
+    Route::post('/profileRtUpload', [ProfileRtController::class, 'updateProfileRtImage'])->name('uploadProfileRt');
+    Route::put('/profileRtUploadData', [ProfileRtController::class, 'updateData'])->name('updateDataRt');
 });
 
 

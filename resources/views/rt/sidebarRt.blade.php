@@ -63,6 +63,14 @@
             📂 Bank Data KK
         </a>
 
+        {{-- Scan TTD --}}
+        <a href="{{ route('profileRt') }}"
+           class="px-4 py-2 rounded-lg font-medium transition-all duration-200
+                  hover:bg-blue-100 hover:text-blue-700 hover:shadow-md
+                  {{ request()->routeIs('profileRt') ? 'bg-blue-200 text-blue-700' : 'text-gray-700' }}">
+            ✒️ TTD Digital
+        </a>
+
         {{-- Logout --}}
         <a href="{{ route('logout') }}"
            class="mt-8 px-4 py-2 rounded-lg font-medium text-red-600 transition-all duration-200

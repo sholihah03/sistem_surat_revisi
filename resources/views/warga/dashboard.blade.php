@@ -71,7 +71,7 @@
                 <div class="carousel-item active position-relative">
                     <img src="{{ asset('images/layananMasyarakat5.png') }}" class="d-block w-100 custom-carousel-img" alt="Slide 1">
                     <div class="carousel-caption carousel-text bg-black bg-opacity-50 rounded px-3 py-2">
-                        <h5 class="text-white font-bold text-xl md:text-2xl">Selamat Datang, Warga!</h5>
+                        <h5 class="text-white font-bold text-xl md:text-2xl">Selamat Datang, {{ $warga->nama_lengkap }}!</h5>
                         <p class="text-white text-xs md:text-sm mt-1">
                         Gunakan sistem ini untuk mengelola surat pengantar secara digital, cepat, dan mudah.
                         </p>

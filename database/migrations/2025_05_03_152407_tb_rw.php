@@ -18,9 +18,9 @@ return new class extends Migration
             $table->string('email_rw', 225);
             $table->string('no_hp_rw', 225);
             $table->string('password', 225);
+            $table->string('profile_rw')->nullable();
             $table->text('ttd_digital')->nullable();
             $table->text('ttd_digital_bersih')->nullable();
-            $table->boolean('login')->default(false);
             $table->timestamps();
         });
     }

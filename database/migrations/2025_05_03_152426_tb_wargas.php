@@ -22,7 +22,6 @@ return new class extends Migration
             $table->boolean('status_verifikasi')->default(false);
             $table->string('remember_token', 225)->nullable();
             $table->string('password', 225)->nullable();
-            $table->boolean('login')->default(false);
             $table->timestamps();
         });
     }

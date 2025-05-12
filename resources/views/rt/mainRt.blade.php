@@ -6,16 +6,16 @@
     <!-- Kartu Statistik -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="p-4 md:p-6 bg-green-100 rounded-xl shadow border-l-4 border-green-500">
-            <h2 class="text-base md:text-lg font-semibold mb-2">📑 Surat Masuk</h2>
-            <p class="text-xl md:text-2xl font-bold text-green-700">12</p>
+            <h2 class="text-base md:text-lg font-semibold mb-2">📑 Surat Masuk Dalam Sebulan</h2>
+            <p class="text-xl md:text-2xl font-bold text-green-700">{{ $totalSuratMasuk }}</p>
         </div>
         <div class="p-4 md:p-6 bg-blue-100 rounded-xl shadow border-l-4 border-blue-500">
-            <h2 class="text-base md:text-lg font-semibold mb-2">✅ Surat Disetujui</h2>
-            <p class="text-xl md:text-2xl font-bold text-blue-700">8</p>
+            <h2 class="text-base md:text-lg font-semibold mb-2">✅ Surat Disetujui Dalam Sebulan</h2>
+            <p class="text-xl md:text-2xl font-bold text-blue-700">{{ $totalDisetujui }}</p>
         </div>
         <div class="p-4 md:p-6 bg-yellow-100 rounded-xl shadow border-l-4 border-yellow-500">
             <h2 class="text-base md:text-lg font-semibold mb-2">👥 Warga Belum Diverifikasi</h2>
-            <p class="text-xl md:text-2xl font-bold text-yellow-700">4</p>
+            <p class="text-xl md:text-2xl font-bold text-yellow-700">{{ $pendingCount }}</p>
         </div>
     </div>
 
@@ -36,17 +36,41 @@
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-2 md:px-4 py-2 whitespace-nowrap">2025-04-26</td>
-                        <td class="px-2 md:px-4 py-2 whitespace-nowrap">Budi Santoso</td>
-                        <td class="px-2 md:px-4 py-2 whitespace-nowrap">Surat Domisili</td>
-                        <td class="px-2 md:px-4 py-2">
-                        <span class="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded text-xs font-semibold">Menunggu</span>
-                        </td>
-                        <td class="px-2 md:px-4 py-2">
-                        <a href="#" class="text-blue-500 hover:underline">Verifikasi</a>
-                        </td>
-                    </tr>
+                    @foreach ($pengajuanTerbaru as $pengajuan)
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-2 md:px-4 py-2 whitespace-nowrap">{{ $pengajuan->created_at->format('Y-m-d') }}</td>
+                            <td class="px-2 md:px-4 py-2 whitespace-nowrap">{{ $pengajuan->warga->nama_lengkap }}</td>
+                            <td class="px-2 md:px-4 py-2 whitespace-nowrap">
+                                @if ($pengajuan instanceof \App\Models\PengajuanSurat)
+                                    {{ $pengajuan->tujuanSurat->nama_tujuan ?? '-' }}
+                                @else
+                                    {{ $pengajuan->tujuan_manual }}
+                                @endif
+                            </td>
+                            <td class="px-2 md:px-4 py-2 whitespace-nowrap">
+                                @if ($pengajuan->status === 'menunggu' || $pengajuan->status_pengajuan_lain === 'menunggu')
+                                    <span class="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded text-xs font-semibold">
+                                        Menunggu
+                                    </span>
+                                @elseif ($pengajuan->status === 'disetujui' || $pengajuan->status_pengajuan_lain === 'disetujui')
+                                    <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs font-semibold">
+                                        Disetujui
+                                    </span>
+                                @elseif ($pengajuan->status === 'ditolak' || $pengajuan->status_pengajuan_lain === 'ditolak')
+                                    <span class="bg-red-100 text-red-800 px-2 py-0.5 rounded text-xs font-semibold">
+                                        Ditolak
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-2 md:px-4 py-2">
+                                @if ($pengajuan->status === 'menunggu' || $pengajuan->status_pengajuan_lain === 'menunggu')
+                                    <a href="{{ route('verifikasiSurat') }}" class="text-blue-500 hover:underline">Verifikasi</a>
+                                @else
+                                    <a href="{{ route('riwayatSuratWarga') }}" class="text-blue-500 hover:underline">Riwayat Surat</a>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
                     </tbody>
                 </table>
                 </div>
