@@ -104,7 +104,7 @@
                 <h3 class="text-lg font-semibold text-gray-800">{{ $item->nama_tujuan }}</h3>
                 <p class="text-gray-600 text-sm">{{ Str::limit($item->deskripsi ?? 'Deskripsi tidak tersedia', 100) }}</p>
               </div>
-              <a href="{{ route('formPengajuanSurat', ['tujuan' => $item->nama_tujuan, 'id' => $item->id_tujuan_surat]) }}"
+              <a href="{{ route('formPengajuanSurat', ['tujuan' => $item->nama_tujuan, 'id' => $item->id_tujuan_surat, 'nomor' => $item->nomor_surat]) }}"
                 class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
                 Ajukan
              </a>
@@ -123,10 +123,10 @@
                 <h3 class="text-lg font-semibold text-gray-800">{{ $item->nama_tujuan }}</h3>
                 <p class="text-gray-600 text-sm">{{ Str::limit($item->deskripsi ?? 'Deskripsi tidak tersedia', 100) }}</p>
               </div>
-              <a href="{{ route('formPengajuanSurat', ['tujuan' => $item->nama_tujuan, 'id' => $item->id_tujuan_surat]) }}"
+             <a href="{{ route('formPengajuanSurat', ['tujuan' => $item->nama_tujuan, 'id' => $item->id_tujuan_surat, 'nomor' => $item->nomor_surat]) }}"
                 class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
                 Ajukan
-             </a>
+            </a>
             </div>
           @endforeach
         </div>

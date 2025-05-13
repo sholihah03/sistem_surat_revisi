@@ -12,29 +12,32 @@ use Illuminate\Support\Carbon;
 use App\Mail\VerifikasiAkunDitolak;
 use App\Http\Controllers\Controller;
 use App\Service\NotificationService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\VerifikasiAkunDisetujui;
 
 class VerifikasiAkunWargaController extends Controller
 {
     public function index(){
+        $profile_rt = Auth::guard('rt')->user()->profile_rt;
         $pendingData = ScanKK::with(['alamat', 'pendaftaran'])
         ->where('status_verifikasi', 'pending')
         ->get();
 
 
-        return view('rt.verifikasiAkunWarga', compact('pendingData'));
+        return view('rt.verifikasiAkunWarga', compact('pendingData', 'profile_rt'));
     }
 
 
     public function detailVerifikasiAkunWarga()
     {
+        $profile_rt = Auth::guard('rt')->user()->profile_rt;
         $pendingData = ScanKK::with(['alamat', 'pendaftaran'])
         ->where('status_verifikasi', 'pending')
         ->get();
 
 
-        return view('rt.detailVerifikasiAkunWarga', compact('pendingData'));
+        return view('rt.detailVerifikasiAkunWarga', compact('pendingData', 'profile_rt'));
     }
 
     public function disetujui($id)

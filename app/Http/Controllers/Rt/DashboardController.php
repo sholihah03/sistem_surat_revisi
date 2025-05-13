@@ -15,15 +15,18 @@ class DashboardController extends Controller
     public function index()
     {
         $pendingCount = ScanKK::where('status_verifikasi', 'pending')->count();
+        $profile_rt = Auth::guard('rt')->user()->profile_rt;
+
 
         // Kirimkan data ke view
-        return view('rt.dashboardRt', compact('pendingCount'));
+        return view('rt.dashboardRt', compact('pendingCount', 'profile_rt'));
     }
 
     public function indexMain()
     {
         $rt = Auth::guard('rt')->user(); // RT yang sedang login
         $rtId = $rt->id_rt;
+        $profile_rt = Auth::guard('rt')->user()->profile_rt;
 
         $bulanIni = Carbon::now()->month;
         $tahunIni = Carbon::now()->year;
@@ -102,7 +105,7 @@ class DashboardController extends Controller
             ->take(5);
 
 
-        return view('rt.mainRt', compact('pendingCount', 'totalSuratMasuk', 'totalDisetujui', 'pengajuanTerbaru'));
+        return view('rt.mainRt', compact('pendingCount', 'totalSuratMasuk', 'totalDisetujui', 'pengajuanTerbaru', 'profile_rt'));
     }
 
 }

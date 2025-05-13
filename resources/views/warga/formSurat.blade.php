@@ -73,38 +73,3 @@
 
 </body>
 </html>
-
-
-{{-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Form Surat</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 min-h-screen py-10 px-4">
-    <div class="max-w-3xl mx-auto bg-white rounded-xl shadow p-6">
-        <h2 class="text-xl font-bold mb-4 text-gray-800 text-center">Form Pengajuan Surat Pengantar</h2>
-
-        <form method="POST" action="{{ route('kirim-surat') }}">
-            @csrf
-            <input type="hidden" name="tujuan_surat" value="{{ request('tujuan') }}">
-
-            <div class="grid grid-cols-1 gap-4">
-                <x-input label="Nama" name="nama" required />
-                <x-input label="Tempat / Tanggal Lahir" name="ttl" required />
-                <x-input label="Nomor KTP" name="ktp" required />
-                <x-select label="Status Perkawinan" name="status" :options="['Kawin', 'Belum', 'Janda', 'Duda']" required />
-                <x-input label="Kebangsaan / Agama" name="kebangsaan" required />
-                <x-input label="Pekerjaan" name="pekerjaan" required />
-                <x-textarea label="Alamat" name="alamat" required />
-                <x-textarea label="Untuk / Maksud / Tujuan" name="maksud" required />
-            </div>
-
-            <button type="submit" class="mt-6 w-full bg-yellow-400 hover:bg-yellow-500 text-white py-2 rounded font-semibold">
-                Kirim Pengajuan
-            </button>
-        </form>
-    </div>
-</body>
-</html> --}}

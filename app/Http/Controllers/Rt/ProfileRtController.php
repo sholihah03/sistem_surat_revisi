@@ -13,7 +13,8 @@ class ProfileRtController extends Controller
     public function index()
     {
         $rt = Auth::guard('rt')->user();
-        return view('rt.profileRt', compact('rt'));
+        $profile_rt = Auth::guard('rt')->user()->profile_rt;
+        return view('rt.profileRt', compact('rt', 'profile_rt'));
     }
 
     public function updateData(Request $request)

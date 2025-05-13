@@ -31,13 +31,15 @@ class PengajuanSuratController extends Controller
     public function formPengajuanSurat(Request $request)
     {
         $tujuan = $request->query('tujuan');
+        $nomor = $request->query('nomor');
         $warga = Auth::guard('warga')->user(); // asumsinya pakai guard 'warga'
 
         // Ambil alamat dari relasi melalui ScanKK
         $alamat = $warga->scan_Kk?->alamat;
 
-        return view('warga.formSuratTujuanPopuler', compact('tujuan', 'warga', 'alamat'));
+        return view('warga.formSuratTujuanPopuler', compact('tujuan', 'warga', 'alamat', 'nomor'));
     }
+    
 
     public function formPengajuanSuratStore(Request $request)
     {

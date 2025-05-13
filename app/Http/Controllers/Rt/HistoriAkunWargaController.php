@@ -6,12 +6,13 @@ use App\Models\ScanKK;
 use App\Models\Kadaluwarsa;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class HistoriAkunWargaController extends Controller
 {
     public function historiVerifikasiAkunWarga(Request $request)
         {
-
+            $profile_rt = Auth::guard('rt')->user()->profile_rt;
             $search = $request->input('search');
 
             $historiData = ScanKK::with(['alamat', 'wargas', 'pendaftaran'])
@@ -32,12 +33,13 @@ class HistoriAkunWargaController extends Controller
 
             $historiData = $historiData->get();
 
-            return view('rt.historiVerifikasiAkunWarga', compact('historiData'));
+            return view('rt.historiVerifikasiAkunWarga', compact('historiData', 'profile_rt'));
         }
 
         public function historiKadaluwarsa()
         {
             $dataKadaluwarsa = Kadaluwarsa::orderBy('created_at', 'desc')->get();
-            return view('rt.historiAkunKadaluwarsa', compact('dataKadaluwarsa'));
+            $profile_rt = Auth::guard('rt')->user()->profile_rt;
+            return view('rt.historiAkunKadaluwarsa', compact('dataKadaluwarsa', 'profile_rt'));
         }
 }

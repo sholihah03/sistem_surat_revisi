@@ -10,11 +10,6 @@ use Illuminate\Support\Facades\Storage;
 
 class TtdDigitalController extends Controller
 {
-    public function index()
-    {
-        return view('rt.scanTTD');
-    }
-
     public function store(Request $request)
     {
         $validated = $request->validate([

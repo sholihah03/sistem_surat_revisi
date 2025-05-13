@@ -67,7 +67,7 @@
             <!-- Judul -->
             <div class="text-center mb-2">
                 <h2 class="font-bold tracking-widest underline">SURAT PENGANTAR</h2>
-                <p>Nomor : .....................................</p>
+                <p>Nomor : {{ $nomor }}</p>
             </div>
             <form x-ref="form" method="POST" action="{{ route('formPengajuanSuratStore') }}">
                 @csrf

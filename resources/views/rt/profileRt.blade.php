@@ -111,45 +111,6 @@
             </div>
         </div>
 
-        <!-- Modal Edit -->
-<div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden h-full w-full overflow-hidden">
-    <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative box-border">
-        <!-- Tombol Close -->
-        <button onclick="closeModal()" class="absolute top-2 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold">&times;</button>
-
-        <h2 class="text-xl font-bold mb-4">Edit Data</h2>
-
-        <form action="{{ route('updateDataRt') }}" method="POST">
-            @csrf
-            @method('PUT')
-
-            <!-- No HP -->
-            <div class="mb-4">
-                <label class="block text-gray-600 mb-1" for="no_hp_rt">No. HP</label>
-                <input type="text" name="no_hp_rt" id="no_hp_rt"
-                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-indigo-500"
-                    value="{{ $rt->no_hp_rt }}">
-            </div>
-
-            <!-- Email -->
-            <div class="mb-4">
-                <label class="block text-gray-600 mb-1" for="email_rt">Email</label>
-                <input type="email" name="email_rt" id="email_rt"
-                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-indigo-500"
-                    value="{{ $rt->email_rt }}">
-            </div>
-
-            <!-- Submit -->
-            <div class="text-center mt-6">
-                <button type="submit"
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg">
-                    Simpan Perubahan
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
         <!-- Form Upload TTD -->
         <div class="bg-white shadow-lg rounded-2xl p-6 md:w-1/2">
             <h1 class="text-2xl font-bold mb-4 text-center text-gray-800">Upload Scan Tanda Tangan</h1>
@@ -188,26 +149,32 @@
             @else
             <!-- Jika tanda tangan sudah ada, tampilkan gambar dan tombol Edit -->
             <div class="mt-4">
-                <table class="min-w-full table-auto">
+                <table class="min-w-full table-auto border border-gray-300 border-collapse">
                     <thead>
-                        <tr>
-                            <th class="px-4 py-2">Tanda Tangan Scan</th>
-                            <th class="px-4 py-2">Tanda Tangan Bersih</th>
-                            <th class="px-4 py-2">Aksi</th>
+                        <tr class="bg-gray-100">
+                            <th class="px-4 py-2 border border-gray-300">Tanda Tangan Scan</th>
+                            <th class="px-4 py-2 border border-gray-300">Tanda Tangan Bersih</th>
+                            <th class="px-4 py-2 border border-gray-300">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="px-4 py-2">
-                                <img src="{{ Storage::url($rt->ttd_digital) }}" alt="Tanda Tangan Scan" class="w-20 h-20 object-cover">
+                            <td class="px-4 py-2 border border-gray-300 text-center">
+                                <img src="{{ Storage::url($rt->ttd_digital) }}"
+                                    alt="Tanda Tangan Scan"
+                                    class="w-20 h-20 object-cover mx-auto cursor-pointer transition-transform duration-200 hover:scale-105"
+                                    onclick="showImageModal('{{ Storage::url($rt->ttd_digital) }}')">
                             </td>
-                            <td class="px-4 py-2">
-                                <img src="{{ Storage::url($rt->ttd_digital_bersih) }}" alt="Tanda Tangan Bersih" class="w-20 h-20 object-cover">
+                            <td class="px-4 py-2 border border-gray-300 text-center">
+                                <img src="{{ Storage::url($rt->ttd_digital_bersih) }}"
+                                    alt="Tanda Tangan Bersih"
+                                    class="w-20 h-20 object-cover mx-auto cursor-pointer transition-transform duration-200 hover:scale-105"
+                                    onclick="showImageModal('{{ Storage::url($rt->ttd_digital_bersih) }}')">
                             </td>
-                            <td class="px-4 py-2">
+                            <td class="px-4 py-2 border border-gray-300 text-center">
                                 <button type="button" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600" onclick="openModalTtd()">
                                     Edit
-                                </button
+                                </button>
                             </td>
                         </tr>
                     </tbody>
@@ -215,31 +182,75 @@
             </div>
             @endif
         </div>
+    </div>
+    <!-- Modal Edit -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden h-full w-full overflow-hidden">
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative box-border">
+            <!-- Tombol Close -->
+            <button onclick="closeModal()" class="absolute top-2 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold">&times;</button>
 
-        <!-- Modal untuk Upload Tanda Tangan -->
-        <div id="editTtdModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-90 hidden">
-            <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
-                <!-- Tombol Close Modal -->
-                <button onclick="closeModalTtd()" class="absolute top-2 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold">&times;</button>
+            <h2 class="text-xl font-bold mb-4">Edit Data</h2>
 
-                <h2 class="text-xl font-bold mb-4">Edit Tanda Tangan</h2>
+            <form action="{{ route('updateDataRt') }}" method="POST">
+                @csrf
+                @method('PUT')
 
-                <form action="{{ route('scanTtdRtUpload') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <!-- Pilih Gambar Tanda Tangan -->
-                    <div class="mb-4">
-                        <label for="scan_ttd" class="block text-sm font-medium text-gray-700 mb-1">Pilih Gambar Scan Tanda Tangan</label>
-                        <input type="file" name="ttd_digital" accept="image/*" required
-                            class="block w-full text-sm text-gray-700 bg-gray-100 border border-gray-300 rounded-lg cursor-pointer p-2">
-                    </div>
+                <!-- No HP -->
+                <div class="mb-4">
+                    <label class="block text-gray-600 mb-1" for="no_hp_rt">No. HP</label>
+                    <input type="text" name="no_hp_rt" id="no_hp_rt"
+                        class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-indigo-500"
+                        value="{{ $rt->no_hp_rt }}">
+                </div>
 
-                    <div class="text-center mt-6">
-                        <button type="submit" class="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700">
-                            Upload
-                        </button>
-                    </div>
-                </form>
-            </div>
+                <!-- Email -->
+                <div class="mb-4">
+                    <label class="block text-gray-600 mb-1" for="email_rt">Email</label>
+                    <input type="email" name="email_rt" id="email_rt"
+                        class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-indigo-500"
+                        value="{{ $rt->email_rt }}">
+                </div>
+
+                <!-- Submit -->
+                <div class="text-center mt-6">
+                    <button type="submit"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg">
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal tampilan gambar -->
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
+        <span class="absolute top-4 right-6 text-white text-3xl cursor-pointer" onclick="closeImageModal()">&times;</span>
+        <img id="modalImage" src="" alt="Preview" class="max-w-sm max-h-50 border-4 border-white rounded-lg shadow-lg">
+    </div>
+
+    <!-- Modal untuk Upload Tanda Tangan -->
+    <div id="editTtdModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-90 hidden">
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
+            <!-- Tombol Close Modal -->
+            <button onclick="closeModalTtd()" class="absolute top-2 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold">&times;</button>
+
+            <h2 class="text-xl font-bold mb-4">Edit Tanda Tangan</h2>
+
+            <form action="{{ route('scanTtdRtUpload') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <!-- Pilih Gambar Tanda Tangan -->
+                <div class="mb-4">
+                    <label for="scan_ttd" class="block text-sm font-medium text-gray-700 mb-1">Pilih Gambar Scan Tanda Tangan</label>
+                    <input type="file" name="ttd_digital" accept="image/*" required
+                        class="block w-full text-sm text-gray-700 bg-gray-100 border border-gray-300 rounded-lg cursor-pointer p-2">
+                </div>
+
+                <div class="text-center mt-6">
+                    <button type="submit" class="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700">
+                        Upload
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -308,6 +319,15 @@
     // Fungsi untuk menutup modal
     function closeModalTtd() {
         document.getElementById('editTtdModal').classList.add('hidden');
+    }
+
+    function showImageModal(imageSrc) {
+        document.getElementById('modalImage').src = imageSrc;
+        document.getElementById('imageModal').classList.remove('hidden');
+    }
+
+    function closeImageModal() {
+        document.getElementById('imageModal').classList.add('hidden');
     }
 </script>
 
