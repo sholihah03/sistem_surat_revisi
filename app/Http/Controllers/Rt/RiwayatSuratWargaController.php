@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 class RiwayatSuratWargaController extends Controller
 {
     public function indexx(Request $request){
-        return view('rt.templateSurat');
+        return view('rt.suratPengantar');
     }
 
     public function index(Request $request)
@@ -39,6 +39,34 @@ class RiwayatSuratWargaController extends Controller
             ->get();
 
         return view('rt.riwayatSuratWarga', compact('profile_rt', 'pengajuanBiasa', 'pengajuanLain'));
+    }
+
+    public function tampilkanSurat($jenis, $id)
+    {
+        $profile_rt = Auth::guard('rt')->user()->profile_rt;
+        if ($jenis === 'biasa') {
+            $pengajuan = PengajuanSurat::with(['warga', 'tujuanSurat', 'scanKk'])->findOrFail($id);
+            $status = $pengajuan->status;
+        } else {
+            $pengajuan = PengajuanSuratLain::with(['warga', 'scanKk'])->findOrFail($id);
+            $status = $pengajuan->status_pengajuan_lain;
+        }
+
+        if ($status !== 'disetujui') {
+            abort(403, 'Surat belum disetujui');
+        }
+
+        $rt = Auth::guard('rt')->user();
+        $ttdPath = Storage::path($rt->ttd_digital_bersih);
+        $ttdBase64 = base64_encode(file_get_contents($ttdPath));
+
+        return view('rt.hasilSurat', [
+            'pengajuan' => $pengajuan,
+            'rt' => $rt,
+            'ttd' => $ttdBase64,
+            'jenis' => $jenis,
+            'profile_rt' => $profile_rt
+        ]);
     }
 
     public function unduhSurat($jenis, $id)

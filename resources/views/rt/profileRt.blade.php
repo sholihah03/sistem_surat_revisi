@@ -229,7 +229,7 @@
     </div>
 
     <!-- Modal untuk Upload Tanda Tangan -->
-    <div id="editTtdModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-90 hidden">
+    <div id="editTtdModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
             <!-- Tombol Close Modal -->
             <button onclick="closeModalTtd()" class="absolute top-2 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold">&times;</button>

@@ -79,14 +79,14 @@ Route::prefix('rt')->middleware(AuthenticateRt::class)->group(function () {
     Route::get('/verifikasiSurat', [VerifikasiSuratController::class, 'index'])->name('verifikasiSurat');
     Route::post('/verifikasiSuratProses', [VerifikasiSuratController::class, 'proses'])->name('verifikasiSuratProses');
     Route::get('/riwayatSuratWarga', [RiwayatSuratWargaController::class, 'index'])->name('riwayatSuratWarga');
-    Route::get('/templateSurat', [RiwayatSuratWargaController::class, 'indexx'])->name('templateSurat');
+    Route::get('/surat/{jenis}/{id}/lihat', [RiwayatSuratWargaController::class, 'tampilkanSurat'])->name('rt.lihatSurat');
+    Route::get('/unduh-surat/{jenis}/{id}', [RiwayatSuratWargaController::class, 'unduhSurat'])->name('rt.unduhSurat');
     Route::get('/bankDataKk', [BankDataController::class, 'index'])->name('bankDataKk');
     Route::get('/scanTtdRt', [TtdDigitalController::class, 'index'])->name('scanTtdRt');
     Route::post('/scanTtdRtUpload', [TtdDigitalController::class, 'store'])->name('scanTtdRtUpload');
     Route::get('/profileRt', [ProfileRtController::class, 'index'])->name('profileRt');
     Route::post('/profileRtUpload', [ProfileRtController::class, 'updateProfileRtImage'])->name('uploadProfileRt');
     Route::put('/profileRtUploadData', [ProfileRtController::class, 'updateData'])->name('updateDataRt');
-    Route::get('/unduh-surat/{jenis}/{id}', [RiwayatSuratWargaController::class, 'unduhSurat'])->name('rt.unduhSurat');
     // // Surat Biasa
     // Route::get('rt/surat-biasa/cetak/{id}', [SuratRtController::class, 'cetakBiasa'])->name('rt.surat-biasa.cetak');
     // Route::get('rt/surat-biasa/unduh/{id}', [SuratRtController::class, 'unduhBiasa'])->name('rt.surat-biasa.unduh');
