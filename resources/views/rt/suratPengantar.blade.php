@@ -6,7 +6,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 40px;
+            margin: 25px;
         }
 
         .kop-surat {
@@ -48,8 +48,15 @@
         }
 
         .kepada {
-            text-align: right;
+            float: right;
+            text-align: left;
+            width: max-content;
             margin-bottom: 15px;
+        }
+
+        .tempat {
+            display: block;
+            text-align: center;
         }
 
         .judul {
@@ -64,18 +71,30 @@
             margin-bottom: 20px;
         }
 
+        p.indent {
+            text-indent: 40px; /* Sesuaikan nilai indentasi sesuai kebutuhan */
+        }
+
         .form-section {
+            display: table;
+            width: 100%;
             margin-bottom: 10px;
         }
 
         .form-section label {
-            display: inline-block;
+            display: table-cell;
             width: 180px;
             vertical-align: top;
         }
 
+        .form-section .value {
+            display: table-cell;
+            vertical-align: top;
+            padding-left: 5px;
+        }
+
         .ttd {
-        margin-top: 10px;
+        margin-top: 5px;
         flex-grow: 1;
         }
 
@@ -87,6 +106,26 @@
         .ttd-table td {
         vertical-align: bottom;
         padding-top: 20px;
+        padding-left: 0; /* Hilangkan padding kiri */
+        }
+
+        .ttd-table td:first-child {
+            padding-left: 0;
+            /* bisa juga margin-left negatif jika perlu */
+            margin-left: -10px;
+        }
+
+        .ttd-table td:last-child {
+            padding-left: 0;
+            /* bisa juga margin-left negatif jika perlu */
+            margin-left: -10px;
+        }
+
+        .nama-ttd {
+        display: inline-block;
+        width: 180px; /* Ubah sesuai kebutuhan */
+        text-align: center;
+        white-space: nowrap;
         }
     </style>
 </head>
@@ -114,77 +153,96 @@
     <!-- ISI SURAT -->
     <div class="content">
         <div class="kepada">
-            <p style="text-align: lift;">Kepada
-            <br>Yth. Lurah Margadadi
-            <br>di_
-            <br><strong style="text-align: center;">TEMPAT</strong></p>
+            <p>
+                Kepada<br>
+                Yth. Lurah Margadadi<br>
+                di_<br>
+                <strong class="tempat">TEMPAT</strong>
+            </p>
         </div>
+        <div style="clear: both;"></div>
 
         <div class="judul">SURAT PENGANTAR</div>
         <p class="nomor-surat">Nomor: {{ $pengajuan->tujuanSurat->nomor_surat ?? '.........................' }}</p>
 
-        <p>Yang bertanda tangan di bawah ini, Ketua RT {{ $rt->no_rt }} RW {{ $rt->rw->no_rw }} Kelurahan Margadadi Kecamatan Indramayu Kabupaten Indramayu, memberikan pengantar kepada:</p>
+        <p class="indent">Yang bertanda tangan di bawah ini, Ketua RT {{ $rt->no_rt }} RW {{ $rt->rw->no_rw }} Kelurahan Margadadi Kecamatan Indramayu Kabupaten Indramayu, memberikan pengantar kepada:</p>
 
         <div class="form-section">
-            <label>Nama</label>: {{ $pengajuan->warga->nama_lengkap }}
+            <label>Nama</label>
+            <span class="value">: {{ $pengajuan->warga->nama_lengkap }}</span>
         </div>
         <div class="form-section">
-            <label>Tempat/ Tanggal Lahir</label>:
-            @if ($jenis === 'biasa')
-                {{ $pengajuan->tempat_lahir ?? '-' }},
-                {{ \Carbon\Carbon::parse($pengajuan->tanggal_lahir)->translatedFormat('d F Y') }}
-            @else
-                {{ $pengajuan->tempat_lahir_pengaju_lain ?? '-' }},
-                {{ \Carbon\Carbon::parse($pengajuan->tanggal_lahir_pengaju_lain)->translatedFormat('d F Y') }}
-            @endif
+            <label>Tempat/ Tanggal Lahir</label>
+            <span class="value">:
+                @if ($jenis === 'biasa')
+                    {{ $pengajuan->tempat_lahir ?? '-' }},
+                    {{ \Carbon\Carbon::parse($pengajuan->tanggal_lahir)->translatedFormat('d F Y') }}
+                @else
+                    {{ $pengajuan->tempat_lahir_pengaju_lain ?? '-' }},
+                    {{ \Carbon\Carbon::parse($pengajuan->tanggal_lahir_pengaju_lain)->translatedFormat('d F Y') }}
+                @endif
+            </span>
         </div>
         <div class="form-section">
-            <label>Nomor KTP</label>: {{ $pengajuan->warga->nik }}
-        </div>
-        <div class="form-section"><label>Status Perkawinan</label>:
-            @if ($jenis === 'biasa')
-                {{ $pengajuan->status_perkawinan ?? '-' }}
-            @else
-                {{ $pengajuan->status_perkawinan_pengaju_lain ?? '-' }}
-            @endif
+            <label>Nomor KTP</label>
+            <span class="value">: {{ $pengajuan->warga->nik }}</span>
         </div>
         <div class="form-section">
-            <label>Kebangsaan/ Agama</label>:
-            @if ($jenis === 'biasa')
-                {{ $pengajuan->agama ?? '-' }}
-            @else
-                {{ $pengajuan->agama_pengaju_lain ?? '-' }}
-            @endif
+            <label>Status Perkawinan</label>
+            <span class="value">:
+                @if ($jenis === 'biasa')
+                    {{ $pengajuan->status_perkawinan ?? '-' }}
+                @else
+                    {{ $pengajuan->status_perkawinan_pengaju_lain ?? '-' }}
+                @endif
+            </span>
         </div>
         <div class="form-section">
-            <label>Pekerjaan</label>:
-            @if ($jenis === 'biasa')
-                {{ $pengajuan->pekerjaan ?? '-' }}
-            @else
-                {{ $pengajuan->pekerjaan_pengaju_lain ?? '-' }}
-            @endif
+            <label>Kebangsaan/ Agama</label>
+            <span class="value">:
+                @if ($jenis === 'biasa')
+                    {{ $pengajuan->agama ?? '-' }}
+                @else
+                    {{ $pengajuan->agama_pengaju_lain ?? '-' }}
+                @endif
+            </span>
         </div>
         <div class="form-section">
-            <label>Alamat</label>:
-            @php
-                $alamat = $pengajuan->scanKk->alamat ?? null;
-            @endphp
+            <label>Pekerjaan</label>
+            <span class="value">:
+                @if ($jenis === 'biasa')
+                    {{ $pengajuan->pekerjaan ?? '-' }}
+                @else
+                    {{ $pengajuan->pekerjaan_pengaju_lain ?? '-' }}
+                @endif
+            </span>
+        </div>
+        <div class="form-section">
+            <label>Alamat</label>
+            <span class="value">:
+                @php
+                    $alamat = $pengajuan->scanKk->alamat ?? null;
+                @endphp
 
-            @if ($alamat)
-                {{ $alamat->nama_jalan }},
-                RT {{ $alamat->rt_alamat ?? '-' }}/RW {{ $alamat->rw_alamat ?? '-' }},
-                Kel. {{ $alamat->kelurahan ?? '-' }},
-                Kec. {{ $alamat->kecamatan ?? '-' }},
-                Kab. {{ $alamat->kabupaten_kota ?? '-' }},
-                Prov. {{ $alamat->provinsi ?? '-' }},
-                Kode Pos {{ $alamat->kode_pos ?? '-' }}
-            @else
-                -
-            @endif
+                @if ($alamat)
+                    {{ $alamat->nama_jalan }},
+                    RT {{ $alamat->rt_alamat ?? '-' }}/RW {{ $alamat->rw_alamat ?? '-' }},<br>
+                    Kel. {{ $alamat->kelurahan ?? '-' }},
+                    Kec. {{ $alamat->kecamatan ?? '-' }},
+                    Kab. {{ $alamat->kabupaten_kota ?? '-' }},<br>
+                    Prov. {{ $alamat->provinsi ?? '-' }},
+                    Kode Pos {{ $alamat->kode_pos ?? '-' }}
+                @else
+                    -
+                @endif
+            </span>
         </div>
-        <div class="form-section"><label>Untuk/ Maksud/ Tujuan</label>: {{ $pengajuan->tujuanSurat->nama_tujuan ?? '-' }}</div>
+        <div class="form-section">
+            <label>Untuk/ Maksud/ Tujuan</label>
+            <span class="value">: {{ $pengajuan->tujuanSurat->nama_tujuan ?? '-' }}</span>
+        </div>
 
-        <p>Demikian Surat Pengantar ini dibuat untuk dapat dipergunakan sebagaimana mestinya.</p>
+        <p class="indent">Demikian Surat Pengantar ini dibuat untuk dapat dipergunakan sebagaimana mestinya.</p>
 
         <!-- TANDA TANGAN -->
         <div class="ttd">
@@ -196,9 +254,8 @@
                 <tr>
                     <td>( .............................................. )</td>
                     <td>
-                        <!-- Menampilkan Tanda Tangan Digital RT -->
-                        <img src="data:image/png;base64,{{ $ttd }}" alt="Tanda Tangan RT" style="width: 100px; height: 100px;"/>
-                        <br>({{ $rt->nama_lengkap_rt }})
+                        <img src="data:image/png;base64,{{ $ttd }}" alt="Tanda Tangan RT" style="width: 100px; height: 100px;"/><br>
+                        ( <span class="nama-ttd">{{ $rt->nama_lengkap_rt ?? '..............................................' }}</span> )
                     </td>
                 </tr>
             </table>
