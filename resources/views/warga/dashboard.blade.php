@@ -10,6 +10,18 @@
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
+   {{-- <style>
+    .js-notif-opened #notifBadge,
+    .js-notif-opened #notifBadgeMobile {
+      display: none !important;
+    }
+  </style>
+  <script>
+    if (localStorage.getItem('notifOpened') === 'true') {
+      document.documentElement.classList.add('js-notif-opened');
+    }
+  </script> --}}
+
   <script>
     tailwind.config = {
       theme: {
@@ -137,43 +149,45 @@
 
     <!-- Status Tabel -->
     <div>
-        <h3 class="text-xl font-bold text-gray-800 mb-4">📂 Status Pengajuan Surat</h3>
+        <h3 class="text-xl font-bold text-gray-800 mb-4">
+            📂 Status Pengajuan Surat - Bulan {{ \Carbon\Carbon::now()->translatedFormat('F Y') }}
+        </h3>
         <div class="overflow-x-auto bg-white rounded-lg shadow p-4">
-            @if($pengajuanSurat->isEmpty())
+            @if($pengajuanSuratGabungan->isEmpty())
                 <p class="text-center text-gray-600">Belum ada pengajuan surat.</p>
             @else
-            <table class="min-w-full text-sm text-gray-700">
-                <thead class="bg-gray-100 border-b">
-                    <tr>
-                        <th class="px-4 py-2 text-left">Tanggal</th>
-                        <th class="px-4 py-2 text-left">Tujuan Surat</th>
-                        <th class="px-4 py-2 text-left">Status</th>
-                        <th class="px-4 py-2 text-left">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                    @foreach($pengajuanSurat as $surat)
-                        <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            <td class="px-4 py-2">{{ $surat->created_at->format('Y-m-d') }}</td>
-                            <td class="px-4 py-2">{{ $surat->tujuan_surat }}</td>
-                            <td class="px-4 py-2">
-                                @if($surat->status === 'Disetujui')
-                                    <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Disetujui</span>
-                                @elseif($surat->status === 'Menunggu')
-                                    <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">Menunggu</span>
-                                @elseif($surat->status === 'Ditolak')
-                                    <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">Ditolak</span>
-                                @else
-                                    <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded">Belum Diproses</span>
-                                @endif
-                            </td>
-                            <td class="px-4 py-2">
-                                <a href="{{ route('riwayatSuratWarga') }}" class="text-blue-500 hover:underline">Lihat</a>
-                            </td>
+                <table class="min-w-full text-sm text-gray-700">
+                    <thead class="bg-gray-100 border-b">
+                        <tr>
+                            <th class="px-4 py-2 text-left">Tanggal</th>
+                            <th class="px-4 py-2 text-left">Tujuan Surat</th>
+                            <th class="px-4 py-2 text-left">Status</th>
+                            <th class="px-4 py-2 text-left">Aksi</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        @foreach($pengajuanSuratGabungan as $surat)
+                            <tr class="hover:bg-gray-50 transition-colors duration-200">
+                                <td class="px-4 py-2">{{ $surat->created_at->format('Y-m-d') }}</td>
+                                <td class="px-4 py-2">{{ $surat->tujuan }}</td>
+                                <td class="px-4 py-2">
+                                    @if($surat->status === 'disetujui')
+                                        <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Disetujui</span>
+                                    @elseif($surat->status === 'menunggu')
+                                        <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">Menunggu</span>
+                                    @elseif($surat->status === 'ditolak')
+                                        <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">Ditolak</span>
+                                    @else
+                                        <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded">Belum Diproses</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-2">
+                                    <a href="{{ route('riwayatSurat') }}" class="text-blue-500 hover:underline">Lihat</a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             @endif
         </div>
     </div>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Warga;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\PengajuanSurat;
 use App\Models\PengajuanSuratLain;
@@ -10,30 +11,38 @@ use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    public function index(){
-        $wargaId = Auth::guard('warga')->id();
+    public function index()
+    {
+        // Ambil data user dari guard warga
         $warga = Auth::guard('warga')->user();
 
-        $pengajuanSurat = PengajuanSurat::where(function ($query) use ($wargaId) {
-                                    $query->where('warga_id', $wargaId)
-                                          ->where('status', '!=', 'Ditolak');
-                                })->get();
+        // Ambil pengajuan surat untuk warga tersebut, sekaligus eager load tujuanSurat
+        $pengajuanSurat = PengajuanSurat::with('tujuanSurat')
+            ->where('warga_id', $warga->id_warga)
+            ->get();
 
-        $pengajuanSuratLain = PengajuanSuratLain::where(function ($query) use ($wargaId) {
-                                        $query->where('warga_id', $wargaId)
-                                              ->where('status_pengajuan_lain', '!=', 'Ditolak');
-                                    })->get();
+        // Ambil pengajuan surat lain untuk warga tersebut
+        $pengajuanSuratLain = PengajuanSuratLain::where('warga_id', $warga->id_warga)->get();
 
-        // Handle tujuan_manual
-        $pengajuanSuratLain->transform(function($item) {
-            $item->tujuan_surat = $item->tujuan_surat ?? $item->tujuan_manual;
-            return $item;
-        });
+        // Beri properti 'tujuan' pada masing-masing item pengajuanSurat (ambil nama_tujuan)
+        foreach ($pengajuanSurat as $surat) {
+            $surat->tujuan = $surat->tujuanSurat ? $surat->tujuanSurat->nama_tujuan : '-';
+        }
 
-        // Gabungkan data
-        $pengajuanSurat = $pengajuanSurat->merge($pengajuanSuratLain);
+        // Beri properti 'tujuan' pada masing-masing item pengajuanSuratLain (ambil tujuan_manual)
+        foreach ($pengajuanSuratLain as $suratLain) {
+            $suratLain->tujuan = $suratLain->tujuan_manual ?: '-';
+            $suratLain->status = $suratLain->status_pengajuan_lain;
+        }
 
-        return view('warga.dashboard', compact('pengajuanSurat', 'warga'));
+        // Gabungkan koleksi
+        $pengajuanSuratGabungan = $pengajuanSurat->concat($pengajuanSuratLain);
+
+        // Urutkan berdasarkan created_at descending
+        $pengajuanSuratGabungan = $pengajuanSuratGabungan->sortByDesc('created_at');
+
+        return view('warga.dashboard', compact('warga', 'pengajuanSuratGabungan'));
     }
+    
 
 }

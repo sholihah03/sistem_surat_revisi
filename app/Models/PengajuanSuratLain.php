@@ -35,4 +35,10 @@ class PengajuanSuratLain extends Model
     {
         return $this->belongsTo(ScanKK::class, 'scan_kk_id', 'id_scan');
     }
+
+    public function getTujuanDisplayAttribute()
+    {
+        return $this->tujuanSurat ? $this->tujuanSurat->nama_tujuan : '-';
+    }
+
 }

@@ -66,6 +66,20 @@ Route::prefix('warga')->middleware(AuthenticateWarga::class)->group(function () 
     Route::get('/formSuratWarga', [FormSuratController::class, 'index'])->name('formSuratWarga');
     Route::get('/riwayatSurat', [RiwayatSuratController::class, 'index'])->name('riwayatSurat');
     Route::get('/historiSuratWarga', [HistoriSuratController::class, 'index'])->name('historiSuratWarga');
+    Route::post('/notifikasi/dibaca', function () {
+        // Bisa dapat ID notif dari request, tapi kalau mau semua notif dianggap sudah dibaca:
+        $dibaca = session('notifikasi_dibaca_warga', []);
+
+        // Misal kita ambil semua id notif yang ada di request (array)
+        $ids = request('ids', []);
+
+        $dibaca = array_unique(array_merge($dibaca, $ids));
+
+        session(['notifikasi_dibaca_warga' => $dibaca]);
+
+        return response()->json(['success' => true]);
+    })->name('notifikasi.dibaca');
+
 });
 
 Route::prefix('rt')->middleware(AuthenticateRt::class)->group(function () {

@@ -8,12 +8,31 @@
         Halaman ini menampilkan histori verifikasi akun warga, termasuk data yang telah disetujui atau ditolak beserta alasan dan waktu verifikasi.
     </p>
 
-    <form method="GET" action="{{ route('historiVerifikasiAkunWarga') }}" class="mb-4 flex flex-col md:flex-row gap-2 items-start md:items-center">
-        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama warga atau no KK..."
-            class="px-4 py-2 border rounded-md w-full md:w-1/3 text-sm">
-        <button type="submit"
-            class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition">Cari</button>
-    </form>
+    <form method="GET" action="{{ route('historiVerifikasiAkunWarga') }}"
+      class="mb-4 flex flex-col md:flex-row gap-2 items-start md:items-center">
+
+    <div class="flex w-full md:w-1/3 gap-2">
+        <input
+            type="text"
+            name="search"
+            value="{{ request('search') }}"
+            placeholder="Cari nama warga atau no KK..."
+            class="px-4 py-2 border rounded-md w-full text-sm" />
+
+        <button
+            type="submit"
+            class="px-3 py-2 bg-blue-600 text-white rounded-md text-xs hover:bg-blue-700 transition flex-shrink-0">
+            Cari
+        </button>
+    </div>
+
+    <!-- Agar di desktop tombol tetap di bawah input, tapi di mobile tombol di samping -->
+    <!-- Di desktop kita buat div input+tombol berdiri sendiri, tombol di bawah input secara flex-col -->
+    <div class="hidden md:block w-auto">
+        <!-- kosong, tombol sudah di div di atas untuk mobile -->
+    </div>
+</form>
+
 
 
 
