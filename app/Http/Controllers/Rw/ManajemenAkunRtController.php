@@ -13,6 +13,7 @@ class ManajemenAkunRtController extends Controller
 {
     public function index(Request $request)
     {
+        $profile_rw = Auth::guard('rw')->user()->profile_rw;
         $query = Rt::query();
 
         if ($request->has('search')) {
@@ -23,7 +24,7 @@ class ManajemenAkunRtController extends Controller
 
         $rts = $query->get();
 
-        return view('rw.manajemenAkunRt', compact('rts'));
+        return view('rw.manajemenAkunRt', compact('rts', 'profile_rw'));
     }
 
 

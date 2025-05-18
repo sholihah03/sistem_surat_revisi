@@ -71,8 +71,7 @@
                         <td class="p-3">{{ $no++ }}</td>
                         <td class="p-3">{{ $item->warga->nama_lengkap }}</td>
                         <td class="p-3">{{ $item->tujuan_manual }}</td>
-                        <td class="p-3">{{ $item->tujuan_manual->nomor_surat_pengajuan_lain ?? '-' }}</td>
-                        <td class="p-3">{{ ucfirst($item->status_pengajuan_lain) }}</td>
+                        <td class="p-3">{{ $item->nomor_surat_pengajuan_lain ?? '-' }}</td>
                         <td class="p-3">
                             @if ($item->status_pengajuan_lain === 'disetujui')
                                 <span class="text-green-600 font-semibold">{{ ucfirst($item->status_pengajuan_lain) }}</span>

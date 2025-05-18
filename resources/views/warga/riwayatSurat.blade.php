@@ -125,7 +125,7 @@
                   <li>✅ Diserahkan ke RT: {{ $item->created_at->format('Y-m-d') }}</li>
                   @if ($item->status === 'disetujui')
                     <li>✅ RT Menyetujui: {{ $item->updated_at->format('Y-m-d') }}</li>
-                    <li>✅ Diserahkan ke RW: {{ $item->updated_at->addDay()->format('Y-m-d') }}</li>
+                    <li>✅ Diserahkan ke RW: {{ $item->updated_at->format('Y-m-d') }}</li>
                     <li>✅ RW Menyetujui: {{ $item->updated_at->addDays(2)->format('Y-m-d') }}</li>
                   @elseif ($item->status === 'ditolak')
                     <li>❌ Ditolak oleh RT pada {{ $item->created_at->format('Y-m-d') }}</li>
@@ -137,23 +137,23 @@
           @endforeach
 
           {{-- Pengajuan Lain --}}
-          @foreach ($pengajuanLain as $item)
+          @foreach ($pengajuanLain as $itemLain)
             <div class="flex items-start space-x-4">
               <div class="w-1/12 h-2 mt-2 rounded-full {{
-                $item->status_pengajuan_lain === 'disetujui' ? 'bg-blue-500' :
-                ($item->status_pengajuan_lain === 'ditolak' ? 'bg-red-500' : 'bg-yellow-500') }}">
+                $itemLain->status_pengajuan_lain === 'disetujui' ? 'bg-blue-500' :
+                ($itemLain->status_pengajuan_lain === 'ditolak' ? 'bg-red-500' : 'bg-yellow-500') }}">
               </div>
               <div class="w-full">
-                <h4 class="text-lg font-semibold text-gray-800">{{ $item->tujuan_manual }}</h4>
+                <h4 class="text-lg font-semibold text-gray-800">{{ $itemLain->tujuan_manual }}</h4>
                 <ul class="space-y-1 text-gray-700">
-                  <li>✅ Diserahkan ke RT: {{ $item->created_at->format('Y-m-d') }}</li>
-                  @if ($item->status_pengajuan_lain === 'disetujui')
-                    <li>✅ RT Menyetujui: {{ $item->updated_at->format('Y-m-d') }}</li>
-                    <li>✅ Diserahkan ke RW: {{ $item->updated_at->addDay()->format('Y-m-d') }}</li>
-                    <li>✅ RW Menyetujui: {{ $item->updated_at->addDays(2)->format('Y-m-d') }}</li>
-                  @elseif ($item->status_pengajuan_lain === 'ditolak')
+                  <li>✅ Diserahkan ke RT: {{ $itemLain->created_at->format('Y-m-d') }}</li>
+                  @if ($itemLain->status_pengajuan_lain === 'disetujui')
+                    <li>✅ RT Menyetujui: {{ $itemLain->updated_at->format('Y-m-d') }}</li>
+                    <li>✅ Diserahkan ke RW: {{ $itemLain->updated_at->format('Y-m-d') }}</li>
+                    <li>✅ RW Menyetujui: {{ $itemLain->updated_at->addDays(2)->format('Y-m-d') }}</li>
+                  @elseif ($itemLain->status_pengajuan_lain === 'ditolak')
                     <li>❌ Ditolak oleh RT</li>
-                    <li class="text-red-600 font-semibold">Alasan: {{ $item->alasan_penolakan_pengajuan_lain }}</li>
+                    <li class="text-red-600 font-semibold">Alasan: {{ $itemLain->alasan_penolakan_pengajuan_lain }}</li>
                   @endif
                 </ul>
               </div>

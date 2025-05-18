@@ -52,6 +52,7 @@
                         </svg>
                     </button>
                 </div>
+                <p class="text-xs text-red-500 mt-1">Password harus terdiri dari 6 karakter.</p>
             </div>
 
             <!-- Konfirmasi Password -->
@@ -71,6 +72,7 @@
                         </svg>
                     </button>
                 </div>
+                <p class="text-xs text-red-500 mt-1">Ulangi password yang terdiri dari 6 karakter.</p>
             </div>
 
             <!-- Hidden ID -->

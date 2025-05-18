@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Rw;
 use App\Models\TujuanSurat;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class TujuanSuratController extends Controller
 {
     public function index(Request $request)
     {
+        $profile_rw = Auth::guard('rw')->user()->profile_rw;
         $query = TujuanSurat::query();
 
         if ($request->has('search') && $request->search != '') {
@@ -21,7 +23,7 @@ class TujuanSuratController extends Controller
 
         $tujuanSurat = $query->get();
 
-        return view('rw.tujuanSurat', compact('tujuanSurat'));
+        return view('rw.tujuanSurat', compact('tujuanSurat', 'profile_rw'));
     }
 
     public function store(Request $request)

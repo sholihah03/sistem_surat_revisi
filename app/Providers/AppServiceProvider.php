@@ -78,5 +78,25 @@ class AppServiceProvider extends ServiceProvider
                 ]);
             }
         });
+
+        View::composer(['rw.mainRw', 'rw.dashboardRw'], function ($view) {
+            $profile_rw = Auth::guard('rw')->user()->profile_rw ?? null;
+
+            $pengajuanSuratBaru = PengajuanSurat::with(['warga.rt'])
+                ->where('status', 'disetujui')
+                ->orderBy('updated_at', 'desc')
+                ->take(5)
+                ->get();
+
+            $pengajuanSuratLainBaru = PengajuanSuratLain::with(['warga.rt'])
+                ->where('status_pengajuan_lain', 'disetujui')
+                ->orderBy('updated_at', 'desc')
+                ->take(5)
+                ->get();
+
+            $totalNotifRw = $pengajuanSuratBaru->count() + $pengajuanSuratLainBaru->count();
+
+            $view->with(compact('profile_rw', 'totalNotifRw', 'pengajuanSuratBaru', 'pengajuanSuratLainBaru'));
+        });
     }
 }

@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Rt;
+namespace App\Http\Controllers\Rw;
 
-use App\Models\Rt;
+use App\Models\Rw;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-class TtdDigitalController extends Controller
+class TtdDigitalRwController extends Controller
 {
     public function store(Request $request)
     {
@@ -16,17 +15,17 @@ class TtdDigitalController extends Controller
             'ttd_digital' => 'required|image|mimes:jpg,jpeg,png',
         ]);
 
-        $user = auth()->guard('rt')->user();
+        $user = auth()->guard('rw')->user();
 
         $file = $request->file('ttd_digital');
 
         // Simpan file asli ke folder "asli"
         $originalName = uniqid() . '.' . $file->getClientOriginalExtension();
-        $originalPath = $file->storeAs('public/ttd_rt/asli', $originalName);
+        $originalPath = $file->storeAs('public/ttd_rw/asli', $originalName);
 
         // Siapkan path dan nama file untuk hasil bersih
         $cleanFilename = pathinfo($originalName, PATHINFO_FILENAME) . '.png';
-        $cleanDir = 'public/ttd_rt/bersih';
+        $cleanDir = 'public/ttd_rw/bersih';
         $cleanPath = $cleanDir . '/' . $cleanFilename;
 
         // ✅ Buat folder jika belum ada
@@ -44,8 +43,8 @@ class TtdDigitalController extends Controller
         }
 
         // Simpan ke DB
-        $rt = Rt::find($user->id_rt);
-        $rt->update([
+        $rw = Rw::find($user->id_rw);
+        $rw->update([
             'ttd_digital' => $originalPath,
             'ttd_digital_bersih' => $cleanPath,
         ]);
@@ -102,5 +101,4 @@ class TtdDigitalController extends Controller
         imagedestroy($image);
         imagedestroy($transparent);
     }
-
 }

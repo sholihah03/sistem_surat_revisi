@@ -79,13 +79,13 @@
             </div>
             <!-- Profile Icon -->
             <a href="{{ route('profileRt') }}" class="rounded-full overflow-hidden w-8 h-8 bg-blue-100 hover:ring-2 hover:ring-blue-400 block">
-            @if ($profile_rt)
-                <img src="{{ asset('storage/profile_rt/' . $profile_rt) }}" alt="Profile" class="w-full h-full object-cover">
-            @else
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full text-blue-700 p-1" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/>
-                </svg>
-            @endif
+                @if ($profile_rt)
+                    <img src="{{ asset('storage/profile_rt/' . $profile_rt) }}" alt="Profile" class="w-full h-full object-cover">
+                @else
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full text-blue-700 p-1" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/>
+                    </svg>
+                @endif
             </a>
 
             <!-- Hamburger Mobile -->

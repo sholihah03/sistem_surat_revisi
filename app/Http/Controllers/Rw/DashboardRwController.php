@@ -2,12 +2,122 @@
 
 namespace App\Http\Controllers\Rw;
 
-use App\Http\Controllers\Controller;
+use App\Models\Rt;
+use Carbon\Carbon;
+use App\Models\Wargas;
 use Illuminate\Http\Request;
+use App\Models\PengajuanSurat;
+use App\Models\PengajuanSuratLain;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardRwController extends Controller
 {
-    public function index(){
-        return view('rw.dashboardRw');
+    public function index()
+    {
+        $rw = Auth::guard('rw')->user(); // Ambil user dari guard rw
+        $rwId = $rw->id_rw;
+        $now = Carbon::now();
+
+        // Ambil semua ID warga yang tinggal di RW ini
+        $wargaIds = Wargas::where('rw_id', $rwId)->pluck('id_warga');
+        // Ambil daftar RT yang ada di RW ini
+        $rts = Rt::where('rw_id', $rwId)->get();
+        $statusPengajuanPerRt = [];
+
+        foreach ($rts as $rt) {
+            // Ambil warga yang tinggal di RT ini dan RW ini (pastikan rw juga cocok)
+            $wargaIds = Wargas::where('rw_id', $rwId)
+                ->where('rt_id', $rt->id_rt)
+                ->pluck('id_warga');
+
+            // Jumlah pengajuan surat biasa bulan ini per RT
+            $jumlahSuratBiasa = PengajuanSurat::whereIn('warga_id', $wargaIds)
+                ->whereMonth('created_at', $now->month)
+                ->whereYear('created_at', $now->year)
+                ->count();
+
+            // Jumlah pengajuan surat lain bulan ini per RT
+            $jumlahSuratLain = PengajuanSuratLain::whereIn('warga_id', $wargaIds)
+                ->whereMonth('created_at', $now->month)
+                ->whereYear('created_at', $now->year)
+                ->count();
+
+            $totalPengajuan = $jumlahSuratBiasa + $jumlahSuratLain;
+
+            // Surat disetujui
+            $disetujuiBiasa = PengajuanSurat::whereIn('warga_id', $wargaIds)
+                ->where('status', 'disetujui')
+                ->whereMonth('created_at', $now->month)
+                ->whereYear('created_at', $now->year)
+                ->count();
+
+            $disetujuiLain = PengajuanSuratLain::whereIn('warga_id', $wargaIds)
+                ->where('status_pengajuan_lain', 'disetujui')
+                ->whereMonth('created_at', $now->month)
+                ->whereYear('created_at', $now->year)
+                ->count();
+
+            $totalDisetujui = $disetujuiBiasa + $disetujuiLain;
+
+            // Surat ditolak
+            $ditolakBiasa = PengajuanSurat::whereIn('warga_id', $wargaIds)
+                ->where('status', 'ditolak')
+                ->whereMonth('created_at', $now->month)
+                ->whereYear('created_at', $now->year)
+                ->count();
+
+            $ditolakLain = PengajuanSuratLain::whereIn('warga_id', $wargaIds)
+                ->where('status_pengajuan_lain', 'ditolak')
+                ->whereMonth('created_at', $now->month)
+                ->whereYear('created_at', $now->year)
+                ->count();
+
+            $totalDitolak = $ditolakBiasa + $ditolakLain;
+
+            $statusPengajuanPerRt[] = [
+                'no_rt' => $rt->no_rt, // pastikan kolom no_rt di tabel rt
+                'total_pengajuan' => $totalPengajuan,
+                'total_disetujui' => $totalDisetujui,
+                'total_ditolak' => $totalDitolak,
+                'rt_id' => $rt->id_rt,
+            ];
+        }
+
+        // Hitung jumlah pengajuan dari tb_pengajuan_surat
+        $countSuratBiasa = PengajuanSurat::whereIn('warga_id', $wargaIds)
+            ->whereMonth('created_at', $now->month)
+            ->whereYear('created_at', $now->year)
+            ->count();
+
+        // Hitung jumlah pengajuan dari tb_pengajuan_surat_lain
+        $countSuratLain = PengajuanSuratLain::whereIn('warga_id', $wargaIds)
+            ->whereMonth('created_at', $now->month)
+            ->whereYear('created_at', $now->year)
+            ->count();
+
+        // Total gabungan
+        $totalSuratMasuk = $countSuratBiasa + $countSuratLain;
+
+        // ✅ Hitung surat yang disetujui dari dua tabel
+        $suratDisetujuiBiasa = PengajuanSurat::whereIn('warga_id', $wargaIds)
+            ->where('status', 'disetujui')
+            ->whereMonth('created_at', $now->month)
+            ->whereYear('created_at', $now->year)
+            ->count();
+
+        $suratDisetujuiLain = PengajuanSuratLain::whereIn('warga_id', $wargaIds)
+            ->where('status_pengajuan_lain', 'disetujui')
+            ->whereMonth('created_at', $now->month)
+            ->whereYear('created_at', $now->year)
+            ->count();
+
+        $totalSuratDisetujui = $suratDisetujuiBiasa + $suratDisetujuiLain;
+
+        $totalWargaTerdaftar = Wargas::where('rw_id', $rwId)->count();
+
+
+        return view('rw.mainRw', compact('totalSuratMasuk', 'totalSuratDisetujui', 'totalWargaTerdaftar', 'statusPengajuanPerRt'));
     }
+
 }

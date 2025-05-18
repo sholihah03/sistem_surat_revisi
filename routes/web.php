@@ -11,10 +11,12 @@ use App\Http\Controllers\UploadKKController;
 use App\Http\Controllers\Rt\BankDataController;
 use App\Http\Controllers\BuatPasswordController;
 use App\Http\Controllers\Rt\ProfileRtController;
+use App\Http\Controllers\Rw\ProfileRwController;
 use App\Http\Controllers\Rt\TtdDigitalController;
 use App\Http\Controllers\Rw\DashboardRwController;
 use App\Http\Controllers\Rw\TujuanSuratController;
 use App\Http\Controllers\UploadKKManualController;
+use App\Http\Controllers\Rw\TtdDigitalRwController;
 use App\Http\Controllers\Warga\DashboardController;
 use App\Http\Controllers\Warga\FormSuratController;
 use App\Http\Controllers\Rt\VerifikasiSuratController;
@@ -101,21 +103,15 @@ Route::prefix('rt')->middleware(AuthenticateRt::class)->group(function () {
     Route::get('/profileRt', [ProfileRtController::class, 'index'])->name('profileRt');
     Route::post('/profileRtUpload', [ProfileRtController::class, 'updateProfileRtImage'])->name('uploadProfileRt');
     Route::put('/profileRtUploadData', [ProfileRtController::class, 'updateData'])->name('updateDataRt');
-    // // Surat Biasa
-    // Route::get('rt/surat-biasa/cetak/{id}', [SuratRtController::class, 'cetakBiasa'])->name('rt.surat-biasa.cetak');
-    // Route::get('rt/surat-biasa/unduh/{id}', [SuratRtController::class, 'unduhBiasa'])->name('rt.surat-biasa.unduh');
-    // // Surat Lain
-    // Route::get('rt/surat-lain/cetak/{id}', [SuratRtController::class, 'cetakLain'])->name('rt.surat-lain.cetak');
-    // Route::get('rt/surat-lain/unduh/{id}', [SuratRtController::class, 'unduhLain'])->name('rt.surat-lain.unduh');
 
 });
 
 
 Route::prefix('rw')->middleware(AuthenticateRw::class)->group(function () {
-    // Route::get('/dashboardRw', [DashboardRwController::class, 'index'])->name('dashboardRw');
-    Route::get('/dashboardRw', function () {
-        return view('rw.mainRw');
-    })->name('dashboardRw');
+    // Route::get('/dashboardRw', function () {
+    //     return view('rw.mainRw');
+    // })->name('dashboardRw');
+    Route::get('/dashboardRw', [DashboardRwController::class, 'index'])->name('dashboardRw');
     Route::get('/manajemenAkunRt', [ManajemenAkunRtController::class, 'index'])->name('manajemenAkunRt');
     Route::post('/manajemenAkunRt/store', [ManajemenAkunRtController::class, 'store'])->name('manajemenAkunRt.store');
     Route::post('/manajemenAkunRt/update/{id}', [ManajemenAkunRtController::class, 'update'])->name('manajemenAkunRt.update');
@@ -125,6 +121,11 @@ Route::prefix('rw')->middleware(AuthenticateRw::class)->group(function () {
     Route::put('/tujuanSurat/update/{id}', [TujuanSuratController::class, 'update'])->name('tujuanSurat.update');
     Route::delete('/tujuanSurat/delete/{id}', [TujuanSuratController::class, 'destroy'])->name('tujuanSurat.destroy');
     Route::get('/manajemenSuratWarga', [ManajemenSuratWargaController::class, 'index'])->name('manajemenSuratWarga');
+    Route::get('/scanTtdRw', [TtdDigitalRwController::class, 'index'])->name('scanTtdRw');
+    Route::post('/scanTtdRwUpload', [TtdDigitalRwController::class, 'store'])->name('scanTtdRwUpload');
+    Route::get('/profileRw', [ProfileRwController::class, 'index'])->name('profileRw');
+    Route::post('/profileRwUpload', [ProfileRwController::class, 'updateProfileRwImage'])->name('uploadProfileRw');
+    Route::put('/profileRwUploadData', [ProfileRwController::class, 'updateData'])->name('updateDataRw');
 });
 
 

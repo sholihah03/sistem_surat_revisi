@@ -145,7 +145,8 @@
                     <!-- Email -->
                     <div class="flex flex-col">
                         <label for="email" class="text-gray-700 font-semibold mb-1">Email</label>
-                        <div class="flex items-center border border-blue-400 rounded-md px-3 py-2">
+                        <p class="text-xs text-red-500">Harap isi email yang sudah didaftarkan</p>
+                        <div class="flex items-center border border-blue-400 rounded-md px-3 py-2 mt-1">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M2 6c0-1.1.9-2 2-2h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6zm2 0l8 5 8-5H4zm0 2.3v9.7h16V8.3l-8 5-8-5z"/>
                             </svg>
@@ -157,7 +158,8 @@
                     <!-- Password -->
                     <div class="flex flex-col">
                         <label for="password" class="text-gray-700 font-semibold mb-1">Password</label>
-                        <div class="flex items-center border border-blue-400 rounded-md px-3 py-2 relative">
+                        <p class="text-xs text-red-500">Harap isi password dengan 6 karakter</p>
+                        <div class="flex items-center border border-blue-400 rounded-md px-3 py-2 relative mt-1">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 1a5 5 0 00-5 5v3H5a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V10a1 1 0 00-1-1h-2V6a5 5 0 00-5-5zm-3 5a3 3 0 016 0v3H9V6zm3 6a1.5 1.5 0 110 3 1.5 1.5 0 010-3z"/>
                             </svg>
