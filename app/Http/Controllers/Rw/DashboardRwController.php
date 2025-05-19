@@ -45,6 +45,21 @@ class DashboardRwController extends Controller
 
             $totalPengajuan = $jumlahSuratBiasa + $jumlahSuratLain;
 
+            // Surat menunggu
+            $menungguBiasa = PengajuanSurat::whereIn('warga_id', $wargaIds)
+                ->where('status', 'menunggu')
+                ->whereMonth('created_at', $now->month)
+                ->whereYear('created_at', $now->year)
+                ->count();
+
+            $menungguLain = PengajuanSuratLain::whereIn('warga_id', $wargaIds)
+                ->where('status_pengajuan_lain', 'menunggu')
+                ->whereMonth('created_at', $now->month)
+                ->whereYear('created_at', $now->year)
+                ->count();
+
+            $totalMenunggu = $menungguBiasa + $menungguLain;
+
             // Surat disetujui
             $disetujuiBiasa = PengajuanSurat::whereIn('warga_id', $wargaIds)
                 ->where('status', 'disetujui')
@@ -78,6 +93,7 @@ class DashboardRwController extends Controller
             $statusPengajuanPerRt[] = [
                 'no_rt' => $rt->no_rt, // pastikan kolom no_rt di tabel rt
                 'total_pengajuan' => $totalPengajuan,
+                'total_menunggu' => $totalMenunggu,
                 'total_disetujui' => $totalDisetujui,
                 'total_ditolak' => $totalDitolak,
                 'rt_id' => $rt->id_rt,
@@ -117,7 +133,7 @@ class DashboardRwController extends Controller
         $totalWargaTerdaftar = Wargas::where('rw_id', $rwId)->count();
 
 
-        return view('rw.mainRw', compact('totalSuratMasuk', 'totalSuratDisetujui', 'totalWargaTerdaftar', 'statusPengajuanPerRt'));
+        return view('rw.mainRw', compact('totalSuratMasuk', 'totalSuratDisetujui', 'totalWargaTerdaftar', 'statusPengajuanPerRt', 'totalMenunggu'));
     }
 
 }

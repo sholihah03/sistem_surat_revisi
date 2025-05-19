@@ -67,7 +67,7 @@
                                 Warga: <strong>{{ $surat->warga->nama_lengkap ?? '-' }}</strong><br>
                                 RT: <strong>{{ $surat->warga->rt->no_rt ?? '-' }}</strong><br>
                                 (Sudah disetujui RT)<br>
-                                <a href="{{ route('verifikasiSurat') }}" class="text-blue-600 hover:underline text-sm">Verifikasi Sekarang</a><br>
+                                <a href="{{ route('manajemenSuratWarga') }}" class="text-blue-600 hover:underline text-sm">Verifikasi Sekarang</a><br>
                             </p>
                             <hr>
                         @endforeach
@@ -78,7 +78,7 @@
                                 Warga: <strong>{{ $surat->warga->nama_lengkap ?? '-' }}</strong><br>
                                 RT: <strong>{{ $surat->warga->rt->no_rt ?? '-' }}</strong><br>
                                 (Sudah disetujui RT)<br>
-                                <a href="{{ route('verifikasiSurat') }}" class="text-blue-600 hover:underline text-sm">Verifikasi Sekarang</a><br>
+                                <a href="{{ route('manajemenSuratWarga') }}" class="text-blue-600 hover:underline text-sm">Verifikasi Sekarang</a><br>
                             </p>
                             <hr>
                         @endforeach

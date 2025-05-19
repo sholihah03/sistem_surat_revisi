@@ -21,35 +21,41 @@
     </div>
 
     <!-- Daftar Pengajuan Terbaru -->
-    <div class="bg-white bg-opacity-80 p-4 md:p-6 rounded-xl shadow w-full overflow-x-auto">
-        <h2 class="text-lg md:text-xl font-bold text-gray-800 mb-4">🏘️ Status Pengajuan dari RT</h2>
+    <div class="bg-white bg-opacity-80 p-4 md:p-6 rounded-xl shadow w-full">
+        <h2 class="text-lg md:text-xl font-bold text-gray-800 mb-4">
+            🏘️ Status Pengajuan dari RT - Bulan {{ \Carbon\Carbon::now()->translatedFormat('F Y') }}
+        </h2>
+
         <div class="overflow-x-auto">
             <div class="min-w-full inline-block align-middle">
-                <div class="overflow-x-auto border rounded-lg">
-                <table class="min-w-full text-xs md:text-sm text-gray-700">
-                    <thead class="bg-gray-100">
-                    <tr>
-                        <th class="px-2 md:px-4 py-2 text-center">Rt</th>
-                        <th class="px-2 md:px-4 py-2 text-center">Jumlah Surat Masuk</th>
-                        <th class="px-2 md:px-4 py-2 text-center">Surat Disetujui</th>
-                        <th class="px-2 md:px-4 py-2 text-center">Surat Ditolak</th>
-                        <th class="px-2 md:px-4 py-2 text-center">Aksi</th>
-                    </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-                        @foreach($statusPengajuanPerRt as $status)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-2 md:px-4 py-2 whitespace-nowrap text-center align-middle">RT {{ $status['no_rt'] }}</td>
-                            <td class="px-2 md:px-4 py-2 whitespace-nowrap text-center align-middle">{{ $status['total_pengajuan'] }}</td>
-                            <td class="px-2 md:px-4 py-2 whitespace-nowrap text-center align-middle">{{ $status['total_disetujui'] }}</td>
-                            <td class="px-2 md:px-4 py-2 whitespace-nowrap text-center align-middle">{{ $status['total_ditolak'] }}</td>
-                            <td class="px-2 md:px-4 py-2 text-center align-middle">
-                                <a href="#" class="text-green-500 hover:underline">Detail</a>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                <!-- Tambahkan max-h dan overflow-y-auto di sini -->
+                <div class="overflow-x-auto border rounded-lg max-h-[400px] overflow-y-auto">
+                    <table class="min-w-full text-xs md:text-sm text-gray-700">
+                        <thead class="bg-gray-100 sticky top-0 z-10">
+                            <tr>
+                                <th class="px-2 md:px-4 py-2 text-center">Rt</th>
+                                <th class="px-2 md:px-4 py-2 text-center">Jumlah Surat Masuk</th>
+                                <th class="px-2 md:px-4 py-2 text-center">Surat Menunggu Proses</th>
+                                <th class="px-2 md:px-4 py-2 text-center">Surat Disetujui</th>
+                                <th class="px-2 md:px-4 py-2 text-center">Surat Ditolak</th>
+                                <th class="px-2 md:px-4 py-2 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            @foreach($statusPengajuanPerRt as $status)
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-2 md:px-4 py-2 whitespace-nowrap text-center align-middle">RT {{ $status['no_rt'] }}</td>
+                                    <td class="px-2 md:px-4 py-2 whitespace-nowrap text-center align-middle">{{ $status['total_pengajuan'] }}</td>
+                                    <td class="px-2 md:px-4 py-2 whitespace-nowrap text-center align-middle">{{ $status['total_menunggu'] }}</td>
+                                    <td class="px-2 md:px-4 py-2 whitespace-nowrap text-center align-middle">{{ $status['total_disetujui'] }}</td>
+                                    <td class="px-2 md:px-4 py-2 whitespace-nowrap text-center align-middle">{{ $status['total_ditolak'] }}</td>
+                                    <td class="px-2 md:px-4 py-2 text-center align-middle">
+                                        <a href="#" class="text-green-500 hover:underline">Detail</a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

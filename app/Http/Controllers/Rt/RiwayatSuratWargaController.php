@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Rt;
 use App\Models\ScanKK;
 use Illuminate\Http\Request;
 use App\Models\PengajuanSurat;
+use App\Models\HasilSuratTtdRt;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\PengajuanSuratLain;
 use App\Http\Controllers\Controller;
@@ -22,85 +23,60 @@ class RiwayatSuratWargaController extends Controller
         $profile_rt = Auth::guard('rt')->user()->profile_rt;
         $rt_id = Auth::guard('rt')->user()->id_rt;
 
-        // Ambil pengajuan surat biasa, menggunakan relasi warga untuk rt_id
+        // Ambil pengajuan surat biasa yang sudah selesai (disetujui/ditolak)
         $pengajuanBiasa = PengajuanSurat::with(['warga', 'tujuanSurat'])
             ->whereHas('warga', function($query) use ($rt_id) {
-                $query->where('rt_id', $rt_id); // Pastikan rt_id ada di tabel tb_wargas
+                $query->where('rt_id', $rt_id);
             })
             ->whereIn('status', ['disetujui', 'ditolak'])
             ->get();
 
-        // Ambil pengajuan surat lain, menggunakan relasi warga untuk rt_id
+        // Ambil pengajuan surat lain yang sudah selesai
         $pengajuanLain = PengajuanSuratLain::with('warga')
             ->whereHas('warga', function($query) use ($rt_id) {
-                $query->where('rt_id', $rt_id); // Pastikan rt_id ada di tabel tb_wargas
+                $query->where('rt_id', $rt_id);
             })
             ->whereIn('status_pengajuan_lain', ['disetujui', 'ditolak'])
             ->get();
 
-        return view('rt.riwayatSuratWarga', compact('profile_rt', 'pengajuanBiasa', 'pengajuanLain'));
+        // Ambil semua hasil surat dari tb_hasil_surat_ttd_rt yang ada untuk RT ini
+        // Bisa ambil semua hasil surat terkait pengajuan di RT ini, filter by jenis dan pengajuan_id
+        $hasilSurat = HasilSuratTtdRt::whereIn('jenis', ['biasa', 'lain'])
+            ->whereIn('pengajuan_id', $pengajuanBiasa->pluck('id_pengajuan_surat')->merge($pengajuanLain->pluck('id_pengajuan_surat_lain')))
+            ->get()
+            ->keyBy(function($item) {
+                // kunci berdasarkan jenis + pengajuan_id supaya gampang cari di view
+                return $item->jenis.'-'.$item->pengajuan_id;
+            });
+
+        return view('rt.riwayatSuratWarga', compact('profile_rt', 'pengajuanBiasa', 'pengajuanLain', 'hasilSurat'));
     }
 
-    public function tampilkanSurat($jenis, $id)
+    public function lihatHasilSurat($id)
     {
         $profile_rt = Auth::guard('rt')->user()->profile_rt;
-        if ($jenis === 'biasa') {
-            $pengajuan = PengajuanSurat::with(['warga', 'tujuanSurat', 'scanKk'])->findOrFail($id);
-            $status = $pengajuan->status;
-        } else {
-            $pengajuan = PengajuanSuratLain::with(['warga', 'scanKk'])->findOrFail($id);
-            $status = $pengajuan->status_pengajuan_lain;
+        $hasilSurat = HasilSuratTtdRt::findOrFail($id);
+
+        // Pastikan file surat ada dan dapat diakses
+        if (!Storage::exists($hasilSurat->file_surat)) {
+            abort(404, 'File surat tidak ditemukan');
         }
 
-        if ($status !== 'disetujui') {
-            abort(403, 'Surat belum disetujui');
-        }
+        // Jika file surat PDF, kita bisa tampilkan pakai iframe atau embed
+        $fileUrl = Storage::url($hasilSurat->file_surat);
 
-        $rt = Auth::guard('rt')->user();
-        $ttdPath = Storage::path($rt->ttd_digital_bersih);
-        $ttdBase64 = base64_encode(file_get_contents($ttdPath));
-
-        return view('rt.hasilSurat', [
-            'pengajuan' => $pengajuan,
-            'rt' => $rt,
-            'ttd' => $ttdBase64,
-            'jenis' => $jenis,
-            'profile_rt' => $profile_rt
-        ]);
+        return view('rt.hasilSurat', compact('hasilSurat', 'fileUrl', 'profile_rt'));
     }
 
-    public function unduhSurat($jenis, $id)
+    public function unduhHasilSurat($id)
     {
-        if ($jenis === 'biasa') {
-            $pengajuan = PengajuanSurat::with(['warga', 'tujuanSurat'])->findOrFail($id);
-            $status = $pengajuan->status;
-        } else {
-            $pengajuan = PengajuanSuratLain::with('warga')->findOrFail($id);
-            $status = $pengajuan->status_pengajuan_lain;
+        $hasilSurat = HasilSuratTtdRt::findOrFail($id);
+
+        $filePath = $hasilSurat->file_surat; // Simpan path file surat di kolom file_surat
+        if (!Storage::exists($filePath)) {
+            abort(404, "File surat tidak ditemukan");
         }
 
-        if ($status !== 'disetujui') {
-            abort(403, 'Surat belum disetujui');
-        }
-
-        // Ambil data RT
-        $rt = Auth::guard('rt')->user();
-
-        // Ambil path untuk tanda tangan digital bersih
-        $ttdPath = Storage::path($rt->ttd_digital_bersih);
-
-        // Encode gambar menjadi base64
-        $ttdBase64 = base64_encode(file_get_contents($ttdPath));
-
-        $data = [
-            'pengajuan' => $pengajuan,
-            'rt' => $rt,
-            'rw' => Auth::guard('rw')->user(),
-            'ttd' => $ttdBase64, // Kirimkan data base64 gambar
-            'jenis' => $jenis,
-        ];
-
-        $pdf = PDF::loadView('rt.suratPengantar', $data)->setPaper('a4');
-        return $pdf->download('surat-pengantar-'.$pengajuan->warga->nama_lengkap.'.pdf');
+        return Storage::download($filePath);
     }
 }

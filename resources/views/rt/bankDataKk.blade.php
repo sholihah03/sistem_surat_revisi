@@ -9,7 +9,7 @@
             <thead>
                 <tr class="bg-gray-200">
                     <th class="p-2 border">No</th>
-                    <th class="p-2 border">Nama Lengkap</th>
+                    <th class="p-2 border">Nama Lengkap Warga</th>
                     <th class="p-2 border">No KK</th>
                     <th class="p-2 border">Gambar KK</th>
                     <th class="p-2 border">Alamat</th>

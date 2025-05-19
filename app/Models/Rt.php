@@ -48,4 +48,9 @@ class Rt extends Model implements Authenticatable
     {
         return $this->hasMany(Kadaluwarsa::class, 'rt_id', 'id_rt');
     }
+
+    public function rts()
+    {
+        return $this->hasMany(Rt::class, 'rw_id', 'id_rw');
+    }
 }

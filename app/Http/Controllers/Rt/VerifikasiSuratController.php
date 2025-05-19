@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Rt;
 use App\Models\Rw;
 use Illuminate\Http\Request;
 use App\Models\PengajuanSurat;
+use App\Models\HasilSuratTtdRt;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\PengajuanSuratLain;
 use App\Http\Controllers\Controller;
 use App\Mail\NotifikasiVerifikasiRw;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use App\Mail\NotifikasiStatusPengajuanKeWarga;
 
 class VerifikasiSuratController extends Controller
@@ -40,6 +43,30 @@ class VerifikasiSuratController extends Controller
         if ($aksi == 'setuju') {
             $data->status = 'disetujui';
             $data->save();
+
+            // --- Generate dan simpan surat hasil tanda tangan RT ---
+            $pdfData = [
+                'pengajuan' => $data,
+                'rt' => $rt,
+                'rw' => $rw,
+                'ttd' => base64_encode(file_get_contents(Storage::path($rt->ttd_digital_bersih))),
+                'jenis' => 'biasa',
+            ];
+
+            $pdf = Pdf::loadView('rt.suratPengantar', $pdfData)->setPaper('a4');
+            $filename = 'surat-ttd-rt-' . $data->id . '-' . str_replace(' ', '-', strtolower($data->warga->nama_lengkap)) . '-' . time() . '.pdf';
+            Storage::put('public/hasil_surat/ttd_rt/' . $filename, $pdf->output());
+
+            // Simpan data hasil surat ke tb_hasil_surat_ttd_rt
+            HasilSuratTtdRt::updateOrCreate(
+                [
+                    'jenis' => 'biasa',
+                    'pengajuan_id' => $data->id_pengajuan_surat,
+                ],
+                [
+                    'file_surat' => 'public/hasil_surat/ttd_rt/' . $filename,
+                ]
+            );
 
             Mail::to($rw->email_rw)->send(
                 new NotifikasiVerifikasiRw($rw->nama_lengkap_rw, $jenisSurat, $data->warga->nama_lengkap)
@@ -82,6 +109,29 @@ class VerifikasiSuratController extends Controller
                 $data->status_pengajuan_lain = 'disetujui';
                 $data->nomor_surat_pengajuan_lain = $request->nomor_surat;
                 $data->save();
+
+                // Generate dan simpan surat hasil tanda tangan RT untuk surat lain
+                $pdfData = [
+                    'pengajuan' => $data,
+                    'rt' => $rt,
+                    'rw' => $rw,
+                    'ttd' => base64_encode(file_get_contents(Storage::path($rt->ttd_digital_bersih))),
+                    'jenis' => 'lain',
+                ];
+
+                $pdf = Pdf::loadView('rt.suratPengantarLain', $pdfData)->setPaper('a4');
+                $filename = 'surat-ttd-rt-' . $data->id . '-' . str_replace(' ', '-', strtolower($data->warga->nama_lengkap)) . '-' . time() . '.pdf';
+                Storage::put('public/hasil_surat/ttd_rt/' . $filename, $pdf->output());
+
+                HasilSuratTtdRt::updateOrCreate(
+                    [
+                        'jenis' => 'lain',
+                        'pengajuan_id' => $data->id_pengajuan_surat_lain,
+                    ],
+                    [
+                        'file_surat' => 'public/hasil_surat/ttd_rt/' . $filename,
+                    ]
+                );
 
                 Mail::to($rw->email_rw)->send(
                     new NotifikasiVerifikasiRw($rw->nama_lengkap_rw, $jenisSurat, $data->warga->nama_lengkap)

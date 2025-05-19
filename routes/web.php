@@ -19,6 +19,7 @@ use App\Http\Controllers\UploadKKManualController;
 use App\Http\Controllers\Rw\TtdDigitalRwController;
 use App\Http\Controllers\Warga\DashboardController;
 use App\Http\Controllers\Warga\FormSuratController;
+use App\Http\Controllers\Rw\RiwayatSuratRwController;
 use App\Http\Controllers\Rt\VerifikasiSuratController;
 use App\Http\Controllers\Rw\ManajemenAkunRtController;
 use App\Http\Controllers\Warga\HistoriSuratController;
@@ -95,8 +96,8 @@ Route::prefix('rt')->middleware(AuthenticateRt::class)->group(function () {
     Route::get('/verifikasiSurat', [VerifikasiSuratController::class, 'index'])->name('verifikasiSurat');
     Route::post('/verifikasiSuratProses', [VerifikasiSuratController::class, 'proses'])->name('verifikasiSuratProses');
     Route::get('/riwayatSuratWarga', [RiwayatSuratWargaController::class, 'index'])->name('riwayatSuratWarga');
-    Route::get('/surat/{jenis}/{id}/lihat', [RiwayatSuratWargaController::class, 'tampilkanSurat'])->name('rt.lihatSurat');
-    Route::get('/unduh-surat/{jenis}/{id}', [RiwayatSuratWargaController::class, 'unduhSurat'])->name('rt.unduhSurat');
+    Route::get('/surat/{id}/lihat', [RiwayatSuratWargaController::class, 'lihatHasilSurat'])->name('rt.lihatHasilSurat');
+    Route::get('/unduh-surat/{id}', [RiwayatSuratWargaController::class, 'unduhHasilSurat'])->name('rt.unduhHasilSurat');
     Route::get('/bankDataKk', [BankDataController::class, 'index'])->name('bankDataKk');
     Route::get('/scanTtdRt', [TtdDigitalController::class, 'index'])->name('scanTtdRt');
     Route::post('/scanTtdRtUpload', [TtdDigitalController::class, 'store'])->name('scanTtdRtUpload');
@@ -121,11 +122,14 @@ Route::prefix('rw')->middleware(AuthenticateRw::class)->group(function () {
     Route::put('/tujuanSurat/update/{id}', [TujuanSuratController::class, 'update'])->name('tujuanSurat.update');
     Route::delete('/tujuanSurat/delete/{id}', [TujuanSuratController::class, 'destroy'])->name('tujuanSurat.destroy');
     Route::get('/manajemenSuratWarga', [ManajemenSuratWargaController::class, 'index'])->name('manajemenSuratWarga');
+    Route::post('/manajemenSuratWarga/setujui', [ManajemenSuratWargaController::class, 'setujui'])->name('rw.setujuiSurat');
     Route::get('/scanTtdRw', [TtdDigitalRwController::class, 'index'])->name('scanTtdRw');
     Route::post('/scanTtdRwUpload', [TtdDigitalRwController::class, 'store'])->name('scanTtdRwUpload');
     Route::get('/profileRw', [ProfileRwController::class, 'index'])->name('profileRw');
     Route::post('/profileRwUpload', [ProfileRwController::class, 'updateProfileRwImage'])->name('uploadProfileRw');
     Route::put('/profileRwUploadData', [ProfileRwController::class, 'updateData'])->name('updateDataRw');
+    Route::get('/riwayatSurat', [RiwayatSuratRwController::class, 'index'])->name('riwayatSuratRw');
+
 });
 
 
