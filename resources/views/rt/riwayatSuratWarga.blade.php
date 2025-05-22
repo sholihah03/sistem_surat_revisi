@@ -90,7 +90,7 @@
                         <td class="p-3">
                             @php $key = 'lain-'.$item->id_pengajuan_surat_lain; @endphp
                             @if($hasilSurat->has($key))
-                                <button class="btn btn-info lihat-surat text-blue-600 underline" data-id="{{ $hasilSurat[$key]->id_hasil_surat_ttd_rt }}">
+                                <button class="btn btn-info lihat-surat px-3 py-1 bg-yellow-500 text-white font-semibold rounded" data-id="{{ $hasilSurat[$key]->id_hasil_surat_ttd_rt }}">
                                     Lihat Surat
                                 </button>
                             @else

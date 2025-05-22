@@ -129,6 +129,7 @@ Route::prefix('rw')->middleware(AuthenticateRw::class)->group(function () {
     Route::post('/profileRwUpload', [ProfileRwController::class, 'updateProfileRwImage'])->name('uploadProfileRw');
     Route::put('/profileRwUploadData', [ProfileRwController::class, 'updateData'])->name('updateDataRw');
     Route::get('/riwayatSurat', [RiwayatSuratRwController::class, 'index'])->name('riwayatSuratRw');
+    Route::get('/surat/{id}/lihatRw', [RiwayatSuratRwController::class, 'lihatHasilSuratRw'])->name('rw.lihatHasilSurat');
 
 });
 

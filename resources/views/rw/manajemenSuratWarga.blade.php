@@ -28,6 +28,7 @@
                 <th class="px-4 py-2">Rt</th>
                 <th class="px-4 py-2">Nama</th>
                 <th class="px-4 py-2">Jenis</th>
+                <th class="px-4 py-2">Tujuan</th>
                 <th class="px-4 py-2">Nomor Surat</th>
                 <th class="px-4 py-2">Nomor KTP</th>
                 <th class="px-4 py-2">Pekerjaan</th>
@@ -36,7 +37,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($surats as $index => $surat)
+            @forelse($surats as $index => $surat)
                 @php
                     $isSuratBiasa = $surat->jenis === 'biasa';
                     $pengajuan = $isSuratBiasa ? $surat->pengajuanSurat : $surat->pengajuanSuratLain;
@@ -47,8 +48,9 @@
                     <td class="px-4 py-2">{{ $warga->rt->no_rt ?? '-' }}</td>
                     <td class="px-4 py-2">{{ $warga->nama_lengkap ?? '-' }}</td>
                     <td class="px-4 py-2">{{ ucfirst($surat->jenis) }}</td>
+                    <td class="px-4 py-2">{{ $isSuratBiasa ? ($pengajuan->tujuanSurat->nama_tujuan ?? '-') : ($pengajuan->tujuan_manual ?? '-') }}</td>
                     <td class="px-4 py-2">
-                        {{ $isSuratBiasa ? ($pengajuan->tujuanSurat->nama_tujuan ?? '-') : ($pengajuan->nomor_surat_pengajuan_lain ?? '-') }}
+                        {{ $isSuratBiasa ? ($pengajuan->tujuanSurat->nomor_surat ?? '-') : ($pengajuan->nomor_surat_pengajuan_lain ?? '-') }}
                     </td>
                     <td class="px-4 py-2">{{ $warga->nik ?? '-' }}</td>
                     <td class="px-4 py-2">
@@ -72,7 +74,11 @@
                         </form>
                     </td>
                 </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="9" class="text-center text-gray-500 py-4"><strong>Belum ada surat yang masuk</strong></td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
 </div>

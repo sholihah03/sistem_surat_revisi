@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Rw;
 
+use Carbon\Carbon;
 use App\Models\Wargas;
 use App\Models\HasilSurat;
 use Illuminate\Http\Request;
@@ -13,6 +14,7 @@ use App\Models\PengajuanSuratLain;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Storage;
 
 class ManajemenSuratWargaController extends Controller
@@ -47,6 +49,7 @@ class ManajemenSuratWargaController extends Controller
 
 public function setujui(Request $request)
 {
+    Carbon::setLocale('id');
     $pengajuanId = $request->pengajuan_id;
     $jenis = $request->jenis;
 
@@ -73,7 +76,22 @@ public function setujui(Request $request)
     $rt = $pengajuan->warga->rt;
     $rw = $rt->rw;
 
-    // Generate PDF dengan tanda tangan RT & RW
+    // Contoh ambil data nomor surat tergantung jenis
+    $nomorSurat = ($jenis === 'biasa')
+        ? ($pengajuan->tujuanSurat->nomor_surat ?? '-')
+        : ($pengajuan->nomor_surat_pengajuan_lain ?? '-');
+
+    $namaTujuan = $pengajuan->warga->nama_lengkap;
+    $tanggalDisetujui = Carbon::now()->translatedFormat('d F Y');
+
+    // Buat string konten QR code, misal multiline
+    $qrContent = "Nomor Surat: $nomorSurat\nNama Tujuan: $namaTujuan\nTanggal: $tanggalDisetujui";
+
+    $qrPng = QrCode::format('png')->size(300)->generate($qrContent);
+    $qrBase64 = 'data:image/png;base64,' . base64_encode($qrPng);
+
+
+    // === Data untuk PDF ===
     $pdfData = [
         'pengajuan' => $pengajuan,
         'rt' => $rt,
@@ -81,9 +99,13 @@ public function setujui(Request $request)
         'ttd_rt' => base64_encode(file_get_contents(Storage::path($rt->ttd_digital_bersih))),
         'ttd_rw' => base64_encode(file_get_contents(Storage::path($rw->ttd_digital_bersih))),
         'jenis' => $jenis,
+        'tanggal_disetujui_rw' => Carbon::now(),
+        'qr_code_base64' => $qrBase64,
     ];
 
+    // === Generate & Simpan PDF ke Storage ===
     $pdf = Pdf::loadView('rw.suratPengantarRw', $pdfData)->setPaper('a4');
+
     $filename = 'surat-ttd-rtrw-' . $pengajuan->id . '-' . str_replace(' ', '-', strtolower($pengajuan->warga->nama_lengkap)) . '-' . time() . '.pdf';
     $filepath = 'public/hasil_surat/ttd_rw/' . $filename;
 
@@ -102,6 +124,7 @@ public function setujui(Request $request)
 
     return back()->with('success', 'Surat berhasil disetujui RW.');
 }
+
 
 
 }

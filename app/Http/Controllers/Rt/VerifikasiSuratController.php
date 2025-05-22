@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Rt;
 
 use App\Models\Rw;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\PengajuanSurat;
 use App\Models\HasilSuratTtdRt;
@@ -28,6 +29,7 @@ class VerifikasiSuratController extends Controller
 
     public function proses(Request $request)
     {
+        Carbon::setLocale('id');
         $id = $request->id;
         $jenis = $request->jenis;
         $aksi = $request->aksi;
@@ -119,7 +121,7 @@ class VerifikasiSuratController extends Controller
                     'jenis' => 'lain',
                 ];
 
-                $pdf = Pdf::loadView('rt.suratPengantarLain', $pdfData)->setPaper('a4');
+                $pdf = Pdf::loadView('rt.suratPengantar', $pdfData)->setPaper('a4');
                 $filename = 'surat-ttd-rt-' . $data->id . '-' . str_replace(' ', '-', strtolower($data->warga->nama_lengkap)) . '-' . time() . '.pdf';
                 Storage::put('public/hasil_surat/ttd_rt/' . $filename, $pdf->output());
 

@@ -163,7 +163,13 @@
         <div style="clear: both;"></div>
 
         <div class="judul">SURAT PENGANTAR</div>
-        <p class="nomor-surat">Nomor: {{ $pengajuan->tujuanSurat->nomor_surat ?? '.........................' }}</p>
+        <p class="nomor-surat">Nomor:
+            @if ($jenis === 'biasa')
+                {{ $pengajuan->tujuanSurat->nomor_surat ?? '-' }}
+            @else
+                {{ $pengajuan->nomor_surat_pengajuan_lain ?? '-' }}
+            @endif
+        </p>
 
         <p class="indent">Yang bertanda tangan di bawah ini, Ketua RT {{ $rt->no_rt }} RW {{ $rt->rw->no_rw }} Kelurahan Margadadi Kecamatan Indramayu Kabupaten Indramayu, memberikan pengantar kepada:</p>
 
@@ -239,7 +245,13 @@
         </div>
         <div class="form-section">
             <label>Untuk/ Maksud/ Tujuan</label>
-            <span class="value">: {{ $pengajuan->tujuanSurat->nama_tujuan ?? '-' }}</span>
+            <span class="value">:
+                @if ($jenis === 'biasa')
+                    {{ $pengajuan->tujuanSurat->nama_tujuan ?? '-' }}
+                @else
+                    {{ $pengajuan->tujuan_manual ?? '-' }}
+                @endif
+            </span>
         </div>
 
         <p class="indent">Demikian Surat Pengantar ini dibuat untuk dapat dipergunakan sebagaimana mestinya.</p>
@@ -249,7 +261,7 @@
             <table class="ttd-table">
                 <tr>
                     <td>Mengetahui,<br>Ketua RW</td>
-                    <td>Indramayu, ................<br>Ketua RT</td>
+                    <td>Indramayu, {{ \Carbon\Carbon::parse($tanggal_disetujui_rw)->translatedFormat('d F Y') }}<br>Ketua RT</td>
                 </tr>
                 <tr>
                     <td><img src="data:image/png;base64,{{ $ttd_rw }}" alt="Tanda Tangan RW" style="width: 100px; height: 100px;"/><br>
@@ -263,6 +275,11 @@
             </table>
         </div>
     </div>
-
+    <div style="margin-top: 20px; text-align: right;">
+        <p style="font-size: 10pt;">QR Code Verifikasi:</p>
+        {{-- <img src="{{ $qr_code_base64 }}" alt="QR Code" style="width:150px; height:150px;"> --}}
+        {!! $qrCode !!}
+    </div>
+    {{-- <div>{!! $qr_code_svg !!}</div> --}}
 </body>
 </html>
