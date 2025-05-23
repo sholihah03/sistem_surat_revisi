@@ -277,11 +277,7 @@
     </div>
     <div style="margin-top: 20px; text-align: right;">
         <p style="font-size: 10pt;">QR Code Verifikasi:</p>
-        <img src="data:image/png;base64,{{ base64_encode(
-            QrCode::format('png')->size(150)->generate(
-                route('verifikasi.surat', ['token' => $hasilSurat->token])
-            )
-        ) }}" alt="QR Code" style="width:150px; height:150px;">
+        <img src="{{ $qr_code_base64 }}" alt="QR Code" style="width:150px; height:150px;">
     </div>
 </body>
 </html>

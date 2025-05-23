@@ -126,12 +126,15 @@ class ManajemenSuratWargaController extends Controller
         ];
 
         // === Generate & Simpan PDF ke Storage ===
-        // $pdf = Pdf::loadView('rw.suratPengantarRw', $pdfData)->setPaper('a4');
+        $pdf = Pdf::loadView('rw.suratPengantarRw', $pdfData)->setPaper('a4');
 
         $filename = 'surat-ttd-rtrw-' . $pengajuan->id . '-' . str_replace(' ', '-', strtolower($pengajuan->warga->nama_lengkap)) . '-' . time() . '.pdf';
         $filepath = 'public/hasil_surat/ttd_rw/' . $filename;
-        // Simpan ke tb_hasil_surat_ttd_rw dan dapatkan data hasil surat
-        $hasilSurat = HasilSuratTtdRw::updateOrCreate(
+
+        Storage::put($filepath, $pdf->output());
+
+        // Simpan ke tb_hasil_surat_ttd_rw
+        HasilSuratTtdRw::updateOrCreate(
             [
                 'jenis' => $jenis,
                 'pengajuan_id' => $pengajuanId,
@@ -142,15 +145,7 @@ class ManajemenSuratWargaController extends Controller
             ]
         );
 
-        // Masukkan hasil surat ke data view PDF
-        $pdfData['hasilSurat'] = $hasilSurat;
-
-        // Generate PDF dan simpan
-        $pdf = Pdf::loadView('rw.suratPengantarRw', $pdfData)->setPaper('a4');
-        Storage::put($filepath, $pdf->output());
-
         return back()->with('success', 'Surat berhasil disetujui RW.');
-
     }
 
     public function verifikasiSurat($token)
