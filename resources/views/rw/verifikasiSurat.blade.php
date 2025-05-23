@@ -1,6 +1,32 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <meta charset="UTF-8" />
+    <title>Verifikasi Surat Pengantar</title>
+</head>
+<body>
+    <h1>Verifikasi Surat Pengantar</h1>
+
+    <p>Nomor Surat:
+        @if ($hasilSurat->jenis === 'biasa')
+            {{ $pengajuan->tujuanSurat->nomor_surat ?? '-' }}
+        @else
+            {{ $pengajuan->nomor_surat_pengajuan_lain ?? '-' }}
+        @endif
+    </p>
+
+    <p>Nama Pemohon: {{ $pengajuan->warga->nama_lengkap }}</p>
+    <p>RT/RW: {{ $rt->no_rt }}/{{ $rw->no_rw }}</p>
+
+    <p>Surat ini telah disetujui oleh RT {{ $rt->no_rt }} RW {{ $rw->no_rw }} </p>
+
+    <p><a href="{{ Storage::url($hasilSurat->file_surat) }}" target="_blank">Download Surat PDF</a></p>
+</body>
+</html>
+
+{{-- <!DOCTYPE html>
+<html lang="id">
+<head>
     <meta charset="UTF-8">
     <title>Surat Pengantar</title>
     <style>
@@ -164,14 +190,14 @@
 
         <div class="judul">SURAT PENGANTAR</div>
         <p class="nomor-surat">Nomor:
-            @if ($jenis === 'biasa')
+            @if ($hasilSurat->jenis === 'biasa')
                 {{ $pengajuan->tujuanSurat->nomor_surat ?? '-' }}
             @else
                 {{ $pengajuan->nomor_surat_pengajuan_lain ?? '-' }}
             @endif
         </p>
 
-        <p class="indent">Yang bertanda tangan di bawah ini, Ketua RT {{ $rt->no_rt }} RW {{ $rt->rw->no_rw }} Kelurahan Margadadi Kecamatan Indramayu Kabupaten Indramayu, memberikan pengantar kepada:</p>
+        <p class="indent">Yang bertanda tangan di bawah ini, Ketua RT {{ $rt->no_rt }} RW {{ $rw->no_rw }} Kelurahan Margadadi Kecamatan Indramayu Kabupaten Indramayu, memberikan pengantar kepada:</p>
 
         <div class="form-section">
             <label>Nama</label>
@@ -180,8 +206,8 @@
         <div class="form-section">
             <label>Tempat/ Tanggal Lahir</label>
             <span class="value">:
-                @if ($jenis === 'biasa')
-                    {{ $pengajuan->tempat_lahir ?? '-' }},
+                @if ($hasilSurat->$jenis === 'biasa')
+                    {{ $pengajuan->tujuanSurat->tempat_lahir ?? '-' }},
                     {{ \Carbon\Carbon::parse($pengajuan->tanggal_lahir)->translatedFormat('d F Y') }}
                 @else
                     {{ $pengajuan->tempat_lahir_pengaju_lain ?? '-' }},
@@ -196,8 +222,8 @@
         <div class="form-section">
             <label>Status Perkawinan</label>
             <span class="value">:
-                @if ($jenis === 'biasa')
-                    {{ $pengajuan->status_perkawinan ?? '-' }}
+                @if ($hasilSurat->$jenis === 'biasa')
+                    {{ $pengajuan->tujuanSurat->status_perkawinan ?? '-' }}
                 @else
                     {{ $pengajuan->status_perkawinan_pengaju_lain ?? '-' }}
                 @endif
@@ -206,8 +232,8 @@
         <div class="form-section">
             <label>Kebangsaan/ Agama</label>
             <span class="value">:
-                @if ($jenis === 'biasa')
-                    {{ $pengajuan->agama ?? '-' }}
+                @if ($hasilSurat->$jenis === 'biasa')
+                    {{ $pengajuan->tujuanSurat->agama ?? '-' }}
                 @else
                     {{ $pengajuan->agama_pengaju_lain ?? '-' }}
                 @endif
@@ -216,8 +242,8 @@
         <div class="form-section">
             <label>Pekerjaan</label>
             <span class="value">:
-                @if ($jenis === 'biasa')
-                    {{ $pengajuan->pekerjaan ?? '-' }}
+                @if ($hasilSurat->$jenis === 'biasa')
+                    {{ $pengajuan->tujuanSurat->pekerjaan ?? '-' }}
                 @else
                     {{ $pengajuan->pekerjaan_pengaju_lain ?? '-' }}
                 @endif
@@ -246,7 +272,7 @@
         <div class="form-section">
             <label>Untuk/ Maksud/ Tujuan</label>
             <span class="value">:
-                @if ($jenis === 'biasa')
+                @if ($hasilSurat->$jenis === 'biasa')
                     {{ $pengajuan->tujuanSurat->nama_tujuan ?? '-' }}
                 @else
                     {{ $pengajuan->tujuan_manual ?? '-' }}
@@ -275,13 +301,7 @@
             </table>
         </div>
     </div>
-    <div style="margin-top: 20px; text-align: right;">
-        <p style="font-size: 10pt;">QR Code Verifikasi:</p>
-        <img src="data:image/png;base64,{{ base64_encode(
-            QrCode::format('png')->size(150)->generate(
-                route('verifikasi.surat', ['token' => $hasilSurat->token])
-            )
-        ) }}" alt="QR Code" style="width:150px; height:150px;">
-    </div>
+    <div><a href="{{ Storage::url($hasilSurat->file_surat) }}" target="_blank">Download Surat PDF</a></div>
 </body>
-</html>
+</html> --}}
+

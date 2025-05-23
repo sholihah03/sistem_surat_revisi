@@ -59,6 +59,9 @@ Route::post('/uploadKKManualSimpan', [UploadKKManualController::class, 'uploadKK
 
 Route::get('/suratPengantar', [TemplateSuratController::class, 'index'])->name('suratPengantar');
 
+Route::get('/verifikasi-surat/{token}', [ManajemenSuratWargaController::class, 'verifikasiSurat'])->name('verifikasi.surat');
+
+
 Route::prefix('warga')->middleware(AuthenticateWarga::class)->group(function () {
     Route::get('/dashboardWarga', [DashboardController::class, 'index'])->name('dashboardWarga');
     Route::get('/pengajuanSuratWarga', [PengajuanSuratController::class, 'index'])->name('pengajuanSuratWarga');

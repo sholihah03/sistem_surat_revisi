@@ -16,6 +16,7 @@ class HasilSuratTtdRw extends Model
         'jenis',
         'pengajuan_id',
         'file_surat',
+        'token',
     ];
 
     // Relasi opsional (jika ingin digunakan)
