@@ -144,23 +144,22 @@
             @if($pengajuanSuratGabungan->isEmpty())
                 <p class="text-center text-gray-600">Belum ada pengajuan surat.</p>
             @else
-                <!-- Tambahkan max-h dan overflow-y-auto untuk scroll -->
                 <div class="max-h-[400px] overflow-y-auto rounded-md">
-                    <table class="min-w-full text-sm text-gray-700">
-                        <thead class="bg-gray-100 border-b sticky top-0 z-10">
+                    <table class="min-w-full text-sm text-gray-700 border border-gray-300">
+                        <thead class="bg-gray-100 sticky top-0 z-10">
                             <tr>
-                                <th class="px-4 py-2 text-left">Tanggal</th>
-                                <th class="px-4 py-2 text-left">Tujuan Surat</th>
-                                <th class="px-4 py-2 text-left">Status</th>
-                                <th class="px-4 py-2 text-left">Aksi</th>
+                                <th class="px-4 py-2 text-center border border-gray-300">Tanggal</th>
+                                <th class="px-4 py-2 text-center border border-gray-300">Tujuan Surat</th>
+                                <th class="px-4 py-2 text-center border border-gray-300">Status</th>
+                                <th class="px-4 py-2 text-center border border-gray-300">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200">
+                        <tbody class="text-center">
                             @foreach($pengajuanSuratGabungan as $surat)
                                 <tr class="hover:bg-gray-50 transition-colors duration-200">
-                                    <td class="px-4 py-2">{{ $surat->created_at->format('Y-m-d') }}</td>
-                                    <td class="px-4 py-2">{{ $surat->tujuan }}</td>
-                                    <td class="px-4 py-2">
+                                    <td class="px-4 py-2 border border-gray-300">{{ $surat->created_at->translatedFormat('d F Y') }}</td>
+                                    <td class="px-4 py-2 border border-gray-300">{{ $surat->tujuan }}</td>
+                                    <td class="px-4 py-2 border border-gray-300">
                                         @if($surat->status === 'disetujui')
                                             <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Disetujui</span>
                                         @elseif($surat->status === 'menunggu')
@@ -171,7 +170,7 @@
                                             <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded">Belum Diproses</span>
                                         @endif
                                     </td>
-                                    <td class="px-4 py-2">
+                                    <td class="px-4 py-2 border border-gray-300">
                                         <a href="{{ route('riwayatSurat') }}" class="text-blue-500 hover:underline">Lihat</a>
                                     </td>
                                 </tr>
@@ -182,7 +181,6 @@
             @endif
         </div>
     </div>
-
 </div>
 
   <div class="max-w-7xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-md">

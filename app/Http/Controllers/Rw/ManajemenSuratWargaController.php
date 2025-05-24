@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Rw;
 
 use Carbon\Carbon;
-use Illuminate\Support\Str;
 use App\Models\Wargas;
 use App\Models\HasilSurat;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Mail\SuratDisetujuiRw;
 use App\Models\PengajuanSurat;
 use App\Models\HasilSuratTtdRt;
 use App\Models\HasilSuratTtdRw;
@@ -15,17 +16,20 @@ use App\Models\PengajuanSuratLain;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Mail\SuratDisetujuiRwUntukRt;
 use Illuminate\Support\Facades\Storage;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ManajemenSuratWargaController extends Controller
 {
     public function index()
-{
-    $profile_rw = Auth::guard('rw')->user()->profile_rw;
-    $idRwLogin = Auth::guard('rw')->user()->id_rw;
+    {
+        $profile_rw = Auth::guard('rw')->user()->profile_rw;
+        $idRwLogin = Auth::guard('rw')->user()->id_rw;
 
-    $surats = HasilSuratTtdRt::whereDoesntHave('hasilSuratTtdRw')
+        $surats = HasilSuratTtdRt::whereDoesntHave('hasilSuratTtdRw', function ($query) {
+            $query->whereColumn('jenis', 'tb_hasil_surat_ttd_rt.jenis');
+        })
         ->where(function ($query) use ($idRwLogin) {
             // Filter pengajuanSurat biasa yang relasi warga->rt->rw_id = $idRwLogin
             $query->whereHas('pengajuanSurat.warga.rt', function ($q) use ($idRwLogin) {
@@ -44,8 +48,8 @@ class ManajemenSuratWargaController extends Controller
         ])
         ->get();
 
-    return view('rw.manajemenSuratWarga', compact('profile_rw', 'surats'));
-}
+        return view('rw.manajemenSuratWarga', compact('profile_rw', 'surats'));
+    }
 
 
     public function setujui(Request $request)
@@ -155,6 +159,16 @@ class ManajemenSuratWargaController extends Controller
                 'token' => $token,
             ]
         );
+
+        // Kirim email ke warga yang bersangkutan
+        if (!empty($pengajuan->warga->email)) {
+            Mail::to($pengajuan->warga->email)->send(new SuratDisetujuiRw($pengajuan));
+        }
+
+        // Kirim email ke RT
+        if (!empty($rt->email_rt)) {
+            Mail::to($rt->email_rt)->send(new SuratDisetujuiRwUntukRt($pengajuan));
+        }
 
         return back()->with('success', 'Surat berhasil disetujui RW.');
     }

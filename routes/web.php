@@ -71,6 +71,7 @@ Route::prefix('warga')->middleware(AuthenticateWarga::class)->group(function () 
     Route::post('/formPengajuanSuratLainStore', [PengajuanSuratController::class, 'formPengajuanSuratLainStore'])->name('formPengajuanSuratLainStore');
     Route::get('/formSuratWarga', [FormSuratController::class, 'index'])->name('formSuratWarga');
     Route::get('/riwayatSurat', [RiwayatSuratController::class, 'index'])->name('riwayatSurat');
+    Route::get('/surat/pdf/{id}', [RiwayatSuratController::class, 'showPdf'])->name('surat.pdf');
     Route::get('/historiSuratWarga', [HistoriSuratController::class, 'index'])->name('historiSuratWarga');
     Route::post('/notifikasi/dibaca', function () {
         // Bisa dapat ID notif dari request, tapi kalau mau semua notif dianggap sudah dibaca:

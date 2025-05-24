@@ -4,7 +4,7 @@
     <title>Verifikasi Surat Dibutuhkan</title>
 </head>
 <body>
-    <p>Yth. Bapak/Ibu {{ $namaRw }},</p>
+    <p>Yth. Bapak/Ibu RW {{ $namaRw }},</p>
 
     <p>Telah disetujui oleh RT surat pengajuan <strong>{{ $jenisSurat }}</strong> milik warga <strong>{{ $namaWarga }}</strong>.</p>
 

@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\HasilSuratTtdRw;
+use Carbon\Carbon;
 use App\Models\ScanKK;
 use App\Service\OCRService;
 use App\Models\PengajuanSurat;
@@ -27,6 +29,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Carbon::setLocale('id');
+
         View::composer('*', function ($view) {
             $pendingCount = ScanKK::where('status_verifikasi', 'pending')->count();
             $pendingSuratCount = PengajuanSurat::where('status', 'menunggu')->count();
@@ -61,14 +65,26 @@ class AppServiceProvider extends ServiceProvider
                     ->take(5)
                     ->get();
 
-                $notifikasi = $notifikasiBiasa->concat($notifikasiLain)->sortByDesc('updated_at')->take(5);
+                // Ambil surat yang sudah selesai dan masuk ke tb_hasil_surat_ttd_rw
+                $notifikasiSelesai = HasilSuratTtdRw::with(['pengajuanSurat', 'pengajuanSuratLain'])
+                    ->whereHas('pengajuanSurat', function ($query) use ($warga) {
+                        $query->where('warga_id', $warga->id_warga);
+                    })
+                    ->orWhereHas('pengajuanSuratLain', function ($query) use ($warga) {
+                        $query->where('warga_id', $warga->id_warga);
+                    })
+                    ->orderBy('updated_at', 'desc')
+                    ->take(5)
+                    ->get();
+
+                $notifikasi = $notifikasiBiasa->concat($notifikasiLain)->concat($notifikasiSelesai)->sortByDesc('updated_at')->take(5);
 
                 // Ambil ID notifikasi yang sudah dibaca dari session
                 $dibaca = session('notifikasi_dibaca_warga', []);
 
                 // Filter notifikasi agar yang sudah dibaca tidak muncul (atau hilangkan badge-nya)
                 $notifikasiBaru = $notifikasi->filter(function($item) use ($dibaca) {
-                    return !in_array($item->id, $dibaca);
+                    return !in_array(($item->id ?? $item->id_hasil_surat_ttd_rw) . $item->updated_at->timestamp, $dibaca);
                 });
 
                 $view->with([
@@ -81,15 +97,24 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer(['rw.mainRw', 'rw.dashboardRw'], function ($view) {
             $profile_rw = Auth::guard('rw')->user()->profile_rw ?? null;
+            // Ambil pengajuan biasa yang sudah ada hasilnya
+            $pengajuanSuratDisetujuiIds = HasilSuratTtdRw::where('jenis', 'biasa')
+                ->pluck('pengajuan_id')->toArray();
+
+            // Ambil pengajuan lain yang sudah ada hasilnya
+            $pengajuanSuratLainDisetujuiIds = HasilSuratTtdRw::where('jenis', 'lain')
+                ->pluck('pengajuan_id')->toArray();
 
             $pengajuanSuratBaru = PengajuanSurat::with(['warga.rt'])
                 ->where('status', 'disetujui')
+                ->whereNotIn('id_pengajuan_surat', $pengajuanSuratDisetujuiIds)
                 ->orderBy('updated_at', 'desc')
                 ->take(5)
                 ->get();
 
             $pengajuanSuratLainBaru = PengajuanSuratLain::with(['warga.rt'])
                 ->where('status_pengajuan_lain', 'disetujui')
+                ->whereNotIn('id_pengajuan_surat_lain', $pengajuanSuratLainDisetujuiIds)
                 ->orderBy('updated_at', 'desc')
                 ->take(5)
                 ->get();

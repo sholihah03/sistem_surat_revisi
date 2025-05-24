@@ -5,7 +5,7 @@
     <title>Notifikasi Verifikasi</title>
 </head>
 <body>
-    <p>Yth. Ketua RT {{ $pendaftaran->rt->no_rt ?? '-' }},</p>
+    <p>Yth. Bapak/Ibu RT {{ $pendaftaran->rt->no_rt ?? '-' }},</p>
     <p>Ada pendaftaran warga baru dengan Nama Warga: <strong>{{ $pendaftaran->nama_lengkap }}</strong> yang sudah mengunggah KK dan menunggu verifikasi.</p>
 
     <p>Silakan verifikasi dalam waktu 24 jam melalui link berikut:</p>

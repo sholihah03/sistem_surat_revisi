@@ -31,8 +31,7 @@ class HasilSuratTtdRt extends Model
 
     public function hasilSuratTtdRw()
     {
-        return $this->hasOne(HasilSuratTtdRw::class, 'pengajuan_id', 'pengajuan_id')
-                    ->where('jenis', $this->jenis);
+        return $this->hasOne(HasilSuratTtdRw::class, 'pengajuan_id', 'pengajuan_id');
     }
 
 }
