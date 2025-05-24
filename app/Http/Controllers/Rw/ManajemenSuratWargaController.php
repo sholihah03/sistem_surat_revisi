@@ -88,6 +88,9 @@ class ManajemenSuratWargaController extends Controller
         // Buat string konten QR code, misal multiline
         $nik = $pengajuan->warga->nik;
         $maskedNIK = substr($nik, 0, 6) . '******' . substr($nik, -4);
+        $tujuan = ($jenis === 'biasa')
+            ? ($pengajuan->tujuanSurat->nama_tujuan ?? '-')
+            : ($pengajuan->tujuan_manual ?? '-');
         $eol = chr(10); // newline universal
 
         // Generate token unik
@@ -96,17 +99,25 @@ class ManajemenSuratWargaController extends Controller
         // URL verifikasi surat dengan token
         $verificationUrl = route('verifikasi.surat', ['token' => $token]);
 
-        $qrContent = "=== SURAT PENGANTAR ===" . $eol . $eol .
-            "Nomor: " . $nomorSurat . $eol . $eol .
-            "Tanggal: " . Carbon::now()->translatedFormat('d F Y') . $eol . $eol .
-            "PEMOHON:" . $eol .
-            "Nama: " . $pengajuan->warga->nama_lengkap . $eol . $eol .
-            "NIK: " . $maskedNIK . $eol .
-            "RT/RW: " . $rt->no_rt . "/" . $rw->no_rw . $eol . $eol .
-            "DISAHKAN OLEH:" . $eol . $eol .
-            "Ketua RT " . $rt->no_rt . " - " . $rt->nama_lengkap_rt . $eol . $eol .
-            "Ketua RW " . $rw->no_rw . " - " . $rw->nama_lengkap_rw . $eol . $eol .
-            "Verifikasi surat: " . $verificationUrl;
+        // $qrContent = "=== SURAT PENGANTAR ===" . $eol . $eol .
+        //     "Nomor: " . $nomorSurat . $eol . $eol .
+        //     "Tanggal: " . Carbon::now()->translatedFormat('d F Y') . $eol . $eol .
+        //     "PEMOHON:" . $eol .
+        //     "Nama: " . $pengajuan->warga->nama_lengkap . $eol . $eol .
+        //     "NIK: " . $maskedNIK . $eol .
+        //     "RT/RW: " . $rt->no_rt . "/" . $rw->no_rw . $eol . $eol .
+        //     "DISAHKAN OLEH:" . $eol . $eol .
+        //     "Ketua RT " . $rt->no_rt . " - " . $rt->nama_lengkap_rt . $eol . $eol .
+        //     "Ketua RW " . $rw->no_rw . " - " . $rw->nama_lengkap_rw . $eol . $eol .
+        //     "Verifikasi surat: " . $verificationUrl;
+
+        $qrContent = "SURAT|"
+            . "NS:" . $nomorSurat . "|"
+            . "TUJUAN:" . strtoupper($tujuan) . "|"
+            . "NIK:" . $maskedNIK . "|"
+            . "NAMA:" . strtoupper($pengajuan->warga->nama_lengkap) . "|"
+            . "TGL:" . Carbon::now()->translatedFormat('d F Y') . "|"
+            . "VERIF_URL:" . $verificationUrl;
 
 
         $qrPng = QrCode::format('png')->size(300)->generate($qrContent);
@@ -157,25 +168,35 @@ class ManajemenSuratWargaController extends Controller
             abort(404, 'Surat tidak ditemukan atau token tidak valid.');
         }
 
-        // Ambil data pengajuan dan relasi yg diperlukan
-        $pengajuan = null;
+        // Ambil data pengajuan berdasarkan jenis
         if ($hasilSurat->jenis === 'biasa') {
-            $pengajuan = PengajuanSurat::with(['warga.rt.rw', 'warga.scan_KK.alamat'])->find($hasilSurat->pengajuan_id);
+        $pengajuan = PengajuanSurat::with([
+            'warga.rt.rw',
+            'warga.scan_KK.alamat',
+            'tujuanSurat'
+            ])->where('id_pengajuan_surat', $hasilSurat->pengajuan_id)->first();
         } else {
-            $pengajuan = PengajuanSuratLain::with(['warga.rt.rw', 'warga.scan_KK.alamat'])->find($hasilSurat->pengajuan_id);
+            $pengajuan = PengajuanSuratLain::with([
+                'warga.rt.rw',
+                'warga.scan_KK.alamat'
+            ])->where('id_pengajuan_surat_lain', $hasilSurat->pengajuan_id)->first();
         }
 
         if (!$pengajuan) {
-            abort(404, 'Data pengajuan tidak ditemukan.');
+        abort(404, 'Data pengajuan tidak ditemukan.');
         }
 
         $rt = $pengajuan->warga->rt;
         $rw = $rt->rw;
 
+        // Ambil tanda tangan digital RT & RW
+        $ttd_rw = base64_encode(Storage::get($rw->ttd_digital_bersih));
+        $ttd_rt = base64_encode(Storage::get($rt->ttd_digital_bersih));
+
+        // Tanggal persetujuan RW (gunakan kolom di hasilSurat atau lainnya)
+        $tanggal_disetujui_rw = $hasilSurat->created_at;
+
         // Tampilkan view verifikasi dengan data surat
-        return view('rw.verifikasiSurat', compact('hasilSurat', 'pengajuan', 'rt', 'rw'));
+        return view('rw.verifikasiSurat', compact('hasilSurat', 'pengajuan', 'rt', 'rw', 'ttd_rt', 'ttd_rw', 'tanggal_disetujui_rw'));
     }
-
-
-
 }

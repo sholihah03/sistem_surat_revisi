@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{{-- <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8" />
@@ -22,9 +22,9 @@
 
     <p><a href="{{ Storage::url($hasilSurat->file_surat) }}" target="_blank">Download Surat PDF</a></p>
 </body>
-</html>
+</html> --}}
 
-{{-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -33,6 +33,28 @@
         body {
             font-family: Arial, sans-serif;
             margin: 25px;
+        }
+
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+
+        .a4 {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: auto;
+            background: white;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+        }
+
+        @media print {
+            body, .a4 {
+                margin: 0;
+                box-shadow: none;
+            }
         }
 
         .kop-surat {
@@ -156,152 +178,170 @@
     </style>
 </head>
 <body>
-
-    <!-- KOP SURAT -->
-    <div class="kop-surat">
-        <table class="header-table">
-            <tr>
-                <td>
-                    <img src="{{ public_path('images/Logo_Indramayu.png') }}" alt="Logo" class="header-logo">
-                </td>
-                <td class="header-text">
-                    <h3>PEMERINTAH KABUPATEN INDRAMAYU</h3>
-                    <h2>KECAMATAN INDRAMAYU</h2>
-                    <h2>KELURAHAN MARGADADI</h2>
-                    <p>Jl. May Sastra Atmaja Nomor : 47 Tlp. (0234) 273 301 Kode Pos 45211</p>
-                    <p>e-mail : kelurahanmargadadi.indramayu@gmail.com</p>
-                    <h3>INDRAMAYU</h3>
-                </td>
-            </tr>
-        </table>
-    </div>
-
-    <!-- ISI SURAT -->
-    <div class="content">
-        <div class="kepada">
-            <p>
-                Kepada<br>
-                Yth. Lurah Margadadi<br>
-                di_<br>
-                <strong class="tempat">TEMPAT</strong>
-            </p>
-        </div>
-        <div style="clear: both;"></div>
-
-        <div class="judul">SURAT PENGANTAR</div>
-        <p class="nomor-surat">Nomor:
-            @if ($hasilSurat->jenis === 'biasa')
-                {{ $pengajuan->tujuanSurat->nomor_surat ?? '-' }}
-            @else
-                {{ $pengajuan->nomor_surat_pengajuan_lain ?? '-' }}
-            @endif
-        </p>
-
-        <p class="indent">Yang bertanda tangan di bawah ini, Ketua RT {{ $rt->no_rt }} RW {{ $rw->no_rw }} Kelurahan Margadadi Kecamatan Indramayu Kabupaten Indramayu, memberikan pengantar kepada:</p>
-
-        <div class="form-section">
-            <label>Nama</label>
-            <span class="value">: {{ $pengajuan->warga->nama_lengkap }}</span>
-        </div>
-        <div class="form-section">
-            <label>Tempat/ Tanggal Lahir</label>
-            <span class="value">:
-                @if ($hasilSurat->$jenis === 'biasa')
-                    {{ $pengajuan->tujuanSurat->tempat_lahir ?? '-' }},
-                    {{ \Carbon\Carbon::parse($pengajuan->tanggal_lahir)->translatedFormat('d F Y') }}
-                @else
-                    {{ $pengajuan->tempat_lahir_pengaju_lain ?? '-' }},
-                    {{ \Carbon\Carbon::parse($pengajuan->tanggal_lahir_pengaju_lain)->translatedFormat('d F Y') }}
-                @endif
-            </span>
-        </div>
-        <div class="form-section">
-            <label>Nomor KTP</label>
-            <span class="value">: {{ $pengajuan->warga->nik }}</span>
-        </div>
-        <div class="form-section">
-            <label>Status Perkawinan</label>
-            <span class="value">:
-                @if ($hasilSurat->$jenis === 'biasa')
-                    {{ $pengajuan->tujuanSurat->status_perkawinan ?? '-' }}
-                @else
-                    {{ $pengajuan->status_perkawinan_pengaju_lain ?? '-' }}
-                @endif
-            </span>
-        </div>
-        <div class="form-section">
-            <label>Kebangsaan/ Agama</label>
-            <span class="value">:
-                @if ($hasilSurat->$jenis === 'biasa')
-                    {{ $pengajuan->tujuanSurat->agama ?? '-' }}
-                @else
-                    {{ $pengajuan->agama_pengaju_lain ?? '-' }}
-                @endif
-            </span>
-        </div>
-        <div class="form-section">
-            <label>Pekerjaan</label>
-            <span class="value">:
-                @if ($hasilSurat->$jenis === 'biasa')
-                    {{ $pengajuan->tujuanSurat->pekerjaan ?? '-' }}
-                @else
-                    {{ $pengajuan->pekerjaan_pengaju_lain ?? '-' }}
-                @endif
-            </span>
-        </div>
-        <div class="form-section">
-            <label>Alamat</label>
-            <span class="value">:
-                @php
-                    $alamat = $pengajuan->scanKk->alamat ?? null;
-                @endphp
-
-                @if ($alamat)
-                    {{ $alamat->nama_jalan }},
-                    RT {{ $alamat->rt_alamat ?? '-' }}/RW {{ $alamat->rw_alamat ?? '-' }},<br>
-                    Kel. {{ $alamat->kelurahan ?? '-' }},
-                    Kec. {{ $alamat->kecamatan ?? '-' }},
-                    Kab. {{ $alamat->kabupaten_kota ?? '-' }},<br>
-                    Prov. {{ $alamat->provinsi ?? '-' }},
-                    Kode Pos {{ $alamat->kode_pos ?? '-' }}
-                @else
-                    -
-                @endif
-            </span>
-        </div>
-        <div class="form-section">
-            <label>Untuk/ Maksud/ Tujuan</label>
-            <span class="value">:
-                @if ($hasilSurat->$jenis === 'biasa')
-                    {{ $pengajuan->tujuanSurat->nama_tujuan ?? '-' }}
-                @else
-                    {{ $pengajuan->tujuan_manual ?? '-' }}
-                @endif
-            </span>
-        </div>
-
-        <p class="indent">Demikian Surat Pengantar ini dibuat untuk dapat dipergunakan sebagaimana mestinya.</p>
-
-        <!-- TANDA TANGAN -->
-        <div class="ttd">
-            <table class="ttd-table">
+    <div class="a4">
+        <!-- KOP SURAT -->
+        <div class="kop-surat">
+            <table class="header-table">
                 <tr>
-                    <td>Mengetahui,<br>Ketua RW</td>
-                    <td>Indramayu, {{ \Carbon\Carbon::parse($tanggal_disetujui_rw)->translatedFormat('d F Y') }}<br>Ketua RT</td>
-                </tr>
-                <tr>
-                    <td><img src="data:image/png;base64,{{ $ttd_rw }}" alt="Tanda Tangan RW" style="width: 100px; height: 100px;"/><br>
-                        ( <span class="nama-ttd">{{ $rw->nama_lengkap_rw ?? '..............................................' }}</span> )
-                    </td>
                     <td>
-                        <img src="data:image/png;base64,{{ $ttd_rt }}" alt="Tanda Tangan RT" style="width: 100px; height: 100px;"/><br>
-                        ( <span class="nama-ttd">{{ $rt->nama_lengkap_rt ?? '..............................................' }}</span> )
+                        @php
+                            $logo = base64_encode(file_get_contents(public_path('images/Logo_Indramayu.png')));
+                        @endphp
+                        <img src="data:image/png;base64,{{ $logo }}" alt="Logo" style="width:100px;">
+                    </td>
+                    <td class="header-text">
+                        <h3>PEMERINTAH KABUPATEN INDRAMAYU</h3>
+                        <h2>KECAMATAN INDRAMAYU</h2>
+                        <h2>KELURAHAN MARGADADI</h2>
+                        <p>Jl. May Sastra Atmaja Nomor : 47 Tlp. (0234) 273 301 Kode Pos 45211</p>
+                        <p>e-mail : kelurahanmargadadi.indramayu@gmail.com</p>
+                        <h3>INDRAMAYU</h3>
                     </td>
                 </tr>
             </table>
         </div>
-    </div>
-    <div><a href="{{ Storage::url($hasilSurat->file_surat) }}" target="_blank">Download Surat PDF</a></div>
-</body>
-</html> --}}
 
+        <!-- ISI SURAT -->
+        <div class="content">
+            <div class="kepada">
+                <p>
+                    Kepada<br>
+                    Yth. Lurah Margadadi<br>
+                    di_<br>
+                    <strong class="tempat">TEMPAT</strong>
+                </p>
+            </div>
+            <div style="clear: both;"></div>
+
+            <div class="judul">SURAT PENGANTAR</div>
+            <p class="nomor-surat">Nomor:
+                @if ($hasilSurat->jenis === 'biasa')
+                    {{ $pengajuan->tujuanSurat->nomor_surat ?? '-' }}
+                @else
+                    {{ $pengajuan->nomor_surat_pengajuan_lain ?? '-' }}
+                @endif
+            </p>
+
+            <p class="indent">Yang bertanda tangan di bawah ini, Ketua RT {{ $rt->no_rt }} RW {{ $rw->no_rw }} Kelurahan Margadadi Kecamatan Indramayu Kabupaten Indramayu, memberikan pengantar kepada:</p>
+
+            <div class="form-section">
+                <label>Nama</label>
+                <span class="value">: {{ $pengajuan->warga->nama_lengkap }}</span>
+            </div>
+            <div class="form-section">
+                <label>Tempat/ Tanggal Lahir</label>
+                <span class="value">:
+                    @if ($hasilSurat->jenis === 'biasa')
+                        {{ $pengajuan->tempat_lahir ?? '-' }},
+                        {{ \Carbon\Carbon::parse($pengajuan->tanggal_lahir)->translatedFormat('d F Y') }}
+                    @else
+                        {{ $pengajuan->tempat_lahir_pengaju_lain ?? '-' }},
+                        {{ \Carbon\Carbon::parse($pengajuan->tanggal_lahir_pengaju_lain)->translatedFormat('d F Y') }}
+                    @endif
+                </span>
+            </div>
+            <div class="form-section">
+                <label>Nomor KTP</label>
+                <span class="value">: {{ $pengajuan->warga->nik }}</span>
+            </div>
+            <div class="form-section">
+                <label>Status Perkawinan</label>
+                <span class="value">:
+                    @if ($hasilSurat->jenis === 'biasa')
+                        {{ $pengajuan->status_perkawinan ?? '-' }}
+                    @else
+                        {{ $pengajuan->status_perkawinan_pengaju_lain ?? '-' }}
+                    @endif
+                </span>
+            </div>
+            <div class="form-section">
+                <label>Kebangsaan/ Agama</label>
+                <span class="value">:
+                    @if ($hasilSurat->jenis === 'biasa')
+                        {{ $pengajuan->agama ?? '-' }}
+                    @else
+                        {{ $pengajuan->agama_pengaju_lain ?? '-' }}
+                    @endif
+                </span>
+            </div>
+            <div class="form-section">
+                <label>Pekerjaan</label>
+                <span class="value">:
+                    @if ($hasilSurat->jenis === 'biasa')
+                        {{ $pengajuan->pekerjaan ?? '-' }}
+                    @else
+                        {{ $pengajuan->pekerjaan_pengaju_lain ?? '-' }}
+                    @endif
+
+                    @if ($hasilSurat->jenis === 'biasa')
+                        {{ $pengajuan->tujuanSurat->nama_tujuan ?? '-' }}
+                    @else
+                        {{ $pengajuan->tujuan_manual ?? '-' }}
+                    @endif
+                </span>
+            </div>
+            <div class="form-section">
+                <label>Alamat</label>
+                <span class="value">:
+                    @php
+                        $alamat = $pengajuan->scanKk->alamat ?? null;
+                    @endphp
+
+                    @if ($alamat)
+                        {{ $alamat->nama_jalan }},
+                        RT {{ $alamat->rt_alamat ?? '-' }}/RW {{ $alamat->rw_alamat ?? '-' }},<br>
+                        Kel. {{ $alamat->kelurahan ?? '-' }},
+                        Kec. {{ $alamat->kecamatan ?? '-' }},
+                        Kab. {{ $alamat->kabupaten_kota ?? '-' }},<br>
+                        Prov. {{ $alamat->provinsi ?? '-' }},
+                        Kode Pos {{ $alamat->kode_pos ?? '-' }}
+                    @else
+                        -
+                    @endif
+                </span>
+            </div>
+            <div class="form-section">
+                <label>Untuk/ Maksud/ Tujuan</label>
+                <span class="value">:
+                    @if ($hasilSurat->jenis === 'biasa')
+                        {{ $pengajuan->tujuanSurat->nama_tujuan ?? '-' }}
+                    @else
+                        {{ $pengajuan->tujuan_manual ?? '-' }}
+                    @endif
+                </span>
+            </div>
+
+            <p class="indent">Demikian Surat Pengantar ini dibuat untuk dapat dipergunakan sebagaimana mestinya.</p>
+
+            <!-- TANDA TANGAN -->
+            <div class="ttd">
+                <table class="ttd-table">
+                    <tr>
+                        <td>Mengetahui,<br>Ketua RW</td>
+                        <td>Indramayu, {{ \Carbon\Carbon::parse($tanggal_disetujui_rw)->translatedFormat('d F Y') }}<br>Ketua RT</td>
+                    </tr>
+                    <tr>
+                        <td>@if ($ttd_rw)
+                                <img src="data:image/png;base64,{{ $ttd_rw }}" alt="Tanda Tangan RW" style="width: 100px; height: 100px;" />
+                            @else
+                                <br><br><br>
+                            @endif
+                            <br>
+                            ( <span class="nama-ttd">{{ $rw->nama_lengkap_rw ?? '..............................................' }}</span> )
+                        </td>
+                        <td>
+                            @if ($ttd_rt)
+                                <img src="data:image/png;base64,{{ $ttd_rt }}" alt="Tanda Tangan RT" style="width: 100px; height: 100px;" />
+                            @else
+                                <br><br><br>
+                            @endif
+                            <br>
+                            ( <span class="nama-ttd">{{ $rt->nama_lengkap_rt ?? '..............................................' }}</span> )
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
