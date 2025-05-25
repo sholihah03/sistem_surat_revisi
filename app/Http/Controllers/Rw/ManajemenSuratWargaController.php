@@ -95,25 +95,12 @@ class ManajemenSuratWargaController extends Controller
         $tujuan = ($jenis === 'biasa')
             ? ($pengajuan->tujuanSurat->nama_tujuan ?? '-')
             : ($pengajuan->tujuan_manual ?? '-');
-        $eol = chr(10); // newline universal
 
         // Generate token unik
         $token = Str::random(40);
 
         // URL verifikasi surat dengan token
         $verificationUrl = route('verifikasi.surat', ['token' => $token]);
-
-        // $qrContent = "=== SURAT PENGANTAR ===" . $eol . $eol .
-        //     "Nomor: " . $nomorSurat . $eol . $eol .
-        //     "Tanggal: " . Carbon::now()->translatedFormat('d F Y') . $eol . $eol .
-        //     "PEMOHON:" . $eol .
-        //     "Nama: " . $pengajuan->warga->nama_lengkap . $eol . $eol .
-        //     "NIK: " . $maskedNIK . $eol .
-        //     "RT/RW: " . $rt->no_rt . "/" . $rw->no_rw . $eol . $eol .
-        //     "DISAHKAN OLEH:" . $eol . $eol .
-        //     "Ketua RT " . $rt->no_rt . " - " . $rt->nama_lengkap_rt . $eol . $eol .
-        //     "Ketua RW " . $rw->no_rw . " - " . $rw->nama_lengkap_rw . $eol . $eol .
-        //     "Verifikasi surat: " . $verificationUrl;
 
         $qrContent = "SURAT|"
             . "NS:" . $nomorSurat . "|"

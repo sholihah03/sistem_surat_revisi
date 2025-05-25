@@ -2,44 +2,32 @@
 
 @section('content')
 <div class="container mx-auto p-4 mb-6 pt-20">
-    <h1 class="text-2xl font-bold mb-6">Histori Verifikasi Akun Warga</h1>
+    <h1 class="text-2xl font-bold mb-2">Histori Verifikasi Akun Warga</h1>
 
-    <p class="mb-6 text-sm md:text-base text-gray-700">
+    <p class="mb-6 text-lg text-gray-700">
         Halaman ini menampilkan histori verifikasi akun warga, termasuk data yang telah disetujui atau ditolak beserta alasan dan waktu verifikasi.
     </p>
 
-    <form method="GET" action="{{ route('historiVerifikasiAkunWarga') }}"
-      class="mb-4 flex flex-col md:flex-row gap-2 items-start md:items-center">
-
-    <div class="flex w-full md:w-1/3 gap-2">
-        <input
-            type="text"
-            name="search"
+    <!-- Form Search -->
+    <form method="GET" action="{{ route('historiVerifikasiAkunWarga') }}" class="relative w-full max-w-sm mb-6">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+        </span>
+        <input type="text" name="search" id="searchInput"
             value="{{ request('search') }}"
             placeholder="Cari nama warga atau no KK..."
-            class="px-4 py-2 border rounded-md w-full text-sm" />
-
-        <button
-            type="submit"
-            class="px-3 py-2 bg-blue-600 text-white rounded-md text-xs hover:bg-blue-700 transition flex-shrink-0">
-            Cari
-        </button>
-    </div>
-
-    <!-- Agar di desktop tombol tetap di bawah input, tapi di mobile tombol di samping -->
-    <!-- Di desktop kita buat div input+tombol berdiri sendiri, tombol di bawah input secara flex-col -->
-    <div class="hidden md:block w-auto">
-        <!-- kosong, tombol sudah di div di atas untuk mobile -->
-    </div>
-</form>
-
-
+            class="pl-10 pr-4 py-2 border rounded w-full focus:outline-none focus:ring-2 focus:ring-green-400 text-sm" />
+    </form>
 
 
     <div class="bg-white bg-opacity-80 p-4 md:p-6 rounded-xl shadow w-full">
         <div class="overflow-x-auto">
             <div class="min-w-full inline-block align-middle overflow-x-auto">
-                <div class="overflow-x-auto border rounded-lg">
+                <div class="overflow-x-auto border rounded-lg shadow-md">
                     <table class="min-w-full text-xs md:text-sm text-gray-700">
                         <thead class="bg-gray-100">
                             <tr>
@@ -86,9 +74,9 @@
                                 </td>
                                 <td class="px-2 md:px-4 py-2 whitespace-nowrap">
                                     <img src="{{ asset('storage/' . str_replace('public/', '', $item->path_file_kk)) }}"
-                                         alt="Scan KK"
-                                         class="w-20 h-auto rounded cursor-pointer"
-                                         onclick="showModal('{{ asset('storage/' . str_replace('public/', '', $item->path_file_kk)) }}')" />
+                                        alt="Scan KK"
+                                        class="w-20 h-auto rounded cursor-pointer"
+                                        onclick="showModal('{{ asset('storage/' . str_replace('public/', '', $item->path_file_kk)) }}')" />
                                 </td>
                             </tr>
                             @empty

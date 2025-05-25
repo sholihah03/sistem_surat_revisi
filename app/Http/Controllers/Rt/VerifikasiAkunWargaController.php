@@ -24,8 +24,12 @@ class VerifikasiAkunWargaController extends Controller
         ->where('status_verifikasi', 'pending')
         ->get();
 
+        $rt = Auth::guard('rt')->user();
+        $ttdDigital = $rt->ttd_digital;
+        $showModalUploadTtd = empty($ttdDigital);
 
-        return view('rt.verifikasiAkunWarga', compact('pendingData', 'profile_rt'));
+
+        return view('rt.verifikasiAkunWarga', compact('pendingData', 'profile_rt', 'showModalUploadTtd','ttdDigital'));
     }
 
 
@@ -36,8 +40,12 @@ class VerifikasiAkunWargaController extends Controller
         ->where('status_verifikasi', 'pending')
         ->get();
 
+        $rt_id = Auth::guard('rt')->user();
+        $ttdDigital = $rt_id->ttd_digital;
+        $showModalUploadTtd = empty($ttdDigital);
 
-        return view('rt.detailVerifikasiAkunWarga', compact('pendingData', 'profile_rt'));
+
+        return view('rt.detailVerifikasiAkunWarga', compact('pendingData', 'profile_rt', 'showModalUploadTtd','ttdDigital'));
     }
 
     public function disetujui($id)

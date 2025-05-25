@@ -27,9 +27,12 @@ class DashboardController extends Controller
         $rt = Auth::guard('rt')->user(); // RT yang sedang login
         $rtId = $rt->id_rt;
         $profile_rt = Auth::guard('rt')->user()->profile_rt;
+        $ttdDigital = $rt->ttd_digital;
 
         $bulanIni = Carbon::now()->month;
         $tahunIni = Carbon::now()->year;
+
+        $showModalUploadTtd = empty($ttdDigital);
 
         // Hitung surat masuk untuk bulan ini dari tb_pengajuan_surat
         $jumlahSuratMasuk1 = PengajuanSurat::whereHas('warga', function ($query) use ($rtId) {
@@ -105,7 +108,16 @@ class DashboardController extends Controller
             ->take(5);
 
 
-        return view('rt.mainRt', compact('pendingCount', 'totalSuratMasuk', 'totalDisetujui', 'pengajuanTerbaru', 'profile_rt'));
+        // return view('rt.mainRt', compact('pendingCount', 'totalSuratMasuk', 'totalDisetujui', 'pengajuanTerbaru', 'profile_rt'));
+        return view('rt.mainRt', [
+            'pendingCount' => $pendingCount,
+            'totalSuratMasuk' => $totalSuratMasuk,
+            'totalDisetujui' => $totalDisetujui,
+            'pengajuanTerbaru' => $pengajuanTerbaru,
+            'profile_rt' => $profile_rt,
+            'showModalUploadTtd' => $showModalUploadTtd,
+            'rt' => $rt,
+        ]);
     }
 
 }

@@ -14,12 +14,16 @@ class BankDataController extends Controller
     {
         $rtId = Auth::guard('rt')->user()->id_rt;
         $profile_rt = Auth::guard('rt')->user()->profile_rt;
+        $rt = Auth::guard('rt')->user();
+        $ttdDigital = $rt->ttd_digital;
+        $showModalUploadTtd = empty($ttdDigital);
+
 
 
         $wargas = Wargas::with(['scan_Kk.alamat'])
                     ->where('rt_id', $rtId)
                     ->get();
 
-        return view('rt.bankDataKk', compact('wargas', 'profile_rt'));
+        return view('rt.bankDataKk', compact('wargas', 'profile_rt', 'showModalUploadTtd', 'rtId', 'ttdDigital','rt'));
     }
 }

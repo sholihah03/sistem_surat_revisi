@@ -21,10 +21,14 @@ class VerifikasiSuratController extends Controller
     public function index()
     {
         $profile_rt = Auth::guard('rt')->user()->profile_rt;
+        $rt_id = Auth::guard('rt')->user();
+        $ttdDigital = $rt_id->ttd_digital;
+        $showModalUploadTtd = empty($ttdDigital);
+
         $pengajuanSurat = PengajuanSurat::with('warga', 'tujuanSurat')->where('status', 'menunggu')->get();
         $pengajuanSuratLain = PengajuanSuratLain::with('warga')->where('status_pengajuan_lain', 'menunggu')->get();
 
-        return view('rt.verifikasiSuratWarga', compact('pengajuanSurat', 'pengajuanSuratLain', 'profile_rt'));
+        return view('rt.verifikasiSuratWarga', compact('pengajuanSurat', 'pengajuanSuratLain', 'profile_rt', 'showModalUploadTtd','ttdDigital'));
     }
 
     public function proses(Request $request)

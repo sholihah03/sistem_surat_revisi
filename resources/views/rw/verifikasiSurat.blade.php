@@ -1,29 +1,3 @@
-{{-- <!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8" />
-    <title>Verifikasi Surat Pengantar</title>
-</head>
-<body>
-    <h1>Verifikasi Surat Pengantar</h1>
-
-    <p>Nomor Surat:
-        @if ($hasilSurat->jenis === 'biasa')
-            {{ $pengajuan->tujuanSurat->nomor_surat ?? '-' }}
-        @else
-            {{ $pengajuan->nomor_surat_pengajuan_lain ?? '-' }}
-        @endif
-    </p>
-
-    <p>Nama Pemohon: {{ $pengajuan->warga->nama_lengkap }}</p>
-    <p>RT/RW: {{ $rt->no_rt }}/{{ $rw->no_rw }}</p>
-
-    <p>Surat ini telah disetujui oleh RT {{ $rt->no_rt }} RW {{ $rw->no_rw }} </p>
-
-    <p><a href="{{ Storage::url($hasilSurat->file_surat) }}" target="_blank">Download Surat PDF</a></p>
-</body>
-</html> --}}
-
 <!DOCTYPE html>
 <html lang="id">
 <head>

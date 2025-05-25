@@ -1,7 +1,12 @@
 @extends('rw.dashboardRw')
 
 @section('content')
-<h1 class="text-2xl pt-20 md:text-3xl font-bold text-gray-800 mb-6">Manajemen Akun RT</h1>
+<h1 class="text-2xl pt-20 md:text-3xl font-bold text-gray-800 mb-2">Manajemen Akun RT</h1>
+<p class="text-gray-600 mb-6">
+    Halaman ini digunakan untuk mengelola akun Ketua RT di lingkungan RW {{ $no_rw }}.
+    Anda dapat menambahkan akun baru, mengedit informasi, atau menghapus akun RT yang tidak aktif.
+    Gunakan fitur pencarian di samping untuk mempermudah menemukan akun berdasarkan nomor RT atau nama Ketua RT.
+</p>
 <!-- Menampilkan pesan sukses jika ada -->
 @if(session('success'))
     <div id="successModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -51,11 +56,9 @@
 </div>
 
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-{{-- <div class="flex justify-end md:grid-cols-3 gap-6 mb-8"> --}}
     <button onclick="openAddModal()" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 mb-4 rounded-lg shadow">
         ➕ Tambah Akun RT
     </button>
-{{-- </div> --}}
     <!-- Form Search -->
     <form method="GET" action="{{ route('manajemenAkunRt') }}" class="relative w-full sm:w-80">
         <span class="absolute inset-y-0 left-0 flex items-center pl-3">
@@ -67,7 +70,7 @@
         </span>
         <input type="text" name="search" id="searchInput"
             value="{{ request('search') }}"
-            placeholder="Cari No RT atau Nama RT..."
+            placeholder="Cari no RT atau nama RT..."
             class="pl-10 pr-4 py-2 border rounded w-full focus:outline-none focus:ring-2 focus:ring-green-400" />
     </form>
 </div>

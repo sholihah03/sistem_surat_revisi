@@ -2,7 +2,12 @@
 
 @section('content')
 <div class="container mx-auto p-4 mb-6 pt-20">
-    <h1 class="text-2xl font-bold mb-6">Verifikasi Surat Warga</h1>
+    <h1 class="text-2xl font-bold mb-2">Verifikasi Surat Warga</h1>
+    <p class="text-gray-600 text-lg mb-6">
+        Halaman ini menampilkan daftar pengajuan surat dari warga yang membutuhkan verifikasi oleh Ketua RT.
+        <br>Silakan teliti setiap data pengajuan sebelum mengambil keputusan untuk menyetujui atau menolak. Pastikan nomor surat diisi untuk pengajuan jenis "<strong class="text-red-500">Lain</strong>" yang disetujui, dan sertakan alasan penolakan jika menolak pengajuan.
+    </p>
+
 
     <div class="overflow-x-auto bg-white shadow rounded-lg">
         <table class="min-w-full text-sm text-left">

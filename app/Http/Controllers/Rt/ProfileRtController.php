@@ -14,7 +14,10 @@ class ProfileRtController extends Controller
     {
         $rt = Auth::guard('rt')->user();
         $profile_rt = Auth::guard('rt')->user()->profile_rt;
-        return view('rt.profileRt', compact('rt', 'profile_rt'));
+        $ttdDigital = $rt->ttd_digital;
+        $showModalUploadTtd = empty($ttdDigital);
+        // dd(Auth::guard('rt')->user());
+        return view('rt.profileRt', compact('rt', 'profile_rt', 'ttdDigital', 'showModalUploadTtd'));
     }
 
     public function updateData(Request $request)

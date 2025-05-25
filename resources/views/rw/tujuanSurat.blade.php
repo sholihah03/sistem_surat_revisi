@@ -1,7 +1,10 @@
 @extends('rw.dashboardRw')
 
 @section('content')
-<h1 class="text-2xl pt-20 md:text-3xl font-bold text-gray-800 mb-6">Kelola Tujuan Surat</h1>
+<h1 class="text-2xl pt-20 md:text-3xl font-bold text-gray-800 mb-2">Kelola Tujuan Surat</h1>
+<p class="text-gray-600 mb-6 text-lg">
+    Halaman ini digunakan untuk menambahkan, mengedit, atau menghapus daftar tujuan surat yang tersedia untuk pengajuan warga.
+</p>
 
 @if(session('success'))
     <div id="successModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">

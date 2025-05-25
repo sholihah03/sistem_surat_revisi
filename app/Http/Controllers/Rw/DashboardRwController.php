@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use App\Models\Wargas;
 use Illuminate\Http\Request;
 use App\Models\PengajuanSurat;
+use App\Models\HasilSuratTtdRt;
 use App\Models\PengajuanSuratLain;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -90,14 +91,17 @@ class DashboardRwController extends Controller
 
             $totalDitolak = $ditolakBiasa + $ditolakLain;
 
-            $statusPengajuanPerRt[] = [
-                'no_rt' => $rt->no_rt, // pastikan kolom no_rt di tabel rt
-                'total_pengajuan' => $totalPengajuan,
-                'total_menunggu' => $totalMenunggu,
-                'total_disetujui' => $totalDisetujui,
-                'total_ditolak' => $totalDitolak,
-                'rt_id' => $rt->id_rt,
-            ];
+            if ($totalPengajuan > 0) {
+                $statusPengajuanPerRt[] = [
+                    'no_rt' => $rt->no_rt,
+                    'total_pengajuan' => $totalPengajuan,
+                    'total_menunggu' => $totalMenunggu,
+                    'total_disetujui' => $totalDisetujui,
+                    'total_ditolak' => $totalDitolak,
+                    'rt_id' => $rt->id_rt,
+                ];
+            }
+
         }
 
         // Hitung jumlah pengajuan dari tb_pengajuan_surat
@@ -130,10 +134,28 @@ class DashboardRwController extends Controller
 
         $totalSuratDisetujui = $suratDisetujuiBiasa + $suratDisetujuiLain;
 
-        $totalWargaTerdaftar = Wargas::where('rw_id', $rwId)->count();
+        $suratBelumTtdRwCount = HasilSuratTtdRt::whereDoesntHave('hasilSuratTtdRw', function ($query) {
+            $query->whereColumn('jenis', 'tb_hasil_surat_ttd_rt.jenis');
+        })
+        ->where(function ($query) use ($rwId) {
+            $query->whereHas('pengajuanSurat.warga.rt', function ($q) use ($rwId) {
+                $q->where('rw_id', $rwId);
+            })
+            ->orWhereHas('pengajuanSuratLain.warga.rt', function ($q) use ($rwId) {
+                $q->where('rw_id', $rwId);
+            });
+        })
+        ->count();
 
+        return view('rw.mainRw', [
+            'totalSuratMasuk' => $totalSuratMasuk,
+            'totalSuratDisetujui' => $totalSuratDisetujui,
+            'totalWargaTerdaftar' => Wargas::where('rw_id', $rwId)->count(),
+            'statusPengajuanPerRt' => $statusPengajuanPerRt,
+            'rw' => $rw,
+            'suratBelumTtdRwCount' => $suratBelumTtdRwCount,
+        ]);
 
-        return view('rw.mainRw', compact('totalSuratMasuk', 'totalSuratDisetujui', 'totalWargaTerdaftar', 'statusPengajuanPerRt', 'totalMenunggu'));
     }
 
 }

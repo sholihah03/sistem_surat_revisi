@@ -2,7 +2,8 @@
 
 @section('content')
 <div class="container mx-auto p-4 mb-6 pt-20">
-    <h1 class="text-2xl font-bold mb-6">Bank Data Kartu Keluarga Warga</h1>
+    <h1 class="text-2xl font-bold mb-2">Bank Data Kartu Keluarga Warga</h1>
+    <p class="mb-6 text-lg text-gray-600">Daftar lengkap data Kartu Keluarga warga yang sudah terdaftar beserta alamat dan foto Kartu Keluarga. Klik gambar KK untuk melihat dan mengunduh dalam format PDF.</p>
 
     <div class="overflow-x-auto bg-white rounded-lg shadow-md">
         <table class="table-auto w-full border">

@@ -2,12 +2,15 @@
 
 @section('content')
 <div class="container mx-auto p-4 mb-6 pt-20">
-    <h1 class="text-2xl font-bold mb-6">Profil RT</h1>
+    <h1 class="text-2xl font-bold mb-2">Profil RT</h1>
+    <p class="text-gray-600 text-lg mb-6">Halaman ini menampilkan data profil RT dan memungkinkan Anda untuk memperbarui informasi serta mengunggah tanda tangan digital.
+        <br>Anda <strong class="text-red-500">wajib</strong> mengunggah scan tanda tangan digital jika belum melakukannya agar proses administrasi dapat berjalan lancar.
+    </p>
 
-    <div class="md:flex md:space-x-6 space-y-6 md:space-y-0">
+    <div class="md:flex md:space-x-6 space-y-6 md:space-y-0 items-stretch">
         <!-- Card Profil -->
-        <div class="bg-white shadow-lg rounded-2xl p-6 md:w-1/2">
-            <h1 class="text-xl font-bold mb-4 text-gray-800">Edit Profile RT</h1>
+        <div class="bg-white shadow-lg rounded-2xl p-6 md:w-1/2 h-full">
+            <h1 class="text-2xl font-bold mb-4 text-gray-800">Edit Profile RT</h1>
             @if (session('dataSuccess'))
                 <div class="bg-green-100 text-green-700 px-4 py-2 rounded mb-4">
                     {{ session('dataSuccess') }}
@@ -112,8 +115,19 @@
         </div>
 
         <!-- Form Upload TTD -->
-        <div class="bg-white shadow-lg rounded-2xl p-6 md:w-1/2">
+        <div class="bg-white shadow-lg rounded-2xl p-6 md:w-1/2 h-full">
             <h1 class="text-2xl font-bold mb-4 text-center text-gray-800">Upload Scan Tanda Tangan</h1>
+            <p class="text-lg text-gray-700">
+                Harap unggah scan tanda tangan digital dengan ketentuan berikut:
+                <ul class="list-disc list-inside mt-2">
+                    <li>Latar belakang (background) gambar sebaiknya berwarna putih atau terang agar proses transparansi berjalan optimal.</li>
+                    <li>Kejernihan tanda tangan harus jelas dan tidak blur agar hasil digitalisasi tampak rapi.</li>
+                    <li>Format gambar yang diterima adalah JPG, JPEG, atau PNG dengan ukuran maksimal sesuai batas server.</li>
+                    <li>Pastikan tanda tangan tidak terpotong dan memenuhi area gambar agar hasil transparan sempurna.</li>
+                    <li>Gambar akan diproses untuk menghilangkan latar belakang putih menjadi transparan agar bisa digunakan di dokumen digital.</li>
+                </ul>
+            </p>
+
 
             @if (session('ttdSuccess'))
                 <div class="bg-green-100 text-green-700 px-4 py-2 rounded mb-4">
@@ -135,7 +149,7 @@
                 <form action="{{ route('scanTtdRtUpload') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
                     @csrf
                     <div>
-                        <label for="scan_ttd" class="block text-sm font-medium text-gray-700 mb-1">Pilih Gambar Scan Tanda Tangan</label>
+                        <label for="scan_ttd" class="block text-sm font-semibold text-gray-800 mb-1">Pilih Gambar Scan Tanda Tangan</label>
                         <input type="file" name="ttd_digital" accept="image/*" required
                             class="block w-full text-sm text-gray-700 bg-gray-100 border border-gray-300 rounded-lg cursor-pointer p-2">
                     </div>

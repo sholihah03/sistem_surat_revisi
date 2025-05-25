@@ -1,7 +1,7 @@
 @extends('rt.dashboardRt')
 
 @section('content')
-    <h1 class="text-2xl pt-20 md:text-3xl font-bold text-gray-800 mb-6">Selamat Datang, Ketua RT!</h1>
+    <h1 class="text-2xl pt-20 md:text-3xl font-bold text-gray-800 mb-6">Selamat Datang, Ketua RT {{ $rt->no_rt }}!</h1>
 
     <!-- Kartu Statistik -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -26,31 +26,30 @@
         </h2>
 
         <div class="overflow-x-auto">
-            <!-- Tambahkan scroll vertikal di sini -->
-            <div class="max-h-[300px] overflow-y-auto">
-                <table class="min-w-full text-xs md:text-sm text-gray-700">
+            <div class="max-h-[300px] rounded-lg overflow-y-auto">
+                <table class="min-w-full text-xs md:text-sm text-gray-700 border border-gray-300">
                     <thead class="bg-gray-100 sticky top-0 z-10">
                         <tr>
-                            <th class="px-2 md:px-4 py-2 text-left">Tanggal</th>
-                            <th class="px-2 md:px-4 py-2 text-left">Nama Warga</th>
-                            <th class="px-2 md:px-4 py-2 text-left">Tujuan Surat</th>
-                            <th class="px-2 md:px-4 py-2 text-left">Status</th>
-                            <th class="px-2 md:px-4 py-2 text-left">Aksi</th>
+                            <th class="px-2 md:px-4 py-2 text-center">Tanggal</th>
+                            <th class="px-2 md:px-4 py-2 text-center">Nama Warga</th>
+                            <th class="px-2 md:px-4 py-2 text-center">Tujuan Surat</th>
+                            <th class="px-2 md:px-4 py-2 text-center">Status</th>
+                            <th class="px-2 md:px-4 py-2 text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200">
-                        @foreach ($pengajuanTerbaru as $pengajuan)
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse ($pengajuanTerbaru as $pengajuan)
                             <tr class="hover:bg-gray-50">
-                                <td class="px-2 md:px-4 py-2 whitespace-nowrap">{{ $pengajuan->created_at->format('Y-m-d') }}</td>
-                                <td class="px-2 md:px-4 py-2 whitespace-nowrap">{{ $pengajuan->warga->nama_lengkap }}</td>
-                                <td class="px-2 md:px-4 py-2 whitespace-nowrap">
+                                <td class="px-2 md:px-4 py-2 whitespace-nowrap text-center">{{ $pengajuan->created_at->format('Y-m-d') }}</td>
+                                <td class="px-2 md:px-4 py-2 whitespace-nowrap text-center">{{ $pengajuan->warga->nama_lengkap }}</td>
+                                <td class="px-2 md:px-4 py-2 whitespace-nowrap text-center">
                                     @if ($pengajuan instanceof \App\Models\PengajuanSurat)
                                         {{ $pengajuan->tujuanSurat->nama_tujuan ?? '-' }}
                                     @else
                                         {{ $pengajuan->tujuan_manual }}
                                     @endif
                                 </td>
-                                <td class="px-2 md:px-4 py-2 whitespace-nowrap">
+                                <td class="px-2 md:px-4 py-2 whitespace-nowrap text-center">
                                     @if ($pengajuan->status === 'menunggu' || $pengajuan->status_pengajuan_lain === 'menunggu')
                                         <span class="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded text-xs font-semibold">
                                             Menunggu
@@ -65,7 +64,7 @@
                                         </span>
                                     @endif
                                 </td>
-                                <td class="px-2 md:px-4 py-2">
+                                <td class="px-2 md:px-4 py-2 whitespace-nowrap text-center">
                                     @if ($pengajuan->status === 'menunggu' || $pengajuan->status_pengajuan_lain === 'menunggu')
                                         <a href="{{ route('verifikasiSurat') }}" class="text-blue-500 hover:underline">Verifikasi</a>
                                     @else
@@ -73,11 +72,52 @@
                                     @endif
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="5" class="border border-gray-300 px-2 md:px-4 py-3 text-center text-gray-500">
+                                    <p>Belum ada data pengajuan.</p>
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
+        @if ($showModalUploadTtd)
+        <!-- Modal Upload TTD Digital -->
+        <div id="modalUploadTtd" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+            <div class="relative bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+                <!-- Tombol Close -->
+                <button onclick="document.getElementById('modalUploadTtd').style.display='none'"
+                        class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-xl">
+                    &times;
+                </button>
+
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">Lengkapi Profil Anda</h2>
+                <p class="text-gray-600 mb-6">
+                    Anda belum mengunggah tanda tangan digital. Silakan lengkapi untuk melanjutkan proses administrasi surat.
+                </p>
+                <div class="flex justify-end">
+                    <a href="{{ route('profileRt') }}"
+                       class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                        Unggah Sekarang
+                    </a>
+                </div>
+            </div>
+        </div>
+    @endif
 @endsection
+@push('scripts')
+    @if ($showModalUploadTtd)
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const modal = document.getElementById('modalUploadTtd');
+                if (modal) {
+                    modal.style.display = 'flex'; // Tampilkan modal otomatis
+                }
+            });
+        </script>
+    @endif
+@endpush

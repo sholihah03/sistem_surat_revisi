@@ -11,35 +11,55 @@ use Illuminate\Support\Facades\Auth;
 class HistoriAkunWargaController extends Controller
 {
     public function historiVerifikasiAkunWarga(Request $request)
-        {
-            $profile_rt = Auth::guard('rt')->user()->profile_rt;
-            $search = $request->input('search');
+    {
+        $profile_rt = Auth::guard('rt')->user()->profile_rt;
+        $rt = Auth::guard('rt')->user();
+        $ttdDigital = $rt->ttd_digital;
+        $showModalUploadTtd = empty($ttdDigital);
 
-            $historiData = ScanKK::with(['alamat', 'wargas', 'pendaftaran'])
-                ->whereIn('status_verifikasi', ['disetujui', 'ditolak'])
-                ->orderBy('updated_at', 'desc');
+        $search = $request->input('search');
 
-                if ($search) {
-                    $historiData->where(function ($query) use ($search) {
-                        $query->whereHas('wargas', function ($q) use ($search) {
-                            $q->where('nama_lengkap', 'like', '%' . $search . '%');
-                        })
-                        ->orWhereHas('pendaftaran', function ($q) use ($search) {
-                            $q->where('nama_lengkap', 'like', '%' . $search . '%');
-                        });
-                    })
-                    ->orWhere('no_kk_scan', 'like', '%' . $search . '%');
-                }
+        $historiData = ScanKK::with(['alamat', 'wargas', 'pendaftaran'])
+            ->whereIn('status_verifikasi', ['disetujui', 'ditolak'])
+            ->whereHas('wargas', function ($q) use ($rt) {
+                $q->where('rt_id', $rt->id_rt);
+            })
+            ->orderBy('updated_at', 'desc');
 
-            $historiData = $historiData->get();
-
-            return view('rt.historiVerifikasiAkunWarga', compact('historiData', 'profile_rt'));
+        if ($search) {
+            $historiData->where(function ($query) use ($search) {
+                $query->whereHas('wargas', function ($q) use ($search) {
+                    $q->where('nama_lengkap', 'like', '%' . $search . '%');
+                })->orWhereHas('pendaftaran', function ($q) use ($search) {
+                    $q->where('nama_lengkap', 'like', '%' . $search . '%');
+                });
+            })->orWhere('no_kk_scan', 'like', '%' . $search . '%');
         }
 
-        public function historiKadaluwarsa()
-        {
-            $dataKadaluwarsa = Kadaluwarsa::orderBy('created_at', 'desc')->get();
-            $profile_rt = Auth::guard('rt')->user()->profile_rt;
-            return view('rt.historiAkunKadaluwarsa', compact('dataKadaluwarsa', 'profile_rt'));
+        $historiData = $historiData->get();
+
+        return view('rt.historiVerifikasiAkunWarga', compact('historiData', 'profile_rt', 'rt', 'showModalUploadTtd'));
+    }
+
+    public function historiKadaluwarsa(Request $request)
+    {
+        $search = $request->input('search');
+        $query = Kadaluwarsa::query()->orderBy('created_at', 'desc');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_lengkap', 'like', '%' . $search . '%')
+                ->orWhere('nik', 'like', '%' . $search . '%');
+            });
         }
+
+        $dataKadaluwarsa = $query->get();
+        $profile_rt = Auth::guard('rt')->user()->profile_rt;
+        $rt = Auth::guard('rt')->user();
+        $ttdDigital = $rt->ttd_digital;
+        $showModalUploadTtd = empty($ttdDigital);
+
+        return view('rt.historiAkunKadaluwarsa', compact('dataKadaluwarsa', 'profile_rt', 'rt', 'showModalUploadTtd','ttdDigital'));
+    }
+
 }
