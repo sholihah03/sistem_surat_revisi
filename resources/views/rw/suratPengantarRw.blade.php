@@ -146,6 +146,13 @@
                     <p>e-mail : kelurahanmargadadi.indramayu@gmail.com</p>
                     <h3>INDRAMAYU</h3>
                 </td>
+
+                <!-- QR Code -->
+                <td style="width: 100px; text-align: right;">
+                    <div style="text-align: right;">
+                        <img src="{{ $qr_code_base64 }}" alt="QR Code" style="width: 80px; height: 80px; margin-left: auto;">
+                    </div>
+                </td>
             </tr>
         </table>
     </div>
@@ -274,10 +281,6 @@
                 </tr>
             </table>
         </div>
-    </div>
-    <div style="margin-top: 20px; text-align: right;">
-        <p style="font-size: 10pt;">QR Code Verifikasi:</p>
-        <img src="{{ $qr_code_base64 }}" alt="QR Code" style="width:150px; height:150px;">
     </div>
 </body>
 </html>

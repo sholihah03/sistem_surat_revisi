@@ -27,8 +27,8 @@ class LoginController extends Controller
 
         // Coba cari di Warga
         $warga = Wargas::where('nama_lengkap', $request->nama_lengkap)
-                      ->where('email', $request->email)
-                      ->first();
+                    ->where('email', $request->email)
+                    ->first();
 
         if ($warga) {
             if (Hash::check($request->password, $warga->password)) {
