@@ -57,7 +57,7 @@
 
 
 </head>
-    <body class="min-h-screen bg-gradient-to-br from-blue-100 via-white to-pink-100">
+    <body class="min-h-screen bg-yellow-50">
 <!-- Navbar -->
   @include('komponen.nav')
 

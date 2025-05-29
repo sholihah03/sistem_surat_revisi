@@ -19,6 +19,7 @@ class Wargas extends Authenticatable
         'rw_id',
         'nama_lengkap',
         'email',
+        'profile_warga',
         'no_kk',
         'nik',
         'no_hp',
@@ -27,7 +28,6 @@ class Wargas extends Authenticatable
         'status_verifikasi',
         'remember_token',
         'password',
-        'login',
     ];
 
     protected $hidden = [

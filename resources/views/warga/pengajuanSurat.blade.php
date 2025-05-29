@@ -17,7 +17,8 @@
   </style>
 </head>
 
-<body class="min-h-screen bg-gradient-to-br from-blue-100 via-white to-pink-100">
+{{-- <body class="min-h-screen bg-gradient-to-br from-blue-100 via-white to-pink-100"> --}}
+<body class="min-h-screen bg-yellow-50">
 
   @if(session('success_form'))
   <div x-data="{ open: true }" x-show="open" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">

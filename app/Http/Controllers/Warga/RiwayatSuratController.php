@@ -8,12 +8,14 @@ use App\Models\PengajuanSurat;
 use App\Models\HasilSuratTtdRw;
 use App\Models\PengajuanSuratLain;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class RiwayatSuratController extends Controller
 {
     public function index(Request $request)
     {
+        $warga = Auth::guard('warga')->user();
         $user = $request->user('warga');
 
         // Ambil semua surat hasil tanda tangan RW milik user
@@ -63,11 +65,12 @@ class RiwayatSuratController extends Controller
             return $item;
         });
 
-        return view('warga.riwayatSurat', compact('pengajuanBiasa', 'pengajuanLain', 'suratSelesai'));
+        return view('warga.riwayatSurat', compact('pengajuanBiasa', 'pengajuanLain', 'suratSelesai', 'warga'));
     }
 
     public function showPdf($id)
     {
+        $warga = Auth::guard('warga')->user();
         // Cari data surat hasil tanda tangan RW berdasarkan id
         $surat = HasilSuratTtdRw::findOrFail($id);
 
@@ -75,7 +78,7 @@ class RiwayatSuratController extends Controller
         $fileUrl = Storage::url($surat->file_surat);
 
         // Render view khusus untuk menampilkan iframe PDF
-        return view('warga.suratPdf', compact('surat', 'fileUrl'));
+        return view('warga.suratPdf', compact('surat', 'fileUrl', 'warga'));
     }
 
 }

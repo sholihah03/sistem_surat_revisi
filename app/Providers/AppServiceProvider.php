@@ -54,6 +54,7 @@ class AppServiceProvider extends ServiceProvider
                 $notifikasiBiasa = PengajuanSurat::with('warga')
                     ->whereIn('status', ['disetujui', 'ditolak'])
                     ->where('warga_id', $warga->id_warga)
+                    ->where('is_read', false)
                     ->orderBy('updated_at', 'desc')
                     ->take(5)
                     ->get();
@@ -61,6 +62,7 @@ class AppServiceProvider extends ServiceProvider
                 $notifikasiLain = PengajuanSuratLain::with('warga')
                     ->whereIn('status_pengajuan_lain', ['disetujui', 'ditolak'])
                     ->where('warga_id', $warga->id_warga)
+                    ->where('is_read', false)
                     ->orderBy('updated_at', 'desc')
                     ->take(5)
                     ->get();
@@ -73,19 +75,43 @@ class AppServiceProvider extends ServiceProvider
                     ->orWhereHas('pengajuanSuratLain', function ($query) use ($warga) {
                         $query->where('warga_id', $warga->id_warga);
                     })
+                    ->where('is_read', false)
                     ->orderBy('updated_at', 'desc')
                     ->take(5)
                     ->get();
 
-                $notifikasi = $notifikasiBiasa->concat($notifikasiLain)->concat($notifikasiSelesai)->sortByDesc('updated_at')->take(5);
+                // Gabungkan semua notifikasi belum dibaca
+                $notifikasiBaru = $notifikasiBiasa->concat($notifikasiLain)->concat($notifikasiSelesai)->sortByDesc('updated_at')->take(5);
 
-                // Ambil ID notifikasi yang sudah dibaca dari session
-                $dibaca = session('notifikasi_dibaca_warga', []);
+                // Untuk menampilkan semua notifikasi (baik sudah dibaca atau belum), bisa ambil 5 terakhir tanpa filter is_read:
+                $notifikasiBiasaAll = PengajuanSurat::with('warga')
+                    ->whereIn('status', ['disetujui', 'ditolak'])
+                    ->where('warga_id', $warga->id_warga)
+                    ->orderBy('updated_at', 'desc')
+                    ->take(5)
+                    ->get();
 
-                // Filter notifikasi agar yang sudah dibaca tidak muncul (atau hilangkan badge-nya)
-                $notifikasiBaru = $notifikasi->filter(function($item) use ($dibaca) {
-                    return !in_array(($item->id ?? $item->id_hasil_surat_ttd_rw) . $item->updated_at->timestamp, $dibaca);
-                });
+                $notifikasiLainAll = PengajuanSuratLain::with('warga')
+                    ->whereIn('status_pengajuan_lain', ['disetujui', 'ditolak'])
+                    ->where('warga_id', $warga->id_warga)
+                    ->orderBy('updated_at', 'desc')
+                    ->take(5)
+                    ->get();
+
+                $notifikasiSelesaiAll = HasilSuratTtdRw::with(['pengajuanSurat', 'pengajuanSuratLain'])
+                    ->where(function ($query) use ($warga) {
+                        $query->whereHas('pengajuanSurat', function ($q) use ($warga) {
+                            $q->where('warga_id', $warga->id_warga);
+                        })
+                        ->orWhereHas('pengajuanSuratLain', function ($q) use ($warga) {
+                            $q->where('warga_id', $warga->id_warga);
+                        });
+                    })
+                    ->orderBy('updated_at', 'desc')
+                    ->take(5)
+                    ->get();
+
+                $notifikasi = $notifikasiBiasaAll->concat($notifikasiLainAll)->concat($notifikasiSelesaiAll)->sortByDesc('updated_at')->take(5);
 
                 $view->with([
                     'notifikasi' => $notifikasi,

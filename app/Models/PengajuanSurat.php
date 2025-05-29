@@ -20,6 +20,7 @@ class PengajuanSurat extends Model
         'tujuan_surat_id',
         'scan_kk_id',
         'status',
+        'is_read',
         'tempat_lahir',
         'tanggal_lahir',
         'pekerjaan',

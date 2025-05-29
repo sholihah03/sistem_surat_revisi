@@ -23,6 +23,7 @@ use App\Http\Controllers\Rw\RiwayatSuratRwController;
 use App\Http\Controllers\Rt\VerifikasiSuratController;
 use App\Http\Controllers\Rw\ManajemenAkunRtController;
 use App\Http\Controllers\Warga\HistoriSuratController;
+use App\Http\Controllers\Warga\ProfileWargaController;
 use App\Http\Controllers\Warga\RiwayatSuratController;
 use App\Http\Controllers\Rt\HistoriAkunWargaController;
 use App\Http\Controllers\Surat\TemplateSuratController;
@@ -30,6 +31,7 @@ use App\Http\Controllers\Rt\RiwayatSuratWargaController;
 use App\Http\Controllers\Warga\PengajuanSuratController;
 use App\Http\Controllers\Rt\VerifikasiAkunWargaController;
 use App\Http\Controllers\Rw\ManajemenSuratWargaController;
+use App\Http\Controllers\Warga\NotificationWargaController;
 use App\Http\Controllers\Rt\DashboardController as RtDashboardController;
 
 Route::get('/', function () {
@@ -64,6 +66,10 @@ Route::get('/verifikasi-surat/{token}', [ManajemenSuratWargaController::class, '
 
 Route::prefix('warga')->middleware(AuthenticateWarga::class)->group(function () {
     Route::get('/dashboardWarga', [DashboardController::class, 'index'])->name('dashboardWarga');
+    Route::post('/notifikasi/mark-as-read', [NotificationWargaController::class, 'markAsRead'])->name('notifikasi.markAsRead');
+    Route::get('/profileWarga', [ProfileWargaController::class, 'index'])->name('profileWarga');
+    Route::post('/profileWarga/uploadFoto', [ProfileWargaController::class, 'uploadFoto'])->name('profileWarga.uploadFoto');
+    Route::put('/profileWarga/update', [ProfileWargaController::class, 'update'])->name('profileWarga.update');
     Route::get('/pengajuanSuratWarga', [PengajuanSuratController::class, 'index'])->name('pengajuanSuratWarga');
     Route::get('/formPengajuanSuratWarga', [PengajuanSuratController::class, 'formPengajuanSurat'])->name('formPengajuanSurat');
     Route::post('/formPengajuanSuratWargaStore', [PengajuanSuratController::class, 'formPengajuanSuratStore'])->name('formPengajuanSuratStore');

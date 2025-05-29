@@ -14,6 +14,7 @@ class PengajuanSuratController extends Controller
 {
     public function index(Request $request)
     {
+        $warga = Auth::guard('warga')->user();
         $query = TujuanSurat::query();
 
         if ($request->has('search') && $request->search != '') {
@@ -25,7 +26,7 @@ class PengajuanSuratController extends Controller
 
         $tujuanSurat = $query->get();
 
-        return view('warga.pengajuanSurat', compact('tujuanSurat'));
+        return view('warga.pengajuanSurat', compact('tujuanSurat', 'warga'));
     }
 
     public function formPengajuanSurat(Request $request)
@@ -39,7 +40,7 @@ class PengajuanSuratController extends Controller
 
         return view('warga.formSuratTujuanPopuler', compact('tujuan', 'warga', 'alamat', 'nomor'));
     }
-    
+
 
     public function formPengajuanSuratStore(Request $request)
     {

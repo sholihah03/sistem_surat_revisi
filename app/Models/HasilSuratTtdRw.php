@@ -16,6 +16,7 @@ class HasilSuratTtdRw extends Model
         'jenis',
         'pengajuan_id',
         'file_surat',
+        'is_read',
         'token',
     ];
 

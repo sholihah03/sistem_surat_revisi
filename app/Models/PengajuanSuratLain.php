@@ -19,6 +19,7 @@ class PengajuanSuratLain extends Model
         'scan_kk_id',
         'nomor_surat_pengajuan_lain',
         'status_pengajuan_lain',
+        'is_read',
         'tujuan_manual',
         'tempat_lahir_pengaju_lain',
         'tanggal_lahir_pengaju_lain',
