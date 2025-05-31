@@ -12,8 +12,8 @@
                     <th class="p-2 border">No</th>
                     <th class="p-2 border">Nama Lengkap Warga</th>
                     <th class="p-2 border">No KK</th>
-                    <th class="p-2 border">Gambar KK</th>
                     <th class="p-2 border">Alamat</th>
+                    <th class="p-2 border">Gambar KK</th>
                 </tr>
             </thead>
             <tbody>

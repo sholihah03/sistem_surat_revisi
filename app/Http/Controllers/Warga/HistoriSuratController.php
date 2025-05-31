@@ -14,6 +14,7 @@ class HistoriSuratController extends Controller
     public function index()
     {
         $wargaId = Auth::guard('warga')->user()->id_warga;
+        $warga = Auth::guard('warga')->user();
 
         // Debugging: Periksa ID Warga
         // dd(Auth::guard('warga')->user());
@@ -51,6 +52,6 @@ class HistoriSuratController extends Controller
         })->get();
 
 
-        return view('warga.historiSurat', compact('disetujuiBiasa', 'ditolakBiasa', 'disetujuiLain', 'ditolakLain', 'hasilSurat'));
+        return view('warga.historiSurat', compact('disetujuiBiasa', 'ditolakBiasa', 'disetujuiLain', 'ditolakLain', 'hasilSurat', 'warga'));
     }
 }

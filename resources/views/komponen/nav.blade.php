@@ -24,7 +24,10 @@
                                 $isUnread = !$notif->is_read;
                             @endphp
 
-                            <div class="border-b border-gray-300 p-2 hover:bg-yellow-100 cursor-pointer {{ $isUnread ? 'bg-yellow-200 font-semibold' : '' }}">
+                            {{-- <div class="border-b border-gray-300 p-2 hover:bg-yellow-100 cursor-pointer {{ $isUnread ? 'bg-yellow-200 font-semibold' : '' }}"> --}}
+                            <div class="border-b border-gray-300 p-2 hover:bg-yellow-100 cursor-pointer {{ $isUnread ? 'bg-yellow-200 font-semibold' : '' }}"
+                                data-id="{{ $isHasil ? $notif->id_hasil_surat_ttd_rw : ($notif->id_pengajuan_surat ?? $notif->id_pengajuan_surat_lain) }}"
+                                data-type="{{ $isHasil ? 'hasil' : (isset($notif->id_pengajuan_surat) ? 'biasa' : 'lain') }}">
                                 @if($isHasil)
                                     @php
                                         $tujuan = $notif->pengajuanSurat->tujuanSurat->nama_tujuan ?? ($notif->pengajuanSuratLain->tujuan_manual ?? 'Surat');
@@ -44,7 +47,7 @@
                                     @endphp
                                     <p class="text-sm">
                                         Surat pengajuan dengan tujuan <strong>{{ $tujuan }}</strong> telah
-                                        <span class="{{ $status === 'disetujui' ? 'text-green-600 font-bold' : 'text-red-600 font-bold' }}">{{ $statusText }}</span>
+                                        <span class="{{ $status === 'disetujui' ? 'text-green-600 font-bold' : 'text-red-600 font-bold' }}"> {{ $statusText }}</span> oleh RT
                                     </p>
                                     <p class="text-xs text-gray-500 mb-1">
                                         {{ $notif->updated_at->diffForHumans() }}
@@ -117,8 +120,13 @@
                     </div>
                 </div>
 
-                <a href="{{ route('profileWarga') }}" class="block px-4 py-2 hover:bg-gray-100 flex items-center gap-2">👤 Profil
-                    <img src="{{ $warga->profile_warga ? asset('storage/profile_warga/' . $warga->profile_warga) : asset('images/profile2.png') }}" class="w-8 h-8 rounded-full object-cover" alt="Profile" />
+                <a href="{{ route('profileWarga') }}" class="block px-4 py-2 hover:bg-gray-100 flex items-center gap-2">
+                    @if($warga->profile_warga)
+                        <img src="{{ asset('storage/profile_warga/' . $warga->profile_warga) }}" class="w-8 h-8 rounded-full object-cover" alt="Profile" />
+                    @else
+                        <span class="text-xl">👤</span>
+                    @endif
+                    Profil
                 </a>
                 <a href="{{ route('logout') }}" class="block px-4 py-2 hover:bg-gray-100 flex items-center gap-2">
                     🚪 Logout
@@ -129,32 +137,15 @@
 </nav>
 
 <script>
-    // function toggleMenu() {
-    //     const menu = document.getElementById('mobileMenu');
-    //     menu.classList.toggle('hidden');
-    // }
-
-    // function toggleNotif() {
-    //     const notif = document.getElementById('notifDropdown');
-    //     notif.classList.toggle('hidden');
-    // }
-
-    // function toggleNotifMobile() {
-    //     const notif = document.getElementById('notifDropdownMobile');
-    //     notif.classList.toggle('hidden');
-    // }
-
-    function toggleNotif() {
+function toggleNotif() {
     const notif = document.getElementById('notifDropdown');
     notif.classList.toggle('hidden');
 
     if (!notif.classList.contains('hidden')) {
-        // Tandai semua notifikasi yang ditampilkan sebagai sudah dibaca (ajax)
         const notifIds = [];
         const notifTypes = [];
 
-        // Ambil data id dan tipe notifikasi dari elemen (harus ditambahkan atribut data-id dan data-type di setiap item notif)
-        document.querySelectorAll('#notifDropdown > div').forEach(el => {
+        document.querySelectorAll('#notifDropdown > div[data-id][data-type]').forEach(el => {
             const id = el.getAttribute('data-id');
             const type = el.getAttribute('data-type');
             if (id && type) {
@@ -177,10 +168,14 @@
             });
         });
 
-        // Sembunyikan badge
         const badge = document.getElementById('notifBadge');
         if (badge) badge.style.display = 'none';
     }
 }
 
+function toggleMenu() {
+    const mobileMenu = document.getElementById('mobileMenu');
+    mobileMenu.classList.toggle('hidden');
+}
 </script>
+

@@ -12,30 +12,17 @@ class NotificationWargaController extends Controller
 {
     public function markAsRead(Request $request)
     {
-        $notifId = $request->id;
-        $type = $request->type;
+        $id = $request->input('id');
+        $type = $request->input('type');
 
-        switch ($type) {
-            case 'pengajuan_surat':
-                $notif = PengajuanSurat::find($notifId);
-                break;
-            case 'pengajuan_surat_lain':
-                $notif = PengajuanSuratLain::find($notifId);
-                break;
-            case 'hasil_surat':
-                $notif = HasilSuratTtdRw::find($notifId);
-                break;
-            default:
-                return response()->json(['status' => 'error', 'message' => 'Tipe notifikasi tidak valid']);
+        if ($type === 'biasa') {
+            PengajuanSurat::where('id_pengajuan_surat', $id)->update(['is_read' => true]);
+        } elseif ($type === 'lain') {
+            PengajuanSuratLain::where('id_pengajuan_surat_lain', $id)->update(['is_read' => true]);
+        } elseif ($type === 'hasil') {
+            HasilSuratTtdRw::where('id_hasil_surat_ttd_rw', $id)->update(['is_read' => true]);
         }
-
-        if ($notif && $notif->warga_id == Auth::guard('warga')->user()->id_warga) {
-            $notif->is_read = true;
-            $notif->save();
-            return response()->json(['status' => 'success']);
-        }
-
-        return response()->json(['status' => 'error', 'message' => 'Notifikasi tidak ditemukan']);
+        return response()->json(['success' => true]);
     }
 }
 

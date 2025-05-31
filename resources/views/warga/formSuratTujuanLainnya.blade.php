@@ -165,22 +165,36 @@
                     </div>
                 </div>
                 <!-- Modal Konfirmasi -->
-                <div x-data="{ showModal: false, showSuccess: false }" x-cloak>
+                <div x-data="{ showModal: false }" x-cloak>
                     <!-- Trigger tombol -->
-                    <div class="text-center mt-6">
-                        <button type="button" @click="showModal = true" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+                    <div class="text-center mt-8">
+                        <button type="button" @click="showModal = true"
+                            class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">
                             Ajukan Surat
                         </button>
                     </div>
 
                     <!-- Modal -->
-                    <div x-show="showModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                        <div class="bg-white p-6 rounded shadow-lg w-full max-w-md text-center">
-                            <h2 class="text-lg font-semibold mb-4">Konfirmasi Pengajuan</h2>
-                            <p class="mb-4">Apakah Anda yakin data yang Anda isi sudah benar?</p>
-                            <div class="flex justify-center gap-4">
-                                <button @click="showModal = false" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cek Lagi</button>
-                                <button @click="showModal = false; showSuccess = true; $nextTick(() => $refs.form.submit())" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Iya</button>
+                    <div x-show="showModal"
+                        class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+                        x-transition>
+                        <div class="bg-white p-6 rounded shadow-md w-full max-w-md">
+                            <h2 class="text-lg font-semibold mb-4 text-center">Konfirmasi Pengajuan</h2>
+                            <p class="text-sm mb-6 text-center">
+                                Pastikan semua data sudah benar sebelum dikirim. Apakah Anda yakin ingin mengajukan surat ini?
+                            </p>
+                            <div class="flex justify-end space-x-3">
+                                <!-- Tombol Cek Lagi -->
+                                <button type="button" @click="showModal = false"
+                                    class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400">
+                                    Cek Lagi
+                                </button>
+
+                                <!-- Tombol Kirim -->
+                                <button type="submit"
+                                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                                    Kirim
+                                </button>
                             </div>
                         </div>
                     </div>

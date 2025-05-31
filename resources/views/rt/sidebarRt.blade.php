@@ -6,9 +6,9 @@
 
         {{-- Dashboard --}}
         <a href="{{ route('dashboardRt') }}"
-           class="px-4 py-2 rounded-lg font-medium transition-all duration-200
-                  hover:bg-blue-100 hover:text-blue-700 hover:shadow-md
-                  {{ request()->routeIs('dashboardRt') ? 'bg-blue-200 text-blue-700' : 'text-gray-700' }}">
+            class="px-4 py-2 rounded-lg font-medium transition-all duration-200
+                    hover:bg-blue-100 hover:text-blue-700 hover:shadow-md
+                    {{ request()->routeIs('dashboardRt') ? 'bg-blue-200 text-blue-700' : 'text-gray-700' }}">
             🏠 Dashboard
         </a>
 
@@ -21,32 +21,39 @@
                 onclick="return false;"
             @else
                 class="w-full text-left px-4 py-2 rounded-lg font-medium transition-all duration-200
-                       hover:bg-blue-100 hover:text-blue-700 hover:shadow-md text-gray-700"
+                        hover:bg-blue-100 hover:text-blue-700 hover:shadow-md text-gray-700"
                 onclick="document.getElementById('submenu-verifikasi').classList.toggle('hidden')"
             @endif>
                 👤 Verifikasi Akun
             </button>
             <div id="submenu-verifikasi" class="mt-1 space-y-1 {{ request()->routeIs('verifikasiAkunWarga') || request()->routeIs('historiVerifikasiAkunWarga') || request()->routeIs('historiAkunKadaluwarsa') ? '' : 'hidden' }}">
                 <a href="{{ route('verifikasiAkunWarga') }}"
-                   class="block pl-8 py-1.5 rounded-lg font-medium text-sm transition-all duration-200
-                          hover:bg-yellow-100 hover:text-yellow-700
-                          {{ request()->routeIs('verifikasiAkunWarga') ? 'bg-yellow-100 text-yellow-700' : 'text-gray-700' }}">
+                    class="block pl-8 py-1.5 rounded-lg font-medium text-sm transition-all duration-200
+                            hover:bg-yellow-100 hover:text-yellow-700
+                            {{ request()->routeIs('verifikasiAkunWarga') ? 'bg-yellow-100 text-yellow-700' : 'text-gray-700' }}">
                     Verifikasi Akun Warga
                 </a>
                 <a href="{{ route('historiVerifikasiAkunWarga') }}"
-                   class="block pl-8 py-1.5 rounded-lg font-medium text-sm transition-all duration-200
-                          hover:bg-yellow-100 hover:text-yellow-700
-                          {{ request()->routeIs('historiVerifikasiAkunWarga') ? 'bg-yellow-100 text-yellow-700' : 'text-gray-700' }}">
+                    class="block pl-8 py-1.5 rounded-lg font-medium text-sm transition-all duration-200
+                            hover:bg-yellow-100 hover:text-yellow-700
+                            {{ request()->routeIs('historiVerifikasiAkunWarga') ? 'bg-yellow-100 text-yellow-700' : 'text-gray-700' }}">
                     Histori Verifikasi
                 </a>
                 <a href="{{ route('historiAkunKadaluwarsa') }}"
-                   class="block pl-8 py-1.5 rounded-lg font-medium text-sm transition-all duration-200
-                          hover:bg-yellow-100 hover:text-yellow-700
-                          {{ request()->routeIs('historiAkunKadaluwarsa') ? 'bg-yellow-100 text-yellow-700' : 'text-gray-700' }}">
+                    class="block pl-8 py-1.5 rounded-lg font-medium text-sm transition-all duration-200
+                            hover:bg-yellow-100 hover:text-yellow-700
+                            {{ request()->routeIs('historiAkunKadaluwarsa') ? 'bg-yellow-100 text-yellow-700' : 'text-gray-700' }}">
                     Histori Akun Expired
                 </a>
             </div>
         </div>
+
+        <a href="#"
+            class="px-4 py-2 rounded-lg font-medium transition-all duration-200
+                    hover:bg-blue-100 hover:text-blue-700 hover:shadow-md
+                    {{ request()->routeIs('#') ? 'bg-blue-200 text-blue-700' : 'text-gray-700' }}">
+            Data Warga
+        </a>
 
         {{-- Verifikasi Surat --}}
         <a href="{{ route('verifikasiSurat') }}"
