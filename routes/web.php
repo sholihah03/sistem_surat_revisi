@@ -66,6 +66,7 @@ Route::get('/verifikasi-surat/{token}', [ManajemenSuratWargaController::class, '
 
 Route::prefix('warga')->middleware(AuthenticateWarga::class)->group(function () {
     Route::get('/dashboardWarga', [DashboardController::class, 'index'])->name('dashboardWarga');
+    Route::get('/panduan', [DashboardController::class, 'panduan'])->name('panduan');
     Route::post('/notifikasi/mark-as-read', [NotificationWargaController::class, 'markAsRead'])->name('notifikasi.markAsRead');
     Route::get('/profileWarga', [ProfileWargaController::class, 'index'])->name('profileWarga');
     Route::post('/profileWarga/uploadFoto', [ProfileWargaController::class, 'uploadFoto'])->name('profileWarga.uploadFoto');

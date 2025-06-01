@@ -2,7 +2,7 @@
 
 @section('content')
 <h1 class="text-2xl pt-20 md:text-3xl font-bold text-gray-800 mb-2">Manajemen Surat Warga</h1>
-<p class="text-gray-700 mb-6">
+<p class="text-gray-700 mb-6 text-lg">
     Halaman ini menampilkan daftar pengajuan surat dari warga yang telah disetujui RT dan menunggu persetujuan RW.
     Periksa informasi surat secara menyeluruh sebelum menyetujui atau menolak.
 </p>

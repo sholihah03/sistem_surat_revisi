@@ -211,10 +211,24 @@
 
                 <!-- No HP -->
                 <div class="mb-4">
-                    <label class="block text-gray-600 mb-1" for="no_hp_rt">No. HP</label>
-                    <input type="text" name="no_hp_rt" id="no_hp_rt"
-                        class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-indigo-500"
-                        value="{{ $rt->no_hp_rt }}">
+                    <label class="block mb-1 text-sm font-medium">Nomer WhatsApp</label>
+                    <div class="flex">
+                        <!-- Prefix "62" tidak bisa diedit -->
+                        <span class="inline-flex items-center px-3 rounded-l border border-r-0 border-gray-300 bg-gray-100 text-gray-600 select-none">62</span>
+                        <!-- Input nomor hp tanpa "62" -->
+                        <input
+                            type="text"
+                            name="no_hp_rt"
+                            id="no_hp_rt"
+                            class="flex-1 border border-gray-300 rounded-r px-3 py-2"
+                            placeholder="Masukkan nomor setelah 62"
+                            required
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                            maxlength="11"
+                            value="{{ Str::startsWith($rt->no_hp_rt, '62') ? substr($rt->no_hp_rt, 2) : $rt->no_hp_rt }}"
+                        >
+                    </div>
+                    <small class="text-gray-500">Nomor harus diawali dengan 62 (otomatis), hanya masukkan nomor setelah kode negara.</small>
                 </div>
 
                 <!-- Email -->

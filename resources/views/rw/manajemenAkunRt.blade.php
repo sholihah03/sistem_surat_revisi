@@ -2,7 +2,7 @@
 
 @section('content')
 <h1 class="text-2xl pt-20 md:text-3xl font-bold text-gray-800 mb-2">Manajemen Akun RT</h1>
-<p class="text-gray-600 mb-6">
+<p class="text-gray-600 mb-6 text-lg">
     Halaman ini digunakan untuk mengelola akun Ketua RT di lingkungan RW {{ $no_rw }}.
     Anda dapat menambahkan akun baru, mengedit informasi, atau menghapus akun RT yang tidak aktif.
     Gunakan fitur pencarian di samping untuk mempermudah menemukan akun berdasarkan nomor RT atau nama Ketua RT.
@@ -131,10 +131,26 @@
             <div class="mb-4">
                 <label class="block mb-1 text-sm font-medium">Nama RT</label>
                 <input type="text" name="nama_lengkap_rt" class="w-full border rounded px-3 py-2" placeholder="Masukkan Nama RT" required>
+                <small class="text-gray-500">Masukkan nama awalan dengan huruf hapital seperti "Ali".</small>
             </div>
             <div class="mb-4">
                 <label class="block mb-1 text-sm font-medium">Nomer WhatsApp</label>
-                <input type="text" name="no_hp_rt" class="w-full border rounded px-3 py-2" placeholder="Masukkan Nomer WhatsApp" required>
+                <div class="flex">
+                    <!-- Prefix "62" tidak bisa diedit -->
+                    <span class="inline-flex items-center px-3 rounded-l border border-r-0 border-gray-300 bg-gray-100 text-gray-600 select-none">62</span>
+                    <!-- Input nomor hp tanpa "62" -->
+                    <input
+                        type="text"
+                        name="no_hp_rt"
+                        id="no_hp_rt_add"
+                        class="flex-1 border border-gray-300 rounded-r px-3 py-2"
+                        placeholder="Masukkan nomor setelah 62"
+                        required
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                        maxlength="11"
+                    >
+                </div>
+                <small class="text-gray-500">Nomor harus diawali dengan 62 (otomatis), hanya masukkan nomor setelah kode negara.</small>
             </div>
             <div class="mb-4">
                 <label class="block mb-1 text-sm font-medium">Email</label>
@@ -142,6 +158,7 @@
             </div>
             <div class="mb-4">
                 <label class="block mb-1 text-sm font-medium">Password</label>
+                <p class="text-xs text-red-500">Harap isi password dengan 6 karakter</p>
                 <div class="relative">
                     <input type="password" id="addPassword" name="password" class="w-full border rounded px-3 py-2 pr-10" placeholder="Masukkan Password" required>
                     <span onclick="togglePasswordVisibility('addPassword', this)" class="absolute inset-y-0 right-3 flex items-center cursor-pointer">
@@ -153,6 +170,7 @@
                         </svg>
                     </span>
                 </div>
+                <small class="text-gray-500">Saran gunakan password seperti "rt_001"</small>
             </div>
             <div class="flex justify-end space-x-2">
                 <button type="button" onclick="closeAddModal()" class="text-gray-600 hover:text-gray-800">Batal</button>
@@ -179,7 +197,21 @@
             </div>
             <div class="mb-4">
                 <label class="block mb-1 text-sm font-medium">Nomer WhatsApp</label>
-                <input id="editNoHpRt" name="no_hp_rt" class="w-full border rounded px-3 py-2" placeholder="Masukkan Nomer WhatsApp" required>
+                <div class="flex">
+                    <!-- Prefix "62" tidak bisa diedit -->
+                    <span class="inline-flex items-center px-3 rounded-l border border-r-0 border-gray-300 bg-gray-100 text-gray-600 select-none">62</span>
+                    <!-- Input nomor hp tanpa "62" -->
+                    <input
+                        type="text"
+                        id="editNoHpRt"
+                        name="no_hp_rt"
+                        class="flex-1 border border-gray-300 rounded-r px-3 py-2"
+                        placeholder="Masukkan nomor setelah 62"
+                        required
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                        maxlength="11"
+                    >
+                </div>
             </div>
             <div class="mb-4">
                 <label class="block mb-1 text-sm font-medium">Email</label>
@@ -224,8 +256,20 @@
             <input name="nama_lengkap_rt" type="text" value="${namaRt}" class="w-full border rounded px-3 py-2" required>
         </div>
         <div class="mb-4">
-            <label class="block mb-1 text-sm font-medium">Username</label>
-            <input name="no_hp_rt" type="text" value="${whatsapp}" class="w-full border rounded px-3 py-2" required>
+            <label class="block mb-1 text-sm font-medium">Nomer WhatsApp</label>
+            <div class="flex">
+                <span class="inline-flex items-center px-3 rounded-l border border-r-0 border-gray-300 bg-gray-100 text-gray-600 select-none">62</span>
+                <input
+                    name="no_hp_rt"
+                    type="text"
+                    value="${whatsapp.startsWith('62') ? whatsapp.substring(2) : whatsapp}"
+                    class="flex-1 border border-gray-300 rounded-r px-3 py-2"
+                    placeholder="Masukkan nomor setelah 62"
+                    required
+                    oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                    maxlength="11"
+                >
+            </div>
         </div>
         <div class="mb-4">
             <label class="block mb-1 text-sm font-medium">Email</label>

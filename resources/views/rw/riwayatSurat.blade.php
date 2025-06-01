@@ -2,7 +2,7 @@
 
 @section('content')
 <h1 class="text-2xl pt-20 md:text-3xl font-bold text-gray-800 mb-2">Riwayat Surat Warga</h1>
-<p class="text-gray-600 mb-6">
+<p class="text-gray-600 mb-6 text-lg">
     Berikut adalah daftar surat pengantar warga yang telah disetujui dan tersimpan.
     Anda dapat melihat detail dan mengunduh surat melalui tombol "<strong class="text-yellow-700">Lihat Surat</strong>" di setiap baris.
 </p>

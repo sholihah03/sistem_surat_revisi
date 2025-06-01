@@ -29,7 +29,7 @@ class ProfileRtController extends Controller
 
         $rt = Auth::guard('rt')->user();
         Rt::where('id_rt', $rt->id_rt)->update([
-            'no_hp_rt' => $request->no_hp_rt,
+            'no_hp_rt' => '62' . $request->no_hp_rt,
             'email_rt' => $request->email_rt,
         ]);
 

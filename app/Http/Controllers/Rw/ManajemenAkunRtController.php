@@ -51,7 +51,7 @@ class ManajemenAkunRtController extends Controller
         'rw_id' => $rw->id_rw,
         'no_rt' => $request->no_rt,
         'nama_lengkap_rt' => $request->nama_lengkap_rt,
-        'no_hp_rt' => $request->no_hp_rt,
+        'no_hp_rt' => '62' . $request->no_hp_rt,
         'email_rt' => $request->email_rt,
         'password' => Hash::make($request->password), // Enkripsi password
     ]);
@@ -76,7 +76,7 @@ class ManajemenAkunRtController extends Controller
         $rt->update([
             'no_rt' => $request->no_rt,
             'nama_lengkap_rt' => $request->nama_lengkap_rt,
-            'no_hp_rt' => $request->no_hp_rt,
+            'no_hp_rt' => '62' . $request->no_hp_rt,
             'email_rt' => $request->email_rt,
         ]);
         // Menambahkan pesan sukses ke flash session

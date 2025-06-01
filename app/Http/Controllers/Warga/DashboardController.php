@@ -15,6 +15,8 @@ class DashboardController extends Controller
     {
         // Ambil data user dari guard warga
         $warga = Auth::guard('warga')->user();
+        $rt = $warga->rt;
+        $rw = $warga->rw;
 
         // Ambil pengajuan surat untuk warga tersebut, sekaligus eager load tujuanSurat
         $pengajuanSurat = PengajuanSurat::with('tujuanSurat')
@@ -41,8 +43,14 @@ class DashboardController extends Controller
         // Urutkan berdasarkan created_at descending
         $pengajuanSuratGabungan = $pengajuanSuratGabungan->sortByDesc('created_at');
 
-        return view('warga.dashboard', compact('warga', 'pengajuanSuratGabungan'));
+        return view('warga.dashboard', compact('warga', 'rt', 'rw', 'pengajuanSuratGabungan'));
     }
-    
+
+    public function panduan()
+    {
+        $warga = Auth::guard('warga')->user();
+        return view('warga.panduan', compact('warga'));
+    }
+
 
 }

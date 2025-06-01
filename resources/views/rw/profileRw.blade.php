@@ -3,6 +3,9 @@
 @section('content')
 <div class="container mx-auto p-4 mb-6 pt-20">
     <h1 class="text-2xl font-bold mb-6">Profil RW</h1>
+    <p class="text-gray-600 text-lg mb-6">Halaman ini menampilkan data profil RW dan memungkinkan Anda untuk memperbarui informasi serta mengunggah tanda tangan digital.
+        <br>Anda <strong class="text-red-500">wajib</strong> mengunggah scan tanda tangan digital jika belum melakukannya agar proses administrasi dapat berjalan lancar.
+    </p>
 
     <div class="md:flex md:space-x-6 space-y-6 md:space-y-0">
         <!-- Card Profil -->
@@ -114,6 +117,16 @@
         <!-- Form Upload TTD -->
         <div class="bg-white shadow-lg rounded-2xl p-6 md:w-1/2">
             <h1 class="text-2xl font-bold mb-4 text-center text-gray-800">Upload Scan Tanda Tangan</h1>
+            <p class="text-lg text-gray-700">
+                Harap unggah scan tanda tangan digital dengan ketentuan berikut:
+                <ul class="list-disc list-inside mt-2">
+                    <li>Latar belakang (background) gambar sebaiknya berwarna putih atau terang agar proses transparansi berjalan optimal.</li>
+                    <li>Kejernihan tanda tangan harus jelas dan tidak blur agar hasil digitalisasi tampak rapi.</li>
+                    <li>Format gambar yang diterima adalah JPG, JPEG, atau PNG dengan ukuran maksimal sesuai batas server.</li>
+                    <li>Pastikan tanda tangan tidak terpotong dan memenuhi area gambar agar hasil transparan sempurna.</li>
+                    <li>Gambar akan diproses untuk menghilangkan latar belakang putih menjadi transparan agar bisa digunakan di dokumen digital.</li>
+                </ul>
+            </p>
 
             @if (session('ttdSuccess'))
                 <div class="bg-green-100 text-green-700 px-4 py-2 rounded mb-4">
@@ -197,10 +210,24 @@
 
                 <!-- No HP -->
                 <div class="mb-4">
-                    <label class="block text-gray-600 mb-1" for="no_hp_rw">No. HP</label>
-                    <input type="text" name="no_hp_rw" id="no_hp_rw"
-                        class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-indigo-500"
-                        value="{{ $rw->no_hp_rw }}">
+                    <label class="block mb-1 text-sm font-medium">No. HP</label>
+                    <div class="flex">
+                        <!-- Prefix "62" tidak bisa diedit -->
+                        <span class="inline-flex items-center px-3 rounded-l border border-r-0 border-gray-300 bg-gray-100 text-gray-600 select-none">62</span>
+                        <!-- Input nomor hp tanpa "62" -->
+                        <input
+                            type="text"
+                            name="no_hp_rw"
+                            id="no_hp_rw"
+                            class="flex-1 border border-gray-300 rounded-r px-3 py-2"
+                            placeholder="Masukkan nomor setelah 62"
+                            required
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                            maxlength="11"
+                            value="{{ Str::startsWith($rw->no_hp_rw, '62') ? substr($rw->no_hp_rw, 2) : $rw->no_hp_rw }}"
+                        >
+                    </div>
+                    <small class="text-gray-500">Nomor harus diawali dengan 62 (otomatis), hanya masukkan nomor setelah kode negara.</small>
                 </div>
 
                 <!-- Email -->

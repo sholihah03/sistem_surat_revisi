@@ -26,7 +26,7 @@ class ProfileRwController extends Controller
 
         $rw = Auth::guard('rw')->user();
         Rw::where('id_rw', $rw->id_rw)->update([
-            'no_hp_rw' => $request->no_hp_rw,
+            'no_hp_rw' => '62' . $request->no_hp_rw,
             'email_rw' => $request->email_rw,
         ]);
 
