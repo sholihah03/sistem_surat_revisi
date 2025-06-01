@@ -46,7 +46,7 @@ class ProfileWargaController extends Controller
         $warga = Auth::guard('warga')->user();
 
         Wargas::where('id_warga', $warga->id_warga)->update([
-            'no_hp' => $request->no_hp,
+            'no_hp' => '62' . $request->no_hp,
             'email' => $request->email,
         ]);
 

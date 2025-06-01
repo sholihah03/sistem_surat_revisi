@@ -169,9 +169,26 @@
 
                 <div class="modal-body">
                 <div class="row g-3">
-                    <div class="col-md-6">
-                    <label class="form-label">No HP</label>
-                    <input type="text" class="form-control" name="no_hp" value="{{ $warga->no_hp }}">
+                    <!-- No HP -->
+                    <div class="col-md-6 mb-4">
+                        <label class="block mb-1 text-sm font-medium">No HP</label>
+                        <div class="flex">
+                            <!-- Prefix "62" tidak bisa diedit -->
+                            <span class="inline-flex items-center px-3 rounded-l border border-r-0 border-gray-300 bg-gray-100 text-gray-600 select-none">62</span>
+                            <!-- Input nomor hp tanpa "62" -->
+                            <input
+                                type="text"
+                                name="no_hp"
+                                id="no_hp"
+                                class="flex-1 border border-gray-300 rounded-r px-3 py-2"
+                                placeholder="Masukkan nomor setelah 62"
+                                required
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                maxlength="11"
+                                value="{{ Str::startsWith($warga->no_hp, '62') ? substr($warga->no_hp, 2) : $warga->no_hp }}"
+                            >
+                        </div>
+                        <small class="text-gray-500">Nomor harus diawali dengan 62 (otomatis), hanya masukkan nomor setelah kode negara.</small>
                     </div>
                     <div class="col-md-6">
                     <label class="form-label">Email</label>
