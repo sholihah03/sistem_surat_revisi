@@ -10,6 +10,7 @@ use App\Http\Middleware\AuthenticateWarga;
 use App\Http\Controllers\UploadKKController;
 use App\Http\Controllers\Rt\BankDataController;
 use App\Http\Controllers\BuatPasswordController;
+use App\Http\Controllers\Rt\DataWargaController;
 use App\Http\Controllers\Rt\ProfileRtController;
 use App\Http\Controllers\Rw\ProfileRwController;
 use App\Http\Controllers\Rt\TtdDigitalController;
@@ -104,6 +105,7 @@ Route::prefix('rt')->middleware(AuthenticateRt::class)->group(function () {
     Route::post('/verifikasiAkunWarga/{id}/ditolak', [VerifikasiAkunWargaController::class, 'ditolak'])->name('verifikasiAkunWarga.ditolak');
     Route::get('/historiVerifikasiAkunWarga', [HistoriAkunWargaController::class, 'historiVerifikasiAkunWarga'])->name('historiVerifikasiAkunWarga');
     Route::get('/historiAkunExpired', [HistoriAkunWargaController::class, 'historiKadaluwarsa'])->name('historiAkunKadaluwarsa');
+    Route::get('/dataWarga', [DataWargaController::class, 'index'])->name('dataWarga');
     Route::get('/verifikasiSurat', [VerifikasiSuratController::class, 'index'])->name('verifikasiSurat');
     Route::post('/verifikasiSuratProses', [VerifikasiSuratController::class, 'proses'])->name('verifikasiSuratProses');
     Route::get('/riwayatSuratWarga', [RiwayatSuratWargaController::class, 'index'])->name('riwayatSuratWarga');

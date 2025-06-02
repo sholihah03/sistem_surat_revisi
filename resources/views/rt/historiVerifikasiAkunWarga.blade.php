@@ -23,73 +23,66 @@
             class="pl-10 pr-4 py-2 border rounded w-full focus:outline-none focus:ring-2 focus:ring-green-400 text-sm" />
     </form>
 
-
     <div class="bg-white bg-opacity-80 p-4 md:p-6 rounded-xl shadow w-full">
-        <div class="overflow-x-auto">
-            <div class="min-w-full inline-block align-middle overflow-x-auto">
-                <div class="overflow-x-auto border rounded-lg shadow-md">
-                    <table class="min-w-full text-xs md:text-sm text-gray-700">
-                        <thead class="bg-gray-100">
-                            <tr>
-                                <th class="px-2 md:px-4 py-2 text-left">No</th>
-                                <th class="px-2 md:px-4 py-2 text-left">Nama Warga</th>
-                                <th class="px-2 md:px-4 py-2 text-left">Nama Kepala Keluarga</th>
-                                <th class="px-2 md:px-4 py-2 text-left">No KK</th>
-                                <th class="px-2 md:px-4 py-2 text-left">Alamat</th>
-                                <th class="px-2 md:px-4 py-2 text-left">Waktu Verifikasi</th>
-                                <th class="px-2 md:px-4 py-2 text-left">Status</th>
-                                <th class="px-2 md:px-4 py-2 text-left">Alasan Penolakan</th>
-                                <th class="px-2 md:px-4 py-2 text-left">Kartu Keluarga</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200 text-gray-900">
-                            @forelse ($historiData as $index => $item)
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-2 md:px-4 py-2 whitespace-nowrap">{{ $index + 1 }}</td>
-                                <td class="px-2 md:px-4 py-2 whitespace-nowrap">
-                                    {{
-                                        $item->status_verifikasi === 'disetujui'
-                                            ? ($item->wargas->first()->nama_lengkap ?? '-')
-                                            : ($item->pendaftaran->first()->nama_lengkap ?? '-')
-                                    }}
-                                </td>
-                                <td class="px-2 md:px-4 py-2 whitespace-nowrap">{{ $item->nama_kepala_keluarga }}</td>
-                                <td class="px-2 md:px-4 py-2 whitespace-nowrap">{{ $item->no_kk_scan }}</td>
-                                <td class="px-2 md:px-4 py-2 whitespace-nowrap">
-                                    {{ $item->alamat->nama_jalan ?? '-' }},<br>
-                                    RT {{ $item->alamat->rt_alamat ?? '-' }}/RW {{ $item->alamat->rw_alamat ?? '-' }},<br>
-                                    Kel. {{ $item->alamat->kelurahan ?? '-' }},
-                                    Kec. {{ $item->alamat->kecamatan ?? '-' }}
-                                </td>
-                                <td class="px-2 md:px-4 py-2 whitespace-nowrap">
-                                    {{ $item->updated_at->format('d-m-Y H:i') }}
-                                </td>
-                                <td class="px-2 md:px-4 py-2 whitespace-nowrap">
-                                    <span class="font-semibold text-{{ $item->status_verifikasi === 'disetujui' ? 'green' : 'red' }}-600">
-                                        {{ ucfirst($item->status_verifikasi) }}
-                                    </span>
-                                </td>
-                                <td class="px-2 md:px-4 py-2 whitespace-nowrap">
-                                    {{ $item->alasan_penolakan ?? '-' }}
-                                </td>
-                                <td class="px-2 md:px-4 py-2 whitespace-nowrap">
-                                    <img src="{{ asset('storage/' . str_replace('public/', '', $item->path_file_kk)) }}"
-                                        alt="Scan KK"
-                                        class="w-20 h-auto rounded cursor-pointer"
-                                        onclick="showModal('{{ asset('storage/' . str_replace('public/', '', $item->path_file_kk)) }}')" />
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="9" class="px-2 md:px-4 py-3 text-center text-gray-500">
-                                    <p>✨ Tidak ada histori verifikasi saat ini. ✨</p>
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="max-h-[400px] overflow-y-auto rounded-lg shadow-md border">
+            <table class="min-w-full table-fixed text-xs md:text-sm text-gray-700">
+                <thead class="bg-gray-100 sticky top-0 z-10">
+                    <tr>
+                        <th class="px-2 md:px-4 py-2 text-left w-8">No</th>
+                        <th class="px-2 md:px-4 py-2 text-left w-40">Nama Warga</th>
+                        <th class="px-2 md:px-4 py-2 text-left w-40">Nama Kepala Keluarga</th>
+                        <th class="px-2 md:px-4 py-2 text-left w-24">No KK</th>
+                        <th class="px-2 md:px-4 py-2 text-left w-56">Alamat</th>
+                        <th class="px-2 md:px-4 py-2 text-left w-32">Waktu Verifikasi</th>
+                        <th class="px-2 md:px-4 py-2 text-left w-20">Status</th>
+                        <th class="px-2 md:px-4 py-2 text-left w-40">Alasan Penolakan</th>
+                        <th class="px-2 md:px-4 py-2 text-left w-28">Kartu Keluarga</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 text-gray-900">
+                    @forelse ($historiData as $index => $item)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-2 md:px-4 py-2 whitespace-nowrap w-8">{{ $index + 1 }}</td>
+                        <td class="px-2 md:px-4 py-2 whitespace-nowrap w-40">
+                            {{
+                                $item->status_verifikasi === 'disetujui'
+                                    ? ($item->wargas->first()->nama_lengkap ?? '-')
+                                    : ($item->pendaftaran->first()->nama_lengkap ?? '-')
+                            }}
+                        </td>
+                        <td class="px-2 md:px-4 py-2 whitespace-nowrap w-40">{{ $item->nama_kepala_keluarga }}</td>
+                        <td class="px-2 md:px-4 py-2 whitespace-nowrap w-24">{{ $item->no_kk_scan }}</td>
+                        <td class="px-2 md:px-4 py-2 whitespace-nowrap w-56">
+                            {{ $item->alamat->nama_jalan ?? '-' }},<br>
+                            RT {{ $item->alamat->rt_alamat ?? '-' }}/RW {{ $item->alamat->rw_alamat ?? '-' }},<br>
+                            Kel. {{ $item->alamat->kelurahan ?? '-' }},
+                            Kec. {{ $item->alamat->kecamatan ?? '-' }}
+                        </td>
+                        <td class="px-2 md:px-4 py-2 whitespace-nowrap w-32">
+                            {{ $item->updated_at->format('d-m-Y H:i') }}
+                        </td>
+                        <td class="px-2 md:px-4 py-2 whitespace-nowrap w-20">
+                            <span class="font-semibold text-{{ $item->status_verifikasi === 'disetujui' ? 'green' : 'red' }}-600">
+                                {{ ucfirst($item->status_verifikasi) }}
+                            </span>
+                        </td>
+                        <td class="px-2 md:px-4 py-2 whitespace-nowrap w-40">{{ $item->alasan_penolakan ?? '-' }}</td>
+                        <td class="px-2 md:px-4 py-2 whitespace-nowrap w-28">
+                            <img src="{{ asset('storage/' . str_replace('public/', '', $item->path_file_kk)) }}"
+                                alt="Scan KK"
+                                class="w-20 h-auto rounded cursor-pointer"
+                                onclick="showModal('{{ asset('storage/' . str_replace('public/', '', $item->path_file_kk)) }}')" />
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="9" class="px-2 md:px-4 py-3 text-center text-gray-500">
+                            <p>✨ Tidak ada histori verifikasi saat ini. ✨</p>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

@@ -19,6 +19,13 @@
         </div>
     </div>
 
+    <!-- Informasi Riwayat Surat -->
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded-md mb-4">
+        <p class="text-sm md:text-base">
+            📌 <strong>Catatan:</strong> Untuk melihat data verifikasi surat dari bulan sebelumnya, silakan kunjungi halaman <a href="{{ route('riwayatSuratWarga') }}" class="text-blue-600 hover:underline font-semibold">Riwayat Surat</a>.
+        </p>
+    </div>
+
     <!-- Daftar Pengajuan Terbaru -->
     <div class="bg-white bg-opacity-80 p-4 md:p-6 rounded-xl shadow w-full">
         <h2 class="text-lg md:text-xl font-bold text-gray-800 mb-4">

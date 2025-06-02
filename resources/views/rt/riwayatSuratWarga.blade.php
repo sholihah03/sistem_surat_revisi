@@ -26,114 +26,116 @@
 
     <div class="bg-white bg-opacity-80 p-4 md:p-6 rounded-xl w-full">
         <div class="overflow-x-auto bg-white shadow rounded-lg">
-            <table class="min-w-full text-sm text-left">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="p-3">No</th>
-                        <th class="p-3">Nama</th>
-                        <th class="p-3">Tujuan</th>
-                        <th class="p-3">Nomor Surat</th>
-                        <th class="p-3">Status</th>
-                        <th class="p-3">Tanggal Diproses</th>
-                        <th class="p-3">Alasan Ditolak</th>
-                        <th class="p-3">Hasil Surat</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @php $no = 1; @endphp
-                    @if($pengajuanBiasa->isEmpty() && $pengajuanLain->isEmpty())
+            <div class="max-h-[280px] overflow-y-auto">
+                <table class="min-w-full text-sm text-left">
+                    <thead class="bg-gray-100 sticky top-0 z-10">
                         <tr>
-                            <td colspan="9" class="p-3 text-center text-gray-500">Belum ada data riwayat surat.</td>
+                            <th class="p-3">No</th>
+                            <th class="p-3">Nama</th>
+                            <th class="p-3">Tujuan</th>
+                            <th class="p-3">Nomor Surat</th>
+                            <th class="p-3">Status</th>
+                            <th class="p-3">Tanggal Diproses</th>
+                            <th class="p-3">Alasan Ditolak</th>
+                            <th class="p-3">Hasil Surat</th>
                         </tr>
-                    @else
-                    {{-- Pengajuan Surat Biasa --}}
-                    @foreach ($pengajuanBiasa as $item)
-                        <tr class="border-t">
-                            <td class="p-3">{{ $no++ }}</td>
-                            <td class="p-3">{{ $item->warga->nama_lengkap }}</td>
-                            <td class="p-3">{{ $item->tujuanSurat->nama_tujuan ?? '-' }}</td>
-                            <td class="p-3">{{ $item->tujuanSurat->nomor_surat ?? '-' }}</td>
-                            <td class="p-3">
-                                @if ($item->status === 'disetujui')
-                                    <span class="text-green-600 font-semibold">{{ ucfirst($item->status) }}</span>
-                                @elseif ($item->status === 'ditolak')
-                                    <span class="text-red-600 font-semibold">{{ ucfirst($item->status) }}</span>
-                                @else
-                                    <span>{{ ucfirst($item->status) }}</span>
-                                @endif
-                            </td>
-                            <td class="p-3">{{ $item->updated_at->translatedFormat('d F Y') }}</td>
-                            <td class="p-3">{{ $item->alasan_penolakan_pengajuan ?? 'Tidak Ada' }}</td>
-                            <td class="p-3">
-                                @php $key = 'biasa-'.$item->id_pengajuan_surat; @endphp
-                                @if($hasilSurat->has($key))
-                                    <button class="btn btn-info lihat-surat px-3 py-1 bg-yellow-500 text-white font-semibold rounded" data-id="{{ $hasilSurat[$key]->id_hasil_surat_ttd_rt }}">
-                                        Lihat Surat
-                                    </button>
-                                @else
-                                    <p class="font-semibold">
+                    </thead>
+                    <tbody>
+                        @php $no = 1; @endphp
+                        @if($pengajuanBiasa->isEmpty() && $pengajuanLain->isEmpty())
+                            <tr>
+                                <td colspan="9" class="p-3 text-center text-gray-500">Belum ada data riwayat surat.</td>
+                            </tr>
+                        @else
+                        {{-- Pengajuan Surat Biasa --}}
+                        @foreach ($pengajuanBiasa as $item)
+                            <tr class="border-t">
+                                <td class="p-3">{{ $no++ }}</td>
+                                <td class="p-3">{{ $item->warga->nama_lengkap }}</td>
+                                <td class="p-3">{{ $item->tujuanSurat->nama_tujuan ?? '-' }}</td>
+                                <td class="p-3">{{ $item->tujuanSurat->nomor_surat ?? '-' }}</td>
+                                <td class="p-3">
+                                    @if ($item->status === 'disetujui')
+                                        <span class="text-green-600 font-semibold">{{ ucfirst($item->status) }}</span>
+                                    @elseif ($item->status === 'ditolak')
+                                        <span class="text-red-600 font-semibold">{{ ucfirst($item->status) }}</span>
+                                    @else
+                                        <span>{{ ucfirst($item->status) }}</span>
+                                    @endif
+                                </td>
+                                <td class="p-3">{{ $item->updated_at->translatedFormat('d F Y') }}</td>
+                                <td class="p-3">{{ $item->alasan_penolakan_pengajuan ?? 'Tidak Ada' }}</td>
+                                <td class="p-3">
+                                    @php $key = 'biasa-'.$item->id_pengajuan_surat; @endphp
+                                    @if($hasilSurat->has($key))
+                                        <button class="btn btn-info lihat-surat px-3 py-1 bg-yellow-500 text-white font-semibold rounded" data-id="{{ $hasilSurat[$key]->id_hasil_surat_ttd_rt }}">
+                                            Lihat Surat
+                                        </button>
+                                    @else
+                                        <p class="font-semibold">
+                                            Tidak Ada
+                                        </p>
+                                    @endif
+                                </td>
+                                {{-- <td class="p-3">
+                                    @php $key = 'biasa-'.$item->id_pengajuan_surat; @endphp
+                                    @if($hasilSurat->has($key))
+                                        <a href="{{ route('rt.unduhHasilSurat', ['id' => $hasilSurat[$key]->id_hasil_surat_ttd_rt]) }}" class="px-3 py-1 bg-green-500 text-white rounded">
+                                            Unduh
+                                        </a>
+                                    @else
                                         Tidak Ada
-                                    </p>
-                                @endif
-                            </td>
-                            {{-- <td class="p-3">
-                                @php $key = 'biasa-'.$item->id_pengajuan_surat; @endphp
-                                @if($hasilSurat->has($key))
-                                    <a href="{{ route('rt.unduhHasilSurat', ['id' => $hasilSurat[$key]->id_hasil_surat_ttd_rt]) }}" class="px-3 py-1 bg-green-500 text-white rounded">
-                                        Unduh
-                                    </a>
-                                @else
-                                    Tidak Ada
-                                @endif
-                            </td> --}}
-                        </tr>
-                    @endforeach
+                                    @endif
+                                </td> --}}
+                            </tr>
+                        @endforeach
 
-                    {{-- Pengajuan Surat Lain --}}
-                    @foreach ($pengajuanLain as $item)
-                        <tr class="border-t">
-                            <td class="p-3">{{ $no++ }}</td>
-                            <td class="p-3">{{ $item->warga->nama_lengkap }}</td>
-                            <td class="p-3">{{ $item->tujuan_manual }}</td>
-                            <td class="p-3">{{ $item->nomor_surat_pengajuan_lain ?? '-' }}</td>
-                            <td class="p-3">
-                                @if ($item->status_pengajuan_lain === 'disetujui')
-                                    <span class="text-green-600 font-semibold">{{ ucfirst($item->status_pengajuan_lain) }}</span>
-                                @elseif ($item->status_pengajuan_lain === 'ditolak')
-                                    <span class="text-red-600 font-semibold">{{ ucfirst($item->status_pengajuan_lain) }}</span>
-                                @else
-                                    <span>{{ ucfirst($item->status_pengajuan_lain) }}</span>
-                                @endif
-                            </td>
-                            <td class="p-3">{{ $item->updated_at->translatedFormat('d F Y') }}</td>
-                            <td class="p-3">{{ $item->alasan_penolakan_pengajuan_lain ?? 'Tidak Ada' }}</td>
-                            <td class="p-3">
-                                @php $key = 'lain-'.$item->id_pengajuan_surat_lain; @endphp
-                                @if($hasilSurat->has($key))
-                                    <button class="btn btn-info lihat-surat px-3 py-1 bg-yellow-500 text-white font-semibold rounded" data-id="{{ $hasilSurat[$key]->id_hasil_surat_ttd_rt }}">
-                                        Lihat Surat
-                                    </button>
-                                @else
-                                    <p class="font-semibold">
+                        {{-- Pengajuan Surat Lain --}}
+                        @foreach ($pengajuanLain as $item)
+                            <tr class="border-t">
+                                <td class="p-3">{{ $no++ }}</td>
+                                <td class="p-3">{{ $item->warga->nama_lengkap }}</td>
+                                <td class="p-3">{{ $item->tujuan_manual }}</td>
+                                <td class="p-3">{{ $item->nomor_surat_pengajuan_lain ?? '-' }}</td>
+                                <td class="p-3">
+                                    @if ($item->status_pengajuan_lain === 'disetujui')
+                                        <span class="text-green-600 font-semibold">{{ ucfirst($item->status_pengajuan_lain) }}</span>
+                                    @elseif ($item->status_pengajuan_lain === 'ditolak')
+                                        <span class="text-red-600 font-semibold">{{ ucfirst($item->status_pengajuan_lain) }}</span>
+                                    @else
+                                        <span>{{ ucfirst($item->status_pengajuan_lain) }}</span>
+                                    @endif
+                                </td>
+                                <td class="p-3">{{ $item->updated_at->translatedFormat('d F Y') }}</td>
+                                <td class="p-3">{{ $item->alasan_penolakan_pengajuan_lain ?? 'Tidak Ada' }}</td>
+                                <td class="p-3">
+                                    @php $key = 'lain-'.$item->id_pengajuan_surat_lain; @endphp
+                                    @if($hasilSurat->has($key))
+                                        <button class="btn btn-info lihat-surat px-3 py-1 bg-yellow-500 text-white font-semibold rounded" data-id="{{ $hasilSurat[$key]->id_hasil_surat_ttd_rt }}">
+                                            Lihat Surat
+                                        </button>
+                                    @else
+                                        <p class="font-semibold">
+                                            Tidak Ada
+                                        </p>
+                                    @endif
+                                </td>
+                                {{-- <td class="p-3">
+                                    @php $key = 'lain-'.$item->id_pengajuan_surat_lain; @endphp
+                                    @if($hasilSurat->has($key))
+                                        <a href="{{ route('rt.unduhHasilSurat', ['id' => $hasilSurat[$key]->id_hasil_surat_ttd_rt]) }}" class="px-3 py-1 bg-green-500 text-white rounded">
+                                            Unduh
+                                        </a>
+                                    @else
                                         Tidak Ada
-                                    </p>
-                                @endif
-                            </td>
-                            {{-- <td class="p-3">
-                                @php $key = 'lain-'.$item->id_pengajuan_surat_lain; @endphp
-                                @if($hasilSurat->has($key))
-                                    <a href="{{ route('rt.unduhHasilSurat', ['id' => $hasilSurat[$key]->id_hasil_surat_ttd_rt]) }}" class="px-3 py-1 bg-green-500 text-white rounded">
-                                        Unduh
-                                    </a>
-                                @else
-                                    Tidak Ada
-                                @endif
-                            </td> --}}
-                        </tr>
-                    @endforeach
-                    @endif
-                </tbody>
-            </table>
+                                    @endif
+                                </td> --}}
+                            </tr>
+                        @endforeach
+                        @endif
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

@@ -48,11 +48,11 @@
             </div>
         </div>
 
-        <a href="#"
+        <a href="{{ route('dataWarga') }}"
             class="px-4 py-2 rounded-lg font-medium transition-all duration-200
                     hover:bg-blue-100 hover:text-blue-700 hover:shadow-md
-                    {{ request()->routeIs('#') ? 'bg-blue-200 text-blue-700' : 'text-gray-700' }}">
-            Data Warga
+                    {{ request()->routeIs('dataWarga') ? 'bg-blue-200 text-blue-700' : 'text-gray-700' }}">
+            👥 Data Warga
         </a>
 
         {{-- Verifikasi Surat --}}
