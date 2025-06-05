@@ -18,6 +18,7 @@ class HasilSuratTtdRw extends Model
         'file_surat',
         'is_read',
         'token',
+        'hash_dokumen',
     ];
 
     // Relasi opsional (jika ingin digunakan)

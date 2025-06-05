@@ -282,5 +282,13 @@
             </table>
         </div>
     </div>
+
+    <hr style="margin-top: 10px;">
+    <p style="font-size: 10pt;">
+        <strong>Informasi Digital Signature:</strong><br>
+        Ditandatangani oleh: {{ $rt->nama_lengkap_rt }} & {{ $rt->rw->nama_lengkap_rw }} (Ketua RT {{ $rt->no_rt }} RW {{ $rt->rw->no_rw }})<br>
+        Waktu TTD: {{ \Carbon\Carbon::parse($waktuTtd)->translatedFormat('d F Y H:i:s') }} WIB<br>
+        SHA-256 Dokumen: <br><code style="word-break: break-all;">{{ $hash_dokumen }}</code>
+    </p>
 </body>
 </html>
