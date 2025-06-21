@@ -34,9 +34,12 @@
                             <th class="p-3">Nama</th>
                             <th class="p-3">Tujuan</th>
                             <th class="p-3">Nomor Surat</th>
-                            <th class="p-3">Status</th>
-                            <th class="p-3">Tanggal Diproses</th>
+                            <th class="p-3">Status RT</th>
+                            <th class="p-3">Tanggal Diproses RT</th>
+                            <th class="p-3">Status RW</th>
+                            <th class="p-3">Tanggal Diproses RW</th>
                             <th class="p-3">Alasan Ditolak</th>
+                            <th class="p-3">Dokumen Persyaratan</th>
                             <th class="p-3">Hasil Surat</th>
                         </tr>
                     </thead>
@@ -44,7 +47,7 @@
                         @php $no = 1; @endphp
                         @if($pengajuanBiasa->isEmpty() && $pengajuanLain->isEmpty())
                             <tr>
-                                <td colspan="9" class="p-3 text-center text-gray-500">Belum ada data riwayat surat.</td>
+                                <td colspan="10" class="p-3 text-center text-gray-500">Belum ada data riwayat surat.</td>
                             </tr>
                         @else
                         {{-- Pengajuan Surat Biasa --}}
@@ -55,16 +58,51 @@
                                 <td class="p-3">{{ $item->tujuanSurat->nama_tujuan ?? '-' }}</td>
                                 <td class="p-3">{{ $item->tujuanSurat->nomor_surat ?? '-' }}</td>
                                 <td class="p-3">
-                                    @if ($item->status === 'disetujui')
-                                        <span class="text-green-600 font-semibold">{{ ucfirst($item->status) }}</span>
-                                    @elseif ($item->status === 'ditolak')
-                                        <span class="text-red-600 font-semibold">{{ ucfirst($item->status) }}</span>
+                                    @if ($item->status_rt === 'disetujui')
+                                        <span class="text-green-600 font-semibold">{{ ucfirst($item->status_rt) }}</span>
+                                    @elseif ($item->status_rt === 'ditolak')
+                                        <span class="text-red-600 font-semibold">{{ ucfirst($item->status_rt) }}</span>
                                     @else
-                                        <span>{{ ucfirst($item->status) }}</span>
+                                        <span>{{ ucfirst($item->status_rt) }}</span>
                                     @endif
                                 </td>
-                                <td class="p-3">{{ $item->updated_at->translatedFormat('d F Y') }}</td>
+                                <td class="p-3">
+                                    {{ $item->waktu_persetujuan_rt ? \Carbon\Carbon::parse($item->waktu_persetujuan_rt)->translatedFormat('d F Y') : '-' }}
+                                </td>
+                                <td class="p-3">
+                                    @if ($item->status_rw === 'disetujui')
+                                        <span class="text-green-600 font-semibold">{{ ucfirst($item->status_rw) }}</span>
+                                    @elseif ($item->status_rw === 'ditolak')
+                                        <span class="text-red-600 font-semibold">{{ ucfirst($item->status_rw) }}</span>
+                                    @else
+                                        <span>{{ ucfirst($item->status_rw ?? 'Menunggu') }}</span>
+                                    @endif
+                                </td>
+                                <td class="p-3">
+                                    {{ $item->waktu_persetujuan_rw ? \Carbon\Carbon::parse($item->waktu_persetujuan_rw)->translatedFormat('d F Y') : '-' }}
+                                </td>
                                 <td class="p-3">{{ $item->alasan_penolakan_pengajuan ?? 'Tidak Ada' }}</td>
+                                <td class="p-3">
+                                    @if($item->pengajuan && $item->pengajuan->count() > 0)
+                                        <ul class="list-disc pl-4">
+                                            @foreach($item->pengajuan as $dok)
+                                                <li class="mb-2">
+                                                    <p class="text-sm text-gray-700 mb-1">
+                                                        {{ $dok->persyaratan->nama_persyaratan ?? 'Dokumen' }}
+                                                    </p>
+                                                    <img
+                                                        src="{{ asset('storage/' . str_replace('public/', '', $dok->dokumen)) }}"
+                                                        alt="Dokumen Persyaratan"
+                                                        class="w-32 cursor-pointer"
+                                                        onclick="showImageModal('{{ asset('storage/' . str_replace('public/', '', $dok->dokumen)) }}', '{{ $dok->persyaratan->nama_persyaratan }}')"
+                                                    />
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @else
+                                        <span class="text-gray-400">Tidak ada dokumen</span>
+                                    @endif
+                                </td>
                                 <td class="p-3">
                                     @php $key = 'biasa-'.$item->id_pengajuan_surat; @endphp
                                     @if($hasilSurat->has($key))
@@ -98,15 +136,29 @@
                                 <td class="p-3">{{ $item->tujuan_manual }}</td>
                                 <td class="p-3">{{ $item->nomor_surat_pengajuan_lain ?? '-' }}</td>
                                 <td class="p-3">
-                                    @if ($item->status_pengajuan_lain === 'disetujui')
-                                        <span class="text-green-600 font-semibold">{{ ucfirst($item->status_pengajuan_lain) }}</span>
-                                    @elseif ($item->status_pengajuan_lain === 'ditolak')
-                                        <span class="text-red-600 font-semibold">{{ ucfirst($item->status_pengajuan_lain) }}</span>
+                                    @if ($item->status_rt_pengajuan_lain === 'disetujui')
+                                        <span class="text-green-600 font-semibold">{{ ucfirst($item->status_rt_pengajuan_lain) }}</span>
+                                    @elseif ($item->status_rt_pengajuan_lain === 'ditolak')
+                                        <span class="text-red-600 font-semibold">{{ ucfirst($item->status_rt_pengajuan_lain) }}</span>
                                     @else
-                                        <span>{{ ucfirst($item->status_pengajuan_lain) }}</span>
+                                        <span>{{ ucfirst($item->status_rt_pengajuan_lain) }}</span>
                                     @endif
                                 </td>
-                                <td class="p-3">{{ $item->updated_at->translatedFormat('d F Y') }}</td>
+                                <td class="p-3">
+                                    {{ $item->waktu_persetujuan_rt_lain ? \Carbon\Carbon::parse($item->waktu_persetujuan_rt_lain)->translatedFormat('d F Y') : '-' }}
+                                </td>
+                                <td class="p-3">
+                                    @if ($item->status_rw_pengajuan_lain === 'disetujui')
+                                        <span class="text-green-600 font-semibold">{{ ucfirst($item->status_rw_pengajuan_lain) }}</span>
+                                    @elseif ($item->status_rw_pengajuan_lain === 'ditolak')
+                                        <span class="text-red-600 font-semibold">{{ ucfirst($item->status_rw_pengajuan_lain) }}</span>
+                                    @else
+                                        <span>{{ ucfirst($item->status_rw_pengajuan_lain) }}</span>
+                                    @endif
+                                </td>
+                                <td class="p-3">
+                                    {{ $item->waktu_persetujuan_rw_lain ? \Carbon\Carbon::parse($item->waktu_persetujuan_rw_lain)->translatedFormat('d F Y') : '-' }}
+                                </td>
                                 <td class="p-3">{{ $item->alasan_penolakan_pengajuan_lain ?? 'Tidak Ada' }}</td>
                                 <td class="p-3">
                                     @php $key = 'lain-'.$item->id_pengajuan_surat_lain; @endphp
@@ -153,6 +205,14 @@
     </div>
 </div>
 
+<!-- Modal untuk melihat gambar dokumen -->
+<div id="imageModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white p-4 rounded-lg shadow-lg max-w-3xl w-full relative">
+        <button onclick="closeImageModal()" class="absolute top-2 right-2 text-gray-600 hover:text-red-500 text-xl font-bold">&times;</button>
+        <img id="modalImage" src="" alt="Preview Gambar" class="w-full max-h-[80vh] object-contain rounded">
+    </div>
+</div>
+
 <script>
 document.querySelectorAll('.lihat-surat').forEach(btn => {
     btn.addEventListener('click', function(e) {
@@ -177,5 +237,18 @@ document.getElementById('closeModal').addEventListener('click', () => {
 
     iframe.src = '';
 });
+
+        let currentImageUrl = '';
+        function showImageModal(imageUrl) {
+            currentImageUrl = imageUrl;
+            document.getElementById('modalImage').src = imageUrl;
+            document.getElementById('imageModal').classList.remove('hidden');
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.add('hidden');
+            document.getElementById('modalImage').src = '';
+            currentImageUrl = '';
+        }
 </script>
 @endsection

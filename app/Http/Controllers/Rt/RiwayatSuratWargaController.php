@@ -29,17 +29,19 @@ class RiwayatSuratWargaController extends Controller
 
         $search = $request->input('search');
 
-        $pengajuanBiasa = PengajuanSurat::with(['warga', 'tujuanSurat'])
+        $pengajuanBiasa = PengajuanSurat::with(['warga', 'tujuanSurat', 'pengajuan.persyaratan'])
             ->whereHas('warga', function($query) use ($rt_id) {
                 $query->where('rt_id', $rt_id);
             })
-            ->whereIn('status', ['disetujui', 'ditolak']);
+            ->whereIn('status_rt', ['disetujui', 'ditolak'])
+            ->orWhereIn('status_rw', ['disetujui', 'ditolak']);
 
         $pengajuanLain = PengajuanSuratLain::with('warga')
             ->whereHas('warga', function($query) use ($rt_id) {
                 $query->where('rt_id', $rt_id);
             })
-            ->whereIn('status_pengajuan_lain', ['disetujui', 'ditolak']);
+            ->whereIn('status_rt_pengajuan_lain', ['disetujui', 'ditolak'])
+            ->orWhereIn('status_rw_pengajuan_lain', ['disetujui', 'ditolak']);
 
         if ($search) {
             $months = [

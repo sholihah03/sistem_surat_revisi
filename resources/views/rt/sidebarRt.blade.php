@@ -49,9 +49,15 @@
         </div>
 
         <a href="{{ route('dataWarga') }}"
+        @if($disabled)
+            class="px-4 py-2 rounded-lg font-medium transition-all duration-200 opacity-50 cursor-not-allowed"
+            tabindex="-1"
+            onclick="return false;"
+        @else
             class="px-4 py-2 rounded-lg font-medium transition-all duration-200
                     hover:bg-blue-100 hover:text-blue-700 hover:shadow-md
-                    {{ request()->routeIs('dataWarga') ? 'bg-blue-200 text-blue-700' : 'text-gray-700' }}">
+                    {{ request()->routeIs('dataWarga') ? 'bg-blue-200 text-blue-700' : 'text-gray-700' }}"
+        @endif>
             👥 Data Warga
         </a>
 

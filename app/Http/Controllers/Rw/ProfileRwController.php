@@ -14,7 +14,9 @@ class ProfileRwController extends Controller
     {
         $rw = Auth::guard('rw')->user();
         $profile_rw = Auth::guard('rw')->user()->profile_rw;
-        return view('rw.profileRw', compact('rw', 'profile_rw'));
+        $ttdDigital = $rw->ttd_digital;
+        $showModalUploadTtdRw = empty($ttdDigital);
+        return view('rw.profileRw', compact('rw', 'profile_rw', 'ttdDigital', 'showModalUploadTtdRw'));
     }
 
     public function updateData(Request $request)

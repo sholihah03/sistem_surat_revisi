@@ -57,22 +57,22 @@
                                     @endif
                                 </td>
                                 <td class="px-2 md:px-4 py-2 whitespace-nowrap text-center">
-                                    @if ($pengajuan->status === 'menunggu' || $pengajuan->status_pengajuan_lain === 'menunggu')
+                                    @if ($pengajuan->status_rt === 'menunggu' || $pengajuan->status_rt_pengajuan_lain === 'menunggu')
                                         <span class="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded text-xs font-semibold">
                                             Menunggu
                                         </span>
-                                    @elseif ($pengajuan->status === 'disetujui' || $pengajuan->status_pengajuan_lain === 'disetujui')
+                                    @elseif ($pengajuan->status_rt === 'disetujui' || $pengajuan->status_rt_pengajuan_lain === 'disetujui')
                                         <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs font-semibold">
                                             Disetujui
                                         </span>
-                                    @elseif ($pengajuan->status === 'ditolak' || $pengajuan->status_pengajuan_lain === 'ditolak')
+                                    @elseif ($pengajuan->status_rt === 'ditolak' || $pengajuan->status_rt_pengajuan_lain === 'ditolak')
                                         <span class="bg-red-100 text-red-800 px-2 py-0.5 rounded text-xs font-semibold">
                                             Ditolak
                                         </span>
                                     @endif
                                 </td>
                                 <td class="px-2 md:px-4 py-2 whitespace-nowrap text-center">
-                                    @if ($pengajuan->status === 'menunggu' || $pengajuan->status_pengajuan_lain === 'menunggu')
+                                    @if ($pengajuan->status_rt === 'menunggu' || $pengajuan->status_rt_pengajuan_lain === 'menunggu')
                                         <a href="{{ route('verifikasiSurat') }}" class="text-blue-500 hover:underline">Verifikasi</a>
                                     @else
                                         <a href="{{ route('riwayatSuratWarga') }}" class="text-blue-500 hover:underline">Riwayat Surat</a>

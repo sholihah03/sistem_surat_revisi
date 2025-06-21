@@ -25,8 +25,10 @@ class VerifikasiSuratController extends Controller
         $ttdDigital = $rt_id->ttd_digital;
         $showModalUploadTtd = empty($ttdDigital);
 
-        $pengajuanSurat = PengajuanSurat::with('warga', 'tujuanSurat')->where('status', 'menunggu')->get();
-        $pengajuanSuratLain = PengajuanSuratLain::with('warga')->where('status_pengajuan_lain', 'menunggu')->get();
+        $pengajuanSurat = PengajuanSurat::with(['warga', 'tujuanSurat', 'pengajuan.persyaratan'])
+    ->where('status_rt', 'menunggu')->get();
+        // $pengajuanSurat = PengajuanSurat::with('warga', 'tujuanSurat')->where('status', 'menunggu')->get();
+        $pengajuanSuratLain = PengajuanSuratLain::with('warga')->where('status_rt_pengajuan_lain', 'menunggu')->get();
 
         return view('rt.verifikasiSuratWarga', compact('pengajuanSurat', 'pengajuanSuratLain', 'profile_rt', 'showModalUploadTtd','ttdDigital'));
     }
@@ -47,7 +49,8 @@ class VerifikasiSuratController extends Controller
         $linkDetail = route('riwayatSurat', ['id' => $data->id]); // sesuaikan route
 
         if ($aksi == 'setuju') {
-            $data->status = 'disetujui';
+            $data->status_rt = 'disetujui';
+            $data->waktu_persetujuan_rt = now();
             $data->save();
 
             // --- Generate dan simpan surat hasil tanda tangan RT ---
@@ -90,7 +93,8 @@ class VerifikasiSuratController extends Controller
             );
 
         } else {
-            $data->status = 'ditolak';
+            $data->status_rt = 'ditolak';
+            $data->waktu_persetujuan_rt = now();
             $data->alasan_penolakan_pengajuan = $request->alasan_penolakan;
             $data->save();
 
@@ -112,7 +116,8 @@ class VerifikasiSuratController extends Controller
             $linkDetail = route('riwayatSurat', ['id' => $data->id]); // sesuaikan route
 
             if ($aksi == 'setuju') {
-                $data->status_pengajuan_lain = 'disetujui';
+                $data->status_rt_pengajuan_lain = 'disetujui';
+                $data->waktu_persetujuan_rt_lain = now();
                 $data->nomor_surat_pengajuan_lain = $request->nomor_surat;
                 $data->save();
 
@@ -155,7 +160,8 @@ class VerifikasiSuratController extends Controller
                 );
 
             } else {
-                $data->status_pengajuan_lain = 'ditolak';
+                $data->status_rt_pengajuan_lain = 'ditolak';
+                $data->waktu_persetujuan_rt_lain = now();
                 $data->alasan_penolakan_pengajuan_lain = $request->alasan_penolakan;
                 $data->save();
 
@@ -181,14 +187,14 @@ class VerifikasiSuratController extends Controller
 
         // Ambil 5 notifikasi terbaru untuk warga yang login, status sudah 'disetujui' atau 'ditolak'
         $notifikasiBiasa = PengajuanSurat::with('warga')
-            ->whereIn('status', ['disetujui', 'ditolak'])
+            ->whereIn('status_rt', ['disetujui', 'ditolak'])
             ->where('warga_id', $warga->id)  // filter berdasarkan warga login
             ->orderBy('updated_at', 'desc')
             ->take(5)
             ->get();
 
         $notifikasiLain = PengajuanSuratLain::with('warga')
-            ->whereIn('status_pengajuan_lain', ['disetujui', 'ditolak'])
+            ->whereIn('status_rt_pengajuan_lain', ['disetujui', 'ditolak'])
             ->where('warga_id', $warga->id)  // filter berdasarkan warga login
             ->orderBy('updated_at', 'desc')
             ->take(5)

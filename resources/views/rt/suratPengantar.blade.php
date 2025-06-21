@@ -247,7 +247,7 @@
             <label>Untuk/ Maksud/ Tujuan</label>
             <span class="value">:
                 @if ($jenis === 'biasa')
-                    {{ $pengajuan->tujuanSurat->nama_tujuan ?? '-' }}
+                    {{ $pengajuan->tujuan_custom ?? ($pengajuan->tujuanSurat->nama_tujuan ?? '-') }}
                 @else
                     {{ $pengajuan->tujuan_manual ?? '-' }}
                 @endif

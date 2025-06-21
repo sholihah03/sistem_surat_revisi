@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Warga;
 
 use App\Models\TujuanSurat;
 use Illuminate\Http\Request;
+use App\Models\PersyaratanSurat;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -32,15 +33,24 @@ class PengajuanSuratController extends Controller
     public function formPengajuanSurat(Request $request)
     {
         $tujuan = $request->query('tujuan');
+        $id = $request->query('id');
         $nomor = $request->query('nomor');
-        $warga = Auth::guard('warga')->user(); // asumsinya pakai guard 'warga'
 
-        // Ambil alamat dari relasi melalui ScanKK
+        $persyaratanList = PersyaratanSurat::where('tujuan_surat_id', $id)
+        ->get()
+        ->map(function ($item) {
+            return (object)[
+                'id' => $item->id_persyaratan_surat,
+                'nama_persyaratan' => $item->nama_persyaratan,
+                'keterangan' => strtolower(trim($item->keterangan)), // normalisasi kunci
+            ];
+        });
+
+        $warga = Auth::guard('warga')->user();
         $alamat = $warga->scan_Kk?->alamat;
 
-        return view('warga.formSuratTujuanPopuler', compact('tujuan', 'warga', 'alamat', 'nomor'));
+        return view('warga.formSuratTujuanPopuler', compact('persyaratanList', 'tujuan', 'nomor', 'warga', 'alamat'));
     }
-
 
     public function formPengajuanSuratStore(Request $request)
     {
@@ -52,29 +62,63 @@ class PengajuanSuratController extends Controller
             'pekerjaan' => 'required|string|max:255',
             'tujuan_surat_id' => 'required|exists:tb_tujuan_surat,id_tujuan_surat',
             'scan_kk_id' => 'required|exists:tb_scan_kk,id_scan',
+            'persyaratan_surat_id' => 'array',
+            'dokumen' => 'array',
         ]);
 
-        DB::table('tb_pengajuan_surat')->insert([
-            'warga_id' => auth('warga')->id(),
-            'tujuan_surat_id' => $validated['tujuan_surat_id'],
-            'scan_kk_id' => $validated['scan_kk_id'],
-            'status' => 'menunggu',
-            'tempat_lahir' => $validated['tempat_lahir'],
-            'tanggal_lahir' => $validated['tanggal_lahir'],
-            'agama' => $validated['agama'],
-            'pekerjaan' => $validated['pekerjaan'],
-            'status_perkawinan' => $validated['status_perkawinan'],
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-        $rtEmail = $request->user('warga')->rt->email_rt ?? null;
-        if ($rtEmail) {
-            Mail::to($rtEmail)->send(new NotifikasiPengajuanSuratKeRT(
-                $request->user('warga')->nama_lengkap
-            ));
+        DB::beginTransaction();
+        try {
+            // 1. Simpan ke tb_pengajuan_surat
+            $pengajuanId = DB::table('tb_pengajuan_surat')->insertGetId([
+                'warga_id' => auth('warga')->id(),
+                'tujuan_surat_id' => $validated['tujuan_surat_id'],
+                'scan_kk_id' => $validated['scan_kk_id'],
+                'status_rt' => 'menunggu',
+                'tempat_lahir' => $validated['tempat_lahir'],
+                'tanggal_lahir' => $validated['tanggal_lahir'],
+                'agama' => $validated['agama'],
+                'pekerjaan' => $validated['pekerjaan'],
+                'status_perkawinan' => $validated['status_perkawinan'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // 2. Simpan file persyaratan (hanya jika ada data)
+            $fileInputs = $request->file('dokumen', []);
+            $persyaratanIDs = $request->input('persyaratan_surat_id', []);
+
+            if (!empty($persyaratanIDs) && !empty($fileInputs)) {
+                foreach ($persyaratanIDs as $idPersyaratan) {
+                    if (isset($fileInputs[$idPersyaratan])) {
+                        $file = $fileInputs[$idPersyaratan];
+                        $filename = 'persyaratan/' . uniqid() . '_' . $file->getClientOriginalName();
+                        $file->storeAs('public', $filename);
+
+                        DB::table('tb_pengajuan_persyaratan')->insert([
+                            'pengajuan_surat_id' => $pengajuanId,
+                            'persyaratan_surat_id' => $idPersyaratan,
+                            'dokumen' => $filename,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
+                }
+            }
+
+            // 3. Kirim notifikasi ke RT
+            $rtEmail = $request->user('warga')->rt->email_rt ?? null;
+            if ($rtEmail) {
+                Mail::to($rtEmail)->send(new NotifikasiPengajuanSuratKeRT(
+                    $request->user('warga')->nama_lengkap
+                ));
+            }
+
+            DB::commit();
+            return redirect()->route('pengajuanSuratWarga')->with('success_form', 'Pengajuan surat berhasil dikirim.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors(['msg' => 'Gagal mengirim pengajuan: ' . $e->getMessage()]);
         }
-
-        return redirect()->route('pengajuanSuratWarga')->with('success_form', 'Pengajuan surat berhasil dikirim.');
     }
 
     public function formPengajuanSuratLain(Request $request)
@@ -102,7 +146,7 @@ class PengajuanSuratController extends Controller
         DB::table('tb_pengajuan_surat_lain')->insert([
             'warga_id' => auth('warga')->id(),
             'scan_kk_id' => $validated['scan_kk_id'],
-            'status_pengajuan_lain' => 'menunggu',
+            'status_rt_pengajuan_lain' => 'menunggu',
             'tujuan_manual' => $validated['tujuan_manual'],
             'tempat_lahir_pengaju_lain' => $validated['tempat_lahir_pengaju_lain'],
             'tanggal_lahir_pengaju_lain' => $validated['tanggal_lahir_pengaju_lain'],

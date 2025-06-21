@@ -146,9 +146,10 @@
                         <table class="min-w-full text-sm text-gray-700 border border-gray-300">
                             <thead class="bg-gray-100 sticky top-0 z-10">
                                 <tr>
-                                    <th class="px-4 py-2 text-center border border-gray-300">Tanggal</th>
+                                    <th class="px-4 py-2 text-center border border-gray-300">Tanggal Diajukan</th>
                                     <th class="px-4 py-2 text-center border border-gray-300">Tujuan Surat</th>
-                                    <th class="px-4 py-2 text-center border border-gray-300">Status</th>
+                                    <th class="px-4 py-2 text-center border border-gray-300">Status Persetujuan RT</th>
+                                    <th class="px-4 py-2 text-center border border-gray-300">Status Persetujuan RW</th>
                                     <th class="px-4 py-2 text-center border border-gray-300">Aksi</th>
                                 </tr>
                             </thead>
@@ -158,14 +159,25 @@
                                         <td class="px-4 py-2 border border-gray-300">{{ $surat->created_at->translatedFormat('d F Y') }}</td>
                                         <td class="px-4 py-2 border border-gray-300">{{ $surat->tujuan }}</td>
                                         <td class="px-4 py-2 border border-gray-300">
-                                            @if($surat->status === 'disetujui')
+                                            @if($surat->status_rt_universal === 'disetujui')
                                                 <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Disetujui</span>
-                                            @elseif($surat->status === 'menunggu')
+                                            @elseif($surat->status_rt_universal === 'menunggu')
                                                 <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">Menunggu</span>
-                                            @elseif($surat->status === 'ditolak')
+                                            @elseif($surat->status_rt_universal === 'ditolak')
                                                 <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">Ditolak</span>
                                             @else
-                                                <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded">Belum Diproses</span>
+                                                <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded">-</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-2 border border-gray-300">
+                                            @if($surat->status_rw_universal === 'disetujui')
+                                                <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Disetujui</span>
+                                            @elseif($surat->status_rw_universal === 'menunggu')
+                                                <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">Menunggu</span>
+                                            @elseif($surat->status_rw_universal === 'ditolak')
+                                                <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">Ditolak</span>
+                                            @else
+                                                <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded">-</span>
                                             @endif
                                         </td>
                                         <td class="px-4 py-2 border border-gray-300">

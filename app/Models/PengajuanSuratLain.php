@@ -14,11 +14,19 @@ class PengajuanSuratLain extends Model
     protected $table = 'tb_pengajuan_surat_lain';
     protected $primaryKey = 'id_pengajuan_surat_lain';
 
+    protected $casts = [
+    'waktu_persetujuan_rw_lain' => 'datetime',
+    'waktu_persetujuan_rt_lain' => 'datetime',
+];
+
     protected $fillable = [
         'warga_id',
         'scan_kk_id',
         'nomor_surat_pengajuan_lain',
-        'status_pengajuan_lain',
+        'status_rt_pengajuan_lain',
+        'waktu_persetujuan_rt_lain',
+        'status_rw_pengajuan_lain',
+        'waktu_persetujuan_rw_lain',
         'is_read',
         'tujuan_manual',
         'tempat_lahir_pengaju_lain',

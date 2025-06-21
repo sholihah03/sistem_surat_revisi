@@ -24,7 +24,10 @@ class DashboardRwController extends Controller
         $wargaIds = Wargas::where('rw_id', $rwId)->pluck('id_warga');
         // Ambil daftar RT yang ada di RW ini
         $rts = Rt::where('rw_id', $rwId)->get();
+        $ttdDigital = $rw->ttd_digital;
         $statusPengajuanPerRt = [];
+
+        $showModalUploadTtdRw = empty($ttdDigital);
 
         foreach ($rts as $rt) {
             // Ambil warga yang tinggal di RT ini dan RW ini (pastikan rw juga cocok)
@@ -48,13 +51,13 @@ class DashboardRwController extends Controller
 
             // Surat menunggu
             $menungguBiasa = PengajuanSurat::whereIn('warga_id', $wargaIds)
-                ->where('status', 'menunggu')
+                ->where('status_rt', 'menunggu')
                 ->whereMonth('created_at', $now->month)
                 ->whereYear('created_at', $now->year)
                 ->count();
 
             $menungguLain = PengajuanSuratLain::whereIn('warga_id', $wargaIds)
-                ->where('status_pengajuan_lain', 'menunggu')
+                ->where('status_rt_pengajuan_lain', 'menunggu')
                 ->whereMonth('created_at', $now->month)
                 ->whereYear('created_at', $now->year)
                 ->count();
@@ -63,13 +66,13 @@ class DashboardRwController extends Controller
 
             // Surat disetujui
             $disetujuiBiasa = PengajuanSurat::whereIn('warga_id', $wargaIds)
-                ->where('status', 'disetujui')
+                ->where('status_rt', 'disetujui')
                 ->whereMonth('created_at', $now->month)
                 ->whereYear('created_at', $now->year)
                 ->count();
 
             $disetujuiLain = PengajuanSuratLain::whereIn('warga_id', $wargaIds)
-                ->where('status_pengajuan_lain', 'disetujui')
+                ->where('status_rt_pengajuan_lain', 'disetujui')
                 ->whereMonth('created_at', $now->month)
                 ->whereYear('created_at', $now->year)
                 ->count();
@@ -78,13 +81,13 @@ class DashboardRwController extends Controller
 
             // Surat ditolak
             $ditolakBiasa = PengajuanSurat::whereIn('warga_id', $wargaIds)
-                ->where('status', 'ditolak')
+                ->where('status_rt', 'ditolak')
                 ->whereMonth('created_at', $now->month)
                 ->whereYear('created_at', $now->year)
                 ->count();
 
             $ditolakLain = PengajuanSuratLain::whereIn('warga_id', $wargaIds)
-                ->where('status_pengajuan_lain', 'ditolak')
+                ->where('status_rt_pengajuan_lain', 'ditolak')
                 ->whereMonth('created_at', $now->month)
                 ->whereYear('created_at', $now->year)
                 ->count();
@@ -121,13 +124,13 @@ class DashboardRwController extends Controller
 
         // ✅ Hitung surat yang disetujui dari dua tabel
         $suratDisetujuiBiasa = PengajuanSurat::whereIn('warga_id', $wargaIds)
-            ->where('status', 'disetujui')
+            ->where('status_rt', 'disetujui')
             ->whereMonth('created_at', $now->month)
             ->whereYear('created_at', $now->year)
             ->count();
 
         $suratDisetujuiLain = PengajuanSuratLain::whereIn('warga_id', $wargaIds)
-            ->where('status_pengajuan_lain', 'disetujui')
+            ->where('status_rt_pengajuan_lain', 'disetujui')
             ->whereMonth('created_at', $now->month)
             ->whereYear('created_at', $now->year)
             ->count();
@@ -154,6 +157,7 @@ class DashboardRwController extends Controller
             'statusPengajuanPerRt' => $statusPengajuanPerRt,
             'rw' => $rw,
             'suratBelumTtdRwCount' => $suratBelumTtdRwCount,
+            'showModalUploadTtdRw' => $showModalUploadTtdRw,
         ]);
 
     }

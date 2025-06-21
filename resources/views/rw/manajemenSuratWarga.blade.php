@@ -37,6 +37,7 @@
                     <th class="px-4 py-2">Nomor KTP</th>
                     <th class="px-4 py-2">Pekerjaan</th>
                     <th class="px-4 py-2">Alamat</th>
+                    <th class="px-4 py-2">Dokumen Persyaratan</th>
                     <th class="px-4 py-2">Aksi</th>
                 </tr>
             </thead>
@@ -68,7 +69,28 @@
                             @endif
                         </td>
                         <td class="px-4 py-2">
-                            <form method="POST" action="{{ route('rw.setujuiSurat') }}">
+                            @if($isSuratBiasa && $pengajuan->pengajuan->isNotEmpty())
+                                <ul class="list-disc pl-4">
+                                    @foreach ($pengajuan->pengajuan as $item)
+                                        <li class="mb-2">
+                                            <p class="text-sm text-gray-700 mb-1">
+                                                {{ $item->persyaratan->nama_persyaratan ?? 'Dokumen' }}
+                                            </p>
+                                            <img
+                                                src="{{ asset('storage/' . str_replace('public/', '', $item->dokumen)) }}"
+                                                alt="Dokumen Persyaratan"
+                                                class="w-32 cursor-pointer"
+                                                onclick="showImageModal('{{ asset('storage/' . str_replace('public/', '', $item->dokumen)) }}', '{{ $item->persyaratan->nama_persyaratan }}')"
+                                            />
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <span class="text-gray-400">Tidak ada dokumen</span>
+                            @endif
+                        </td>
+                        <td class="px-4 py-2">
+                            <form class="mb-2" method="POST" action="{{ route('rw.setujuiSurat') }}">
                                 @csrf
                                 <input type="hidden" name="pengajuan_id" value="{{ $surat->pengajuan_id }}">
                                 <input type="hidden" name="jenis" value="{{ $surat->jenis }}">
@@ -76,6 +98,11 @@
                                     Setujui
                                 </button>
                             </form>
+                            <button type="button"
+                                onclick="showModal('{{ $surat->pengajuan_id }}', '{{ $surat->jenis }}')"
+                                class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                                Tolak
+                            </button>
                         </td>
                     </tr>
                 @empty
@@ -87,7 +114,76 @@
         </table>
     </div>
 </div>
+
+<!-- Modal untuk melihat gambar dokumen -->
+<div id="imageModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white p-4 rounded-lg shadow-lg max-w-3xl w-full relative">
+        <button onclick="closeImageModal()" class="absolute top-2 right-2 text-gray-600 hover:text-red-500 text-xl font-bold">&times;</button>
+        <img id="modalImage" src="" alt="Preview Gambar" class="w-full max-h-[80vh] object-contain rounded">
+    </div>
+</div>
+
+<!-- Modal alasan ditolak -->
+<div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
+    <div class="bg-white p-6 rounded shadow w-full max-w-md">
+        <form id="modalForm" method="POST" action="{{ route('rw.tolakSurat') }}">
+            @csrf
+            <input type="hidden" name="pengajuan_id" id="formId">
+            <input type="hidden" name="jenis" id="formJenis">
+            <input type="hidden" name="aksi" id="formAksi">
+
+            <div id="inputNomorSurat" class="mb-4 hidden">
+                <label class="block mb-1">Nomor Surat</label>
+                <input type="text" name="nomor_surat" class="w-full border rounded px-3 py-2">
+            </div>
+
+            <div id="inputAlasanTolak" class="mb-4">
+                <label class="block mb-1">Alasan Penolakan</label>
+                <textarea name="alasan_penolakan" required class="w-full border rounded px-3 py-2"></textarea>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-300 rounded">Batal</button>
+                <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded">Tolak Surat</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
+    let currentImageUrl = '';
+    function showImageModal(imageUrl) {
+        currentImageUrl = imageUrl;
+        document.getElementById('modalImage').src = imageUrl;
+        document.getElementById('imageModal').classList.remove('hidden');
+    }
+
+    function closeImageModal() {
+        document.getElementById('imageModal').classList.add('hidden');
+        document.getElementById('modalImage').src = '';
+        currentImageUrl = '';
+    }
+
+    function showModal(id, jenis) {
+        document.getElementById('formId').value = id;
+        document.getElementById('formJenis').value = jenis;
+        document.getElementById('formAksi').value = 'tolak';
+
+        document.getElementById('inputNomorSurat').classList.add('hidden');
+        document.getElementById('inputAlasanTolak').classList.remove('hidden');
+
+        document.getElementById('modalForm').action = "{{ route('rw.tolakSurat') }}";
+        document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('modal').classList.add('hidden');
+        document.getElementById('formId').value = '';
+        document.getElementById('formJenis').value = '';
+        document.getElementById('formAksi').value = '';
+        document.querySelector('[name=alasan_penolakan]').value = '';
+    }
+
     function closeModal() {
         const modal = document.getElementById('successModal');
         modal.classList.add('hidden');

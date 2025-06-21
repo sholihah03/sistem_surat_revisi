@@ -29,12 +29,15 @@ class DashboardController extends Controller
         // Beri properti 'tujuan' pada masing-masing item pengajuanSurat (ambil nama_tujuan)
         foreach ($pengajuanSurat as $surat) {
             $surat->tujuan = $surat->tujuanSurat ? $surat->tujuanSurat->nama_tujuan : '-';
+            $surat->status_rt_universal = $surat->status_rt;
+            $surat->status_rw_universal = $surat->status_rw;
         }
 
         // Beri properti 'tujuan' pada masing-masing item pengajuanSuratLain (ambil tujuan_manual)
         foreach ($pengajuanSuratLain as $suratLain) {
             $suratLain->tujuan = $suratLain->tujuan_manual ?: '-';
-            $suratLain->status = $suratLain->status_pengajuan_lain;
+            $suratLain->status_rt_universal = $suratLain->status_rt_pengajuan_lain;
+            $suratLain->status_rw_universal = $suratLain->status_rw_pengajuan_lain;
         }
 
         // Gabungkan koleksi

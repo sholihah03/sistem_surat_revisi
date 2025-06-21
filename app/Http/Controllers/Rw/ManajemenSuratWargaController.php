@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\Wargas;
 use App\Models\HasilSurat;
 use Illuminate\Support\Str;
+use App\Mail\SuratDitolakRw;
 use Illuminate\Http\Request;
 use App\Mail\SuratDisetujuiRw;
 use App\Models\PengajuanSurat;
@@ -13,6 +14,7 @@ use App\Models\HasilSuratTtdRt;
 use App\Models\HasilSuratTtdRw;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\PengajuanSuratLain;
+use App\Mail\SuratDitolakRwUntukRt;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -26,154 +28,220 @@ class ManajemenSuratWargaController extends Controller
     {
         $profile_rw = Auth::guard('rw')->user()->profile_rw;
         $idRwLogin = Auth::guard('rw')->user()->id_rw;
+        $rw = Auth::guard('rw')->user();
+        $ttdDigital = $rw->ttd_digital;
+        $showModalUploadTtdRw = empty($ttdDigital);
 
         $surats = HasilSuratTtdRt::whereDoesntHave('hasilSuratTtdRw', function ($query) {
-            $query->whereColumn('jenis', 'tb_hasil_surat_ttd_rt.jenis');
+            $query->whereColumn('jenis', 'tb_hasil_surat_ttd_rt.jenis')
+            ->whereColumn('pengajuan_id', 'tb_hasil_surat_ttd_rt.pengajuan_id');
         })
         ->where(function ($query) use ($idRwLogin) {
-            // Filter pengajuanSurat biasa yang relasi warga->rt->rw_id = $idRwLogin
-            $query->whereHas('pengajuanSurat.warga.rt', function ($q) use ($idRwLogin) {
-                $q->where('rw_id', $idRwLogin);
+            $query->whereHas('pengajuanSurat', function ($q) use ($idRwLogin) {
+                $q->where('status_rw', '!=', 'ditolak') // pengecualian untuk yang ditolak
+                ->whereHas('warga.rt', function ($sub) use ($idRwLogin) {
+                    $sub->where('rw_id', $idRwLogin);
+                });
             })
-            // Atau filter pengajuanSuratLain yang relasi warga->rt->rw_id = $idRwLogin
-            ->orWhereHas('pengajuanSuratLain.warga.rt', function ($q) use ($idRwLogin) {
-                $q->where('rw_id', $idRwLogin);
+            ->orWhereHas('pengajuanSuratLain', function ($q) use ($idRwLogin) {
+                $q->where('status_rw_pengajuan_lain', '!=', 'ditolak') // pengecualian juga
+                ->whereHas('warga.rt', function ($sub) use ($idRwLogin) {
+                    $sub->where('rw_id', $idRwLogin);
+                });
             });
         })
+
         ->with([
             'pengajuanSuratLain.warga.rt',
             'pengajuanSuratLain.warga.scan_Kk.alamat',
             'pengajuanSurat.warga.rt',
-            'pengajuanSurat.warga.scan_Kk.alamat'
+            'pengajuanSurat.warga.scan_Kk.alamat',
+            'pengajuanSurat.pengajuan.persyaratan',
         ])
         ->get();
 
-        return view('rw.manajemenSuratWarga', compact('profile_rw', 'surats'));
+        return view('rw.manajemenSuratWarga', compact('profile_rw', 'surats', 'ttdDigital', 'showModalUploadTtdRw'));
     }
 
 
-public function setujui(Request $request)
-{
-    Carbon::setLocale('id');
-    $pengajuanId = $request->pengajuan_id;
-    $jenis = $request->jenis;
+    public function setujui(Request $request)
+    {
+        Carbon::setLocale('id');
+        $pengajuanId = $request->pengajuan_id;
+        $jenis = $request->jenis;
 
-    $suratRt = HasilSuratTtdRt::where('pengajuan_id', $pengajuanId)
-                ->where('jenis', $jenis)
-                ->first();
+        $suratRt = HasilSuratTtdRt::where('pengajuan_id', $pengajuanId)
+                    ->where('jenis', $jenis)
+                    ->first();
 
-    if (!$suratRt) {
-        return back()->with('error', 'Surat dari RT belum tersedia.');
-    }
+        if (!$suratRt) {
+            return back()->with('error', 'Surat dari RT belum tersedia.');
+        }
 
-    if ($jenis === 'biasa') {
-        $pengajuan = PengajuanSurat::with(['warga.rt.rw', 'warga.scan_KK.alamat', 'tujuanSurat'])->find($pengajuanId);
-    } else {
-        $pengajuan = PengajuanSuratLain::with(['warga.rt.rw', 'warga.scan_KK.alamat'])->find($pengajuanId);
-    }
+        if ($jenis === 'biasa') {
+            $pengajuan = PengajuanSurat::with(['warga.rt.rw', 'warga.scan_KK.alamat', 'tujuanSurat'])->find($pengajuanId);
+        } else {
+            $pengajuan = PengajuanSuratLain::with(['warga.rt.rw', 'warga.scan_KK.alamat'])->find($pengajuanId);
+        }
 
-    if (!$pengajuan) {
-        return back()->with('error', 'Data pengajuan tidak ditemukan.');
-    }
+        if (!$pengajuan) {
+            return back()->with('error', 'Data pengajuan tidak ditemukan.');
+        }
 
-    $rt = $pengajuan->warga->rt;
-    $rw = $rt->rw;
+        // Update status RW pada tabel pengajuan
+        if ($jenis === 'biasa') {
+            $pengajuan->status_rw = 'disetujui';
+            $pengajuan->waktu_persetujuan_rw = now();
+        } else {
+            $pengajuan->status_rw_pengajuan_lain = 'disetujui';
+            $pengajuan->waktu_persetujuan_rw_pengajuan_lain = now();
+        }
+        $pengajuan->save();
 
-    $nomorSurat = ($jenis === 'biasa')
-        ? ($pengajuan->tujuanSurat->nomor_surat ?? '-')
-        : ($pengajuan->nomor_surat_pengajuan_lain ?? '-');
+        $rt = $pengajuan->warga->rt;
+        $rw = $rt->rw;
 
-    $tujuan = ($jenis === 'biasa')
-        ? ($pengajuan->tujuanSurat->nama_tujuan ?? '-')
-        : ($pengajuan->tujuan_manual ?? '-');
+        $nomorSurat = ($jenis === 'biasa')
+            ? ($pengajuan->tujuanSurat->nomor_surat ?? '-')
+            : ($pengajuan->nomor_surat_pengajuan_lain ?? '-');
 
-    $nik = $pengajuan->warga->nik;
-    $maskedNIK = substr($nik, 0, 6) . '******' . substr($nik, -4);
+        $tujuan = ($jenis === 'biasa')
+            ? ($pengajuan->tujuanSurat->nama_tujuan ?? '-')
+            : ($pengajuan->tujuan_manual ?? '-');
 
-    $token = Str::random(40);
-    $verificationUrl = route('verifikasi.surat', ['token' => $token]);
+        $nik = $pengajuan->warga->nik;
+        $maskedNIK = substr($nik, 0, 6) . '******' . substr($nik, -4);
 
-    $qrContent = "SURAT|"
-        . "NS:" . $nomorSurat . "|"
-        . "TUJUAN:" . strtoupper($tujuan) . "|"
-        . "NIK:" . $maskedNIK . "|"
-        . "NAMA:" . strtoupper($pengajuan->warga->nama_lengkap) . "|"
-        . "TGL:" . Carbon::now()->translatedFormat('d F Y') . "|"
-        . "VERIF_URL:" . $verificationUrl;
+        $token = Str::random(40);
+        $verificationUrl = route('verifikasi.surat', ['token' => $token]);
 
-    $qrPng = QrCode::format('png')->size(300)->generate($qrContent);
-    $qrBase64 = 'data:image/png;base64,' . base64_encode($qrPng);
+        $qrContent = "SURAT|"
+            . "NS:" . $nomorSurat . "|"
+            . "TUJUAN:" . strtoupper($tujuan) . "|"
+            . "NIK:" . $maskedNIK . "|"
+            . "NAMA:" . strtoupper($pengajuan->warga->nama_lengkap) . "|"
+            . "TGL:" . Carbon::now()->translatedFormat('d F Y') . "|"
+            . "VERIF_URL:" . $verificationUrl;
 
-    $ttdRwBase64 = base64_encode(file_get_contents(Storage::path($rw->ttd_digital_bersih)));
-    $ttdRtBase64 = base64_encode(file_get_contents(Storage::path($rt->ttd_digital_bersih)));
+        $qrPng = QrCode::format('png')->size(300)->generate($qrContent);
+        $qrBase64 = 'data:image/png;base64,' . base64_encode($qrPng);
 
-    $waktuTtd = now();
+        $ttdRwBase64 = base64_encode(file_get_contents(Storage::path($rw->ttd_digital_bersih)));
+        $ttdRtBase64 = base64_encode(file_get_contents(Storage::path($rt->ttd_digital_bersih)));
 
-    // Generate sementara untuk hash
-    $tempPdf = Pdf::loadView('rw.suratPengantarRw', [
-        'pengajuan' => $pengajuan,
-        'rt' => $rt,
-        'rw' => $rw,
-        'ttd_rt' => $ttdRtBase64,
-        'ttd_rw' => $ttdRwBase64,
-        'jenis' => $jenis,
-        'tanggal_disetujui_rw' => $waktuTtd,
-        'qr_code_base64' => $qrBase64,
-        'hash_dokumen' => '',
-        'waktuTtd' => $waktuTtd,
-    ])->setPaper('a4');
+        $waktuTtd = now();
 
-    $pdfContent = $tempPdf->output();
-    $hashDokumen = hash('sha256', $pdfContent);
-
-    // Final PDF dengan hash aktual
-    $finalPdf = Pdf::loadView('rw.suratPengantarRw', [
-        'pengajuan' => $pengajuan,
-        'rt' => $rt,
-        'rw' => $rw,
-        'ttd_rt' => $ttdRtBase64,
-        'ttd_rw' => $ttdRwBase64,
-        'jenis' => $jenis,
-        'tanggal_disetujui_rw' => $waktuTtd,
-        'qr_code_base64' => $qrBase64,
-        'hash_dokumen' => $hashDokumen,
-        'waktuTtd' => $waktuTtd,
-    ])->setPaper('a4');
-
-    $pdfContentFinal = $finalPdf->output();
-
-    $filename = 'surat-ttd-rtrw-' . $pengajuan->id . '-' . str_replace(' ', '-', strtolower($pengajuan->warga->nama_lengkap)) . '-' . time() . '.pdf';
-    $filepath = 'public/hasil_surat/ttd_rw/' . $filename;
-
-    Storage::put($filepath, $pdfContentFinal);
-
-    HasilSuratTtdRw::updateOrCreate(
-        [
+        // Generate sementara untuk hash
+        $tempPdf = Pdf::loadView('rw.suratPengantarRw', [
+            'pengajuan' => $pengajuan,
+            'rt' => $rt,
+            'rw' => $rw,
+            'ttd_rt' => $ttdRtBase64,
+            'ttd_rw' => $ttdRwBase64,
             'jenis' => $jenis,
-            'pengajuan_id' => $pengajuanId,
-        ],
-        [
-            'file_surat' => $filepath,
-            'token' => $token,
+            'tanggal_disetujui_rw' => $waktuTtd,
+            'qr_code_base64' => $qrBase64,
+            'hash_dokumen' => '',
+            'waktuTtd' => $waktuTtd,
+        ])->setPaper('a4');
+
+        $pdfContent = $tempPdf->output();
+        $hashDokumen = hash('sha256', $pdfContent);
+
+        // Final PDF dengan hash aktual
+        $finalPdf = Pdf::loadView('rw.suratPengantarRw', [
+            'pengajuan' => $pengajuan,
+            'rt' => $rt,
+            'rw' => $rw,
+            'ttd_rt' => $ttdRtBase64,
+            'ttd_rw' => $ttdRwBase64,
+            'jenis' => $jenis,
+            'tanggal_disetujui_rw' => $waktuTtd,
+            'qr_code_base64' => $qrBase64,
             'hash_dokumen' => $hashDokumen,
-            'waktu_ttd' => $waktuTtd,
-        ]
-    );
+            'waktuTtd' => $waktuTtd,
+        ])->setPaper('a4');
 
-    if (!empty($pengajuan->warga->email)) {
-        Mail::to($pengajuan->warga->email)->send(new SuratDisetujuiRw($pengajuan));
+        $pdfContentFinal = $finalPdf->output();
+
+        $filename = 'surat-ttd-rtrw-' . $pengajuan->id . '-' . str_replace(' ', '-', strtolower($pengajuan->warga->nama_lengkap)) . '-' . time() . '.pdf';
+        $filepath = 'public/hasil_surat/ttd_rw/' . $filename;
+
+        Storage::put($filepath, $pdfContentFinal);
+
+        HasilSuratTtdRw::updateOrCreate(
+            [
+                'jenis' => $jenis,
+                'pengajuan_id' => $pengajuanId,
+            ],
+            [
+                'file_surat' => $filepath,
+                'token' => $token,
+                'hash_dokumen' => $hashDokumen,
+                'waktu_ttd' => $waktuTtd,
+            ]
+        );
+
+        if (!empty($pengajuan->warga->email)) {
+            Mail::to($pengajuan->warga->email)->send(new SuratDisetujuiRw($pengajuan));
+        }
+
+        if (!empty($rt->email_rt)) {
+            Mail::to($rt->email_rt)->send(new SuratDisetujuiRwUntukRt($pengajuan));
+        }
+
+        return back()->with('success', 'Surat berhasil disetujui RW.');
     }
 
-    if (!empty($rt->email_rt)) {
-        Mail::to($rt->email_rt)->send(new SuratDisetujuiRwUntukRt($pengajuan));
-    }
+    public function tolak(Request $request)
+    {
+        $pengajuanId = $request->pengajuan_id;
+        $jenis = $request->jenis;
+        $alasan = $request->alasan_penolakan;
 
-    return back()->with('success', 'Surat berhasil disetujui RW.');
-}
+        if ($jenis === 'biasa') {
+            $pengajuan = PengajuanSurat::with('warga.rt')->find($pengajuanId);
+            if ($pengajuan) {
+                $pengajuan->status_rw = 'ditolak';
+                $pengajuan->waktu_persetujuan_rw = now();
+                $pengajuan->alasan_penolakan_pengajuan = $alasan;
+                $pengajuan->save();
+
+                if (!empty($pengajuan->warga->email)) {
+                    Mail::to($pengajuan->warga->email)->send(new SuratDitolakRw($pengajuan));
+                }
+
+                if (!empty($pengajuan->warga->rt->email_rt)) {
+                    Mail::to($pengajuan->warga->rt->email_rt)->send(new SuratDitolakRwUntukRt($pengajuan));
+                }
+            }
+        } else {
+            $pengajuan = PengajuanSuratLain::with('warga.rt')->find($pengajuanId);
+            if ($pengajuan) {
+                $pengajuan->status_rw_pengajuan_lain = 'ditolak';
+                $pengajuan->waktu_persetujuan_rw_lain = now();
+                $pengajuan->alasan_penolakan_pengajuan_lain = $alasan;
+                $pengajuan->save();
+
+                if (!empty($pengajuan->warga->email)) {
+                    Mail::to($pengajuan->warga->email)->send(new SuratDitolakRw($pengajuan));
+                }
+
+                if (!empty($pengajuan->warga->rt->email_rt)) {
+                    Mail::to($pengajuan->warga->rt->email_rt)->send(new SuratDitolakRwUntukRt($pengajuan));
+                }
+            }
+        }
+
+        return back()->with('success', 'Pengajuan surat berhasil ditolak.');
+    }
 
 
     public function verifikasiSurat($token)
     {
+        $rw = Auth::guard('rw')->user();
+        $ttdDigital = $rw->ttd_digital;
+        $showModalUploadTtdRw = empty($ttdDigital);
         // Cari surat berdasarkan token
         $hasilSurat = HasilSuratTtdRw::where('token', $token)->first();
 
@@ -210,6 +278,6 @@ public function setujui(Request $request)
         $tanggal_disetujui_rw = $hasilSurat->created_at;
 
         // Tampilkan view verifikasi dengan data surat
-        return view('rw.verifikasiSurat', compact('hasilSurat', 'pengajuan', 'rt', 'rw', 'ttd_rt', 'ttd_rw', 'tanggal_disetujui_rw'));
+        return view('rw.verifikasiSurat', compact('hasilSurat', 'pengajuan', 'rt', 'rw', 'ttd_rt', 'ttd_rw', 'tanggal_disetujui_rw', 'showModalUploadTtdRw'));
     }
 }

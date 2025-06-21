@@ -88,7 +88,35 @@
                     </ul>
                 </div>
             @endif
-            <form x-ref="form" method="POST" action="{{ route('formPengajuanSuratStore') }}">
+            @php
+                $persyaratanByStatus = [];
+
+                foreach ($persyaratanList as $item) {
+                    $key = strtolower(trim($item->keterangan)); // cukup lowercase saja
+                    $persyaratanByStatus[$key][] = [
+                        'id' => $item->id,
+                        'nama' => $item->nama_persyaratan,
+                    ];
+                }
+            @endphp
+
+            <form
+                x-data="{
+                    status: '',
+                    allPersyaratan: {{ Js::from($persyaratanByStatus) }},
+                    get isGeneral() {
+                        // jika semua kunci adalah string kosong atau hanya satu entri
+                        return Object.keys(this.allPersyaratan).length === 1 && Object.keys(this.allPersyaratan)[0] === '';
+                    },
+                    get filteredPersyaratan() {
+                        return this.isGeneral ? this.allPersyaratan[''] : (this.allPersyaratan[this.status] || []);
+                    }
+                }"
+                x-ref="form"
+                method="POST"
+                action="{{ route('formPengajuanSuratStore') }}"
+                enctype="multipart/form-data"
+            >
                 @csrf
                 <input type="hidden" name="tujuan_surat_id" value="{{ request()->query('id') }}">
                 <input type="hidden" name="scan_kk_id" value="{{ $warga->scan_Kk?->id_scan }}">
@@ -129,7 +157,11 @@
                             Status Perkawinan<span class="ml-1">:</span>
                         </p>
                         <p class="pl-2">
-                            <select name="status_perkawinan" required class="border border-gray-300 px-3 py-1 rounded w-full sm:w-[19rem] max-w-sm">
+                            <select
+                                name="status_perkawinan"
+                                required
+                                class="border border-gray-300 px-3 py-1 rounded w-full sm:w-[19rem] max-w-sm"
+                                x-model="status">
                                 <option value="">-- Pilih Status --</option>
                                 <option value="kawin">Kawin</option>
                                 <option value="belum">Belum</option>
@@ -138,6 +170,23 @@
                             </select>
                         </p>
                     </div>
+                    <div class="flex flex-col sm:flex-row sm:items-center mb-2"
+                        x-show="(isGeneral && filteredPersyaratan.length > 0) || filteredPersyaratan.length > 0">
+                        <p class="text-sm text-gray-700 font-semibold">Dokumen yang harus dilengkapi:</p>
+                        <ul class="list-disc pl-6 text-sm text-gray-800 space-y-4">
+                            <template x-for="(item, index) in filteredPersyaratan" :key="item.id">
+                                <li>
+                                    <p class="font-medium" x-text="item.nama"></p>
+                                    <input type="hidden" :name="`persyaratan_surat_id[]`" :value="item.id">
+                                    <input :name="`dokumen[${item.id}]`" type="file" required
+                                        class="border border-gray-300 px-3 py-1 rounded w-full sm:w-[19rem] max-w-sm" />
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+                    <p class="text-sm text-red-600 italic mb-2" x-show="isGeneral">
+                            Dokumen di atas ini wajib diisi tanpa memandang status perkawinan.
+                        </p>
                     <div class="flex flex-col sm:flex-row sm:items-center mb-2">
                         <p class="w-full sm:w-52 font-semibold flex whitespace-nowrap mr-5">
                             Agama<span class="ml-1">:</span>

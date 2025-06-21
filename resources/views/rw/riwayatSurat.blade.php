@@ -33,73 +33,159 @@
                     <th class="px-4 py-2">Jenis Surat</th>
                     <th class="px-4 py-2">Tujuan Surat</th>
                     <th class="px-4 py-2">Nomor Surat</th>
-                    <th class="px-4 py-2">Tanggal Disetujui</th>
+                    <th class="px-4 py-2">Tanggal Disetujui / Ditolak</th>
+                    <th class="px-4 py-2">Status Surat</th>
+                    <th class="px-4 py-2">Alasan Ditolak</th>
+                    <th class="px-4 py-2">Dokumen Persyaratan</th>
                     <th class="px-4 py-2">Hasil Surat</th>
                 </tr>
             </thead>
-            <tbody>
-                @if($hasilSurat->isEmpty())
-                    <tr>
-                        <td colspan="7" class="text-center text-gray-500 py-4">
-                            Belum ada surat yang disetujui dan tersimpan.
-                        </td>
-                    </tr>
-                @else
-                    @php $no = 1; @endphp
-                    @foreach($hasilSurat as $item)
-                    <tr>
-                        <td class="px-4 py-2">{{ $no++ }}</td>
-                        <td class="px-4 py-2">
-                            @if($item->jenis === 'biasa')
-                                {{ $item->pengajuanSurat->warga->nama_lengkap ?? '-' }}
-                            @else
-                                {{ $item->pengajuanSuratLain->warga->nama_lengkap ?? '-' }}
-                            @endif
-                        </td>
-                        <td class="px-4 py-2">
-                            {{ ucfirst($item->jenis) }}
-                        </td>
-                        <td class="px-4 py-2">
-                            @if($item->jenis === 'biasa')
-                                {{ $item->pengajuanSurat->tujuanSurat->nama_tujuan ?? '-' }}
-                            @else
-                                {{ $item->pengajuanSuratLain->tujuan_manual ?? '-' }}
-                            @endif
-                        </td>
-                        <td class="px-4 py-2">
-                            @if($item->jenis === 'biasa')
-                                {{ $item->pengajuanSurat->tujuanSurat->nomor_surat ?? '-' }}
-                            @else
-                                {{ $item->pengajuanSuratLain->nomor_surat_pengajuan_lain ?? '-' }}
-                            @endif
-                        </td>
-                        <td class="px-4 py-2">
-                            @if($item->jenis === 'biasa')
-                                {{ $item->pengajuanSurat->updated_at->translatedFormat('d F Y') ?? '-' }}
-                            @else
-                                {{ $item->pengajuanSuratLain->updated_at->translatedFormat('d F Y') ?? '-' }}
-                            @endif
-                        </td>
-                        <td class="px-4 py-2">
-                            @if($item->file_surat && \Illuminate\Support\Facades\Storage::exists($item->file_surat))
-                                <button class="btn btn-info lihat-surat px-3 py-1 bg-yellow-500 text-white font-semibold rounded" data-id="{{ $item->id_hasil_surat_ttd_rw }}">
-                                    Lihat Surat
-                                </button>
-                            @else
-                                <p class="font-semibold">Tidak Ada</p>
-                            @endif
-                        </td>
-                    </tr>
+<tbody>
+    @php $no = 1; @endphp
+
+    {{-- Tampilkan surat yang disetujui --}}
+    @foreach($hasilSuratDisetujui as $item)
+    <tr>
+        <td class="px-4 py-2">{{ $no++ }}</td>
+        <td class="px-4 py-2">
+            @if($item->jenis === 'biasa')
+                {{ $item->pengajuanSurat->warga->nama_lengkap ?? '-' }}
+            @else
+                {{ $item->pengajuanSuratLain->warga->nama_lengkap ?? '-' }}
+            @endif
+        </td>
+        <td class="px-4 py-2">{{ ucfirst($item->jenis) }}</td>
+        <td class="px-4 py-2">
+            @if($item->jenis === 'biasa')
+                {{ $item->pengajuanSurat->tujuanSurat->nama_tujuan ?? '-' }}
+            @else
+                {{ $item->pengajuanSuratLain->tujuan_manual ?? '-' }}
+            @endif
+        </td>
+        <td class="px-4 py-2">
+            @if($item->jenis === 'biasa')
+                {{ $item->pengajuanSurat->tujuanSurat->nomor_surat ?? '-' }}
+            @else
+                {{ $item->pengajuanSuratLain->nomor_surat_pengajuan_lain ?? '-' }}
+            @endif
+        </td>
+        <td class="px-4 py-2">
+            @if($item->jenis === 'biasa')
+                {{ $item->pengajuanSurat && $item->pengajuanSurat->waktu_persetujuan_rw ? \Carbon\Carbon::parse($item->pengajuanSurat->waktu_persetujuan_rw)->translatedFormat('d F Y') : '-' }}
+            @else
+                {{ $item->pengajuanSuratLain && $item->pengajuanSuratLain->waktu_persetujuan_rw_pengajuan_lain ? \Carbon\Carbon::parse($item->pengajuanSuratLain->waktu_persetujuan_rw_pengajuan_lain)->translatedFormat('d F Y') : '-' }}
+            @endif
+        </td>
+        <td class="px-4 py-2">
+            @if($item->jenis === 'biasa')
+                {{ $item->pengajuanSurat->status_rw ?? '-' }}
+            @else
+                {{ $item->pengajuanSuratLain->status_rw_pengajuan_lain ?? '-' }}
+            @endif
+        </td>
+        <td class="px-4 py-2">
+            @if($item->jenis === 'biasa')
+                {{ $item->pengajuanSurat->alasan_penolakan_pengajuan ?? 'Tidak Ada' }}
+            @else
+                {{ $item->pengajuanSuratLain->alasan_penolakan_pengajuan_lain ?? 'Tidak Ada' }}
+            @endif
+        </td>
+        <td class="px-4 py-2">
+            @php
+                $isSuratBiasa = $item->jenis === 'biasa';
+                $pengajuan = $isSuratBiasa ? $item->pengajuanSurat : $item->pengajuanSuratLain;
+            @endphp
+            @if($isSuratBiasa && $pengajuan->pengajuan->isNotEmpty())
+                <ul class="list-disc pl-4">
+                    @foreach ($pengajuan->pengajuan as $dokumen)
+                        <li class="mb-2">
+                            <p class="text-sm text-gray-700 mb-1">
+                                {{ $dokumen->persyaratan->nama_persyaratan ?? 'Dokumen' }}
+                            </p>
+                            <img
+                                src="{{ asset('storage/' . str_replace('public/', '', $dokumen->dokumen)) }}"
+                                alt="Dokumen Persyaratan"
+                                class="w-32 cursor-pointer"
+                                onclick="showImageModal('{{ asset('storage/' . str_replace('public/', '', $dokumen->dokumen)) }}', '{{ $dokumen->persyaratan->nama_persyaratan }}')"
+                            />
+                        </li>
                     @endforeach
-                @endif
-            </tbody>
+                </ul>
+            @else
+                <span class="text-gray-400">Tidak ada dokumen</span>
+            @endif
+        </td>
+<td class="px-4 py-2">
+    @if(!empty($item->id_hasil_surat_ttd_rw))
+        <button
+            onclick="showHasilSuratModal('{{ route('rw.lihatHasilSurat', ['id' => $item->id_hasil_surat_ttd_rw]) }}')"
+            class="btn btn-info lihat-surat px-3 py-1 bg-yellow-500 text-white font-semibold rounded"
+        >
+            Lihat Surat
+        </button>
+    @else
+        <span class="text-gray-400">Surat tidak tersedia</span>
+    @endif
+</td>
+
+
+
+
+    </tr>
+    @endforeach
+
+    {{-- Tampilkan surat yang ditolak (jenis biasa) --}}
+    @foreach($pengajuanDitolakBiasa as $item)
+    <tr>
+        <td class="px-4 py-2">{{ $no++ }}</td>
+        <td class="px-4 py-2">{{ $item->warga->nama_lengkap ?? '-' }}</td>
+        <td class="px-4 py-2">Biasa</td>
+        <td class="px-4 py-2">{{ $item->tujuanSurat->nama_tujuan ?? '-' }}</td>
+        <td class="px-4 py-2">{{ $item->tujuanSurat->nomor_surat ?? '-' }}</td>
+        <td class="px-4 py-2">
+            {{ $item->waktu_persetujuan_rw ? \Carbon\Carbon::parse($item->waktu_persetujuan_rw)->translatedFormat('d F Y') : '-' }}
+        </td>
+        <td class="px-4 py-2 text-red-600 font-semibold">Ditolak</td>
+        <td class="px-4 py-2">{{ $item->alasan_penolakan_pengajuan ?? '-' }}</td>
+        <td class="px-4 py-2"><span class="text-gray-500 font-semibold">Tidak Ada</span></td>
+    </tr>
+    @endforeach
+
+    {{-- Tampilkan surat yang ditolak (jenis lain) --}}
+    @foreach($pengajuanDitolakLain as $item)
+    <tr>
+        <td class="px-4 py-2">{{ $no++ }}</td>
+        <td class="px-4 py-2">{{ $item->warga->nama_lengkap ?? '-' }}</td>
+        <td class="px-4 py-2">Lain</td>
+        <td class="px-4 py-2">{{ $item->tujuan_manual ?? '-' }}</td>
+        <td class="px-4 py-2">{{ $item->nomor_surat_pengajuan_lain ?? '-' }}</td>
+        <td class="px-4 py-2">
+            {{ $item->waktu_persetujuan_rw_pengajuan_lain ? \Carbon\Carbon::parse($item->waktu_persetujuan_rw_pengajuan_lain)->translatedFormat('d F Y') : '-' }}
+        </td>
+        <td class="px-4 py-2 text-red-600 font-semibold">Ditolak</td>
+        <td class="px-4 py-2">{{ $item->alasan_penolakan_pengajuan_lain ?? '-' }}</td>
+        <td class="px-4 py-2"><span class="text-gray-500 font-semibold">Tidak Ada</span></td>
+    </tr>
+    @endforeach
+
+    {{-- Jika semua kosong --}}
+    @if($hasilSuratDisetujui->isEmpty() && $pengajuanDitolakBiasa->isEmpty() && $pengajuanDitolakLain->isEmpty())
+    <tr>
+        <td colspan="9" class="text-center text-gray-500 py-4">
+            Belum ada surat yang disetujui atau ditolak.
+        </td>
+    </tr>
+    @endif
+</tbody>
+
         </table>
     </div>
 </div>
 
-<!-- Modal untuk lihat hasil surat -->
-<div id="modalHasilSurat" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
-    <div class="bg-white rounded-lg shadow-lg w-[80%] h-[90vh] flex flex-col">
+<!-- Modal Hasil Surat -->
+<div id="modalHasilSurat" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+                bg-white rounded-lg shadow-lg w-[80%] h-[90vh] flex flex-col">
         <div class="flex justify-between items-center p-4 border-b">
             <h3 class="text-lg font-semibold">Hasil Surat</h3>
             <button id="closeModal" class="text-gray-600 hover:text-gray-900 text-2xl leading-none">&times;</button>
@@ -111,28 +197,16 @@
 </div>
 
 <script>
-document.querySelectorAll('.lihat-surat').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        const idHasilSurat = this.getAttribute('data-id');
+    function showHasilSuratModal(url) {
         const iframe = document.getElementById('iframeHasilSurat');
-        const modal = document.getElementById('modalHasilSurat');
+        iframe.src = url;
+        document.getElementById('modalHasilSurat').classList.remove('hidden');
+    }
 
-        iframe.src = `/rw/surat/${idHasilSurat}/lihatRw`; // Sesuaikan route RW untuk lihat surat
-
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
+    document.getElementById('closeModal').addEventListener('click', function () {
+        document.getElementById('modalHasilSurat').classList.add('hidden');
+        document.getElementById('iframeHasilSurat').src = ''; // clear src saat modal ditutup
     });
-});
-
-document.getElementById('closeModal').addEventListener('click', () => {
-    const modal = document.getElementById('modalHasilSurat');
-    const iframe = document.getElementById('iframeHasilSurat');
-
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-
-    iframe.src = '';
-});
 </script>
+
 @endsection

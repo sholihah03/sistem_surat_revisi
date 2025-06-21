@@ -18,4 +18,10 @@ class TujuanSurat extends Model
         'nomor_surat',
         'status_populer'
     ];
+
+    public function persyaratan()
+    {
+        return $this->hasMany(PersyaratanSurat::class, 'tujuan_surat_id', 'id_tujuan_surat');
+    }
+
 }

@@ -73,4 +73,40 @@
         </svg>
         <span><strong>Info:</strong> Ada {{ $suratBelumTtdRwCount }} surat yang perlu ditandatangani hari ini!</span>
     </div>
+
+    @if ($showModalUploadTtdRw)
+        <!-- Modal Upload TTD Digital -->
+        <div id="modalUploadTtd" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+            <div class="relative bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+                <!-- Tombol Close -->
+                <button onclick="document.getElementById('modalUploadTtd').style.display='none'"
+                        class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-xl">
+                    &times;
+                </button>
+
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">Lengkapi Profil Anda</h2>
+                <p class="text-gray-600 mb-6">
+                    Anda belum mengunggah tanda tangan digital. Silakan lengkapi untuk melanjutkan proses administrasi surat.
+                </p>
+                <div class="flex justify-end">
+                    <a href="{{ route('profileRw') }}"
+                       class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                        Unggah Sekarang
+                    </a>
+                </div>
+            </div>
+        </div>
+    @endif
 @endsection
+@push('scripts')
+    @if ($showModalUploadTtdRw)
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const modal = document.getElementById('modalUploadTtd');
+                if (modal) {
+                    modal.style.display = 'flex'; // Tampilkan modal otomatis
+                }
+            });
+        </script>
+    @endif
+@endpush

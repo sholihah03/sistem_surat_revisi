@@ -38,13 +38,29 @@
                                     <a href="{{ route('historiSuratWarga') }}" class="text-blue-600 text-sm hover:underline">Lihat surat</a>
                                 @else
                                     @php
-                                        $status = $notif->status ?? $notif->status_pengajuan_lain ?? null;
-                                        $tujuan = $notif->tujuanSurat->nama_tujuan ?? ($notif->tujuan_manual ?? 'Surat Lain');
-                                        $statusText = $status === 'disetujui' ? 'disetujui' : 'ditolak';
+                                        $status_rt = $notif->status_rt ?? $notif->status_rt_pengajuan_lain ?? null;
+                                        $status_rw = $notif->status_rw ?? $notif->status_rw_pengajuan_lain ?? null;
+
+                                        $tujuan = $notif->tujuanSurat->nama_tujuan ?? ($notif->tujuan_manual ?? 'Surat');
+                                        $isDisetujuiRt = $status_rt === 'disetujui';
+                                        $isDitolakRt = $status_rt === 'ditolak';
+                                        $isDisetujuiRw = $status_rw === 'disetujui';
+                                        $isDitolakRw = $status_rw === 'ditolak';
                                     @endphp
                                     <p class="text-sm">
-                                        Surat pengajuan dengan tujuan <strong>{{ $tujuan }}</strong> telah
-                                        <span class="{{ $status === 'disetujui' ? 'text-green-600 font-bold' : 'text-red-600 font-bold' }}"> {{ $statusText }}</span> oleh RT
+                                        @if($isDisetujuiRw)
+                                            Surat pengajuan dengan tujuan <strong>{{ $tujuan }}</strong> telah
+                                            <span class="text-green-600 font-bold">selesai diproses</span> dan sudah dapat <strong>dilihat atau diunduh</strong>.
+                                        @elseif($isDitolakRw)
+                                            Surat pengajuan dengan tujuan <strong>{{ $tujuan }}</strong> telah
+                                            <span class="text-red-600 font-bold">ditolak oleh RW</span>
+                                        @elseif($isDisetujuiRt)
+                                            Surat pengajuan dengan tujuan <strong>{{ $tujuan }}</strong> telah
+                                            <span class="text-green-600 font-bold">disetujui oleh RT</span>
+                                        @elseif($isDitolakRt)
+                                            Surat pengajuan dengan tujuan <strong>{{ $tujuan }}</strong> telah
+                                            <span class="text-red-600 font-bold">ditolak oleh RT</span>
+                                        @endif
                                     </p>
                                     <p class="text-xs text-gray-500 mb-1">
                                         {{ $notif->created_at->diffForHumans() }}
@@ -112,7 +128,7 @@
                                         <a href="{{ route('historiSuratWarga') }}" class="text-blue-600 text-sm hover:underline">Lihat surat</a>
                                     @else
                                         @php
-                                            $status = $notif->status ?? $notif->status_pengajuan_lain ?? null;
+                                            $status = $notif->status_rt ?? $notif->status_rt_pengajuan_lain ?? null;
                                             $tujuan = $notif->tujuanSurat->nama_tujuan ?? ($notif->tujuan_manual ?? 'Surat Lain');
                                             $statusText = $status === 'disetujui' ? 'disetujui' : 'ditolak';
                                         @endphp

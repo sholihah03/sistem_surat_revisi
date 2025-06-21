@@ -124,53 +124,68 @@
                     @foreach ($pengajuanBiasa as $item)
                         <div class="flex items-start space-x-4">
                             <div class="w-1/12 h-2 mt-2 rounded-full {{
-                                $item->status === 'disetujui' ? 'bg-blue-500' :
-                                ($item->status === 'ditolak' ? 'bg-red-500' : 'bg-yellow-500') }}">
+                                $item->status_rw === 'disetujui' ? 'bg-blue-500' :
+                                ($item->status_rw === 'ditolak' ? 'bg-red-500' :
+                                ($item->status_rt === 'ditolak' ? 'bg-red-500' :
+                                ($item->status_rt === 'disetujui' ? 'bg-yellow-500' : 'bg-yellow-500'))) }}">
                             </div>
                             <div class="w-full">
                                 <h4 class="text-lg font-semibold text-gray-800">{{ $item->tujuanSurat->nama_tujuan ?? '-' }}</h4>
                                 <ul class="space-y-1 text-gray-700">
-                                <li>✅ Diserahkan ke RT: {{ $item->created_at->translatedFormat('d F Y') }}</li>
-                                @if ($item->status === 'disetujui')
-                                    <li>✅ RT Menyetujui: {{ $item->updated_at->translatedFormat('d F Y') }}</li>
-                                    <li>✅ Diserahkan ke RW: {{ $item->updated_at->translatedFormat('d F Y') }}</li>
-                                    @if ($item->disetujui_rw)
-                                        <li>✅ RW Menyetujui: {{ \Carbon\Carbon::parse($item->updated_at)->translatedFormat('d F Y') }}</li>
-                                    @else
-                                        <li>⏳ Menunggu Persetujuan RW</li>
+                                    <li>✅ Diserahkan ke RT: {{ $item->created_at->translatedFormat('d F Y') }}</li>
+
+                                    @if ($item->status_rt === 'disetujui')
+                                        <li>✅ RT Menyetujui: {{ $item->waktu_persetujuan_rt ? $item->waktu_persetujuan_rt->translatedFormat('d F Y') : '-' }}</li>
+
+                                        @if (is_null($item->status_rw))
+                                            <li>⏳ Menunggu Persetujuan RW</li>
+                                        @elseif ($item->status_rw === 'disetujui')
+                                            <li>✅ RW Menyetujui: {{ $item->waktu_persetujuan_rw ? $item->waktu_persetujuan_rw->translatedFormat('d F Y') : '-' }}</li>
+                                        @elseif ($item->status_rw === 'ditolak')
+                                            <li>❌ Ditolak oleh RW: {{ $item->waktu_persetujuan_rw ? $item->waktu_persetujuan_rw->translatedFormat('d F Y') : '-' }}</li>
+                                            <li class="text-red-600 font-semibold">Alasan: {{ $item->alasan_penolakan_pengajuan ?? '-' }}</li>
+                                        @endif
+
+                                    @elseif ($item->status_rt === 'ditolak')
+                                        <li>❌ Ditolak oleh RT: {{ $item->waktu_persetujuan_rt ? $item->waktu_persetujuan_rt->translatedFormat('d F Y') : '-' }}</li>
+                                        <li class="text-red-600 font-semibold">Alasan: {{ $item->alasan_penolakan_pengajuan ?? '-' }}</li>
                                     @endif
-                                @elseif ($item->status === 'ditolak')
-                                    <li>❌ Ditolak oleh RT pada {{ $item->created_at->translatedFormat('d F Y') }}</li>
-                                    <li class="text-red-600 font-semibold">Alasan: {{ $item->alasan_penolakan_pengajuan }}</li>
-                                @endif
                                 </ul>
                             </div>
                         </div>
                     @endforeach
 
+
                     {{-- Pengajuan Lain --}}
                     @foreach ($pengajuanLain as $itemLain)
                         <div class="flex items-start space-x-4">
                             <div class="w-1/12 h-2 mt-2 rounded-full {{
-                                $itemLain->status_pengajuan_lain === 'disetujui' ? 'bg-blue-500' :
-                                ($itemLain->status_pengajuan_lain === 'ditolak' ? 'bg-red-500' : 'bg-yellow-500') }}">
+                                $itemLain->status_rw_pengajuan_lain === 'disetujui' ? 'bg-blue-500' :
+                                ($itemLain->status_rw_pengajuan_lain === 'ditolak' ? 'bg-red-500' :
+                                ($itemLain->status_rt_pengajuan_lain === 'ditolak' ? 'bg-red-500' :
+                                ($itemLain->status_rt_pengajuan_lain === 'disetujui' ? 'bg-yellow-500' : 'bg-yellow-500'))) }}">
                             </div>
                             <div class="w-full">
                                 <h4 class="text-lg font-semibold text-gray-800">{{ $itemLain->tujuan_manual }}</h4>
                                 <ul class="space-y-1 text-gray-700">
-                                <li>✅ Diserahkan ke RT: {{ $itemLain->created_at->translatedFormat('d F Y') }}</li>
-                                @if ($itemLain->status_pengajuan_lain === 'disetujui')
-                                    <li>✅ RT Menyetujui: {{ $itemLain->updated_at->translatedFormat('d F Y') }}</li>
-                                    <li>✅ Diserahkan ke RW: {{ $itemLain->updated_at->translatedFormat('d F Y') }}</li>
-                                    @if ($itemLain->disetujui_rw)
-                                        <li>✅ RW Menyetujui: {{ \Carbon\Carbon::parse($itemLain->updated_at)->translatedFormat('d F Y') }}</li>
-                                    @else
-                                        <li>⏳ Menunggu Persetujuan RW</li>
+                                    <li>✅ Diserahkan ke RT: {{ $itemLain->created_at->translatedFormat('d F Y') }}</li>
+
+                                    @if ($itemLain->status_rt_pengajuan_lain === 'disetujui')
+                                        <li>✅ RT Menyetujui: {{ optional($itemLain->waktu_persetujuan_rt_lain)->translatedFormat('d F Y') }}</li>
+
+                                        @if (is_null($itemLain->status_rw_pengajuan_lain))
+                                            <li>⏳ Menunggu Persetujuan RW</li>
+                                        @elseif ($itemLain->status_rw_pengajuan_lain === 'disetujui')
+                                            <li>✅ RW Menyetujui: {{ optional($itemLain->waktu_persetujuan_rw_lain)->translatedFormat('d F Y') }}</li>
+                                        @elseif ($itemLain->status_rw_pengajuan_lain === 'ditolak')
+                                            <li>❌ Ditolak oleh RW: {{ optional($itemLain->waktu_persetujuan_rw_lain)->translatedFormat('d F Y') }}</li>
+                                            <li class="text-red-600 font-semibold">Alasan: {{ $itemLain->alasan_penolakan_pengajuan_lain ?? '-' }}</li>
+                                        @endif
+
+                                    @elseif ($itemLain->status_rt_pengajuan_lain === 'ditolak')
+                                        <li>❌ Ditolak oleh RT: {{ optional($itemLain->waktu_persetujuan_rt_lain)->translatedFormat('d F Y') }}</li>
+                                        <li class="text-red-600 font-semibold">Alasan: {{ $itemLain->alasan_penolakan_pengajuan_lain ?? '-' }}</li>
                                     @endif
-                                @elseif ($itemLain->status_pengajuan_lain === 'ditolak')
-                                    <li>❌ Ditolak oleh RT</li>
-                                    <li class="text-red-600 font-semibold">Alasan: {{ $itemLain->alasan_penolakan_pengajuan_lain }}</li>
-                                @endif
                                 </ul>
                             </div>
                         </div>

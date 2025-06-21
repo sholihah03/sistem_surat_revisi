@@ -13,9 +13,13 @@ class ManajemenAkunRtController extends Controller
 {
     public function index(Request $request)
     {
+        $rw = Auth::guard('rw')->user();
         $profile_rw = Auth::guard('rw')->user()->profile_rw;
         $no_rw = Auth::guard('rw')->user()->no_rw;
         $query = Rt::query();
+        $ttdDigital = $rw->ttd_digital;
+
+        $showModalUploadTtdRw = empty($ttdDigital);
 
         if ($request->has('search')) {
             $search = $request->search;
@@ -25,7 +29,36 @@ class ManajemenAkunRtController extends Controller
 
         $rts = $query->get();
 
-        return view('rw.manajemenAkunRt', compact('rts', 'profile_rw', 'no_rw'));
+        return view('rw.manajemenAkunRt', compact('rts', 'profile_rw', 'no_rw', 'ttdDigital', 'showModalUploadTtdRw'));
+    }
+
+    public function akunIndex(Request $request)
+    {
+        $rw = Auth::guard('rw')->user();
+        $rwId = $rw->id_rw;
+        $no_rw = $rw->no_rw;
+
+        $ttdDigital = $rw->ttd_digital;
+        $showModalUploadTtdRw = empty($ttdDigital);
+
+        $search = $request->input('search');
+
+        $rtQuery = Rt::with('wargas') // eager load relasi warga
+            ->where('rw_id', $rwId);
+
+        if ($search) {
+            $rtQuery->where(function ($q) use ($search) {
+                $q->where('no_rt', 'like', "%$search%")
+                ->orWhere('nama_lengkap_rt', 'like', "%$search%")
+                ->orWhereHas('wargas', function ($w) use ($search) {
+                    $w->where('nama_lengkap', 'like', "%$search%");
+                });
+            });
+        }
+
+        $rtList = $rtQuery->get();
+
+        return view('rw.akunRT', compact('rtList', 'no_rw', 'ttdDigital', 'showModalUploadTtdRw'));
     }
 
 

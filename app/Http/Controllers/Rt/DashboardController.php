@@ -56,7 +56,7 @@ class DashboardController extends Controller
         $jumlahDisetujui1 = PengajuanSurat::whereHas('warga', function ($query) use ($rtId) {
             $query->where('rt_id', $rtId);
         })
-        ->where('status', 'disetujui')
+        ->where('status_rt', 'disetujui')
         ->whereMonth('created_at', $bulanIni)
         ->whereYear('created_at', $tahunIni)
         ->count();
@@ -65,7 +65,7 @@ class DashboardController extends Controller
         $jumlahDisetujui2 = PengajuanSuratLain::whereHas('warga', function ($query) use ($rtId) {
             $query->where('rt_id', $rtId);
         })
-        ->where('status_pengajuan_lain', 'disetujui')
+        ->where('status_rt_pengajuan_lain', 'disetujui')
         ->whereMonth('created_at', $bulanIni)
         ->whereYear('created_at', $tahunIni)
         ->count();

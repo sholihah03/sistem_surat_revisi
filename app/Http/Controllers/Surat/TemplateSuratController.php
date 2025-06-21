@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers\Surat;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class TemplateSuratController extends Controller
 {
     public function index(){
-        return view('surat.tempalteSuratPengantar');
+        $rw = Auth::guard('rw')->user();
+        $ttdDigital = $rw->ttd_digital;
+        $showModalUploadTtdRw = empty($ttdDigital);
+
+        return view('surat.tempalteSuratPengantar', compact('ttdDigital', 'showModalUploadTtdRw'));
     }
 }

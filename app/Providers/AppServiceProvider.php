@@ -33,8 +33,8 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer('*', function ($view) {
             $pendingCount = ScanKK::where('status_verifikasi', 'pending')->count();
-            $pendingSuratCount = PengajuanSurat::where('status', 'menunggu')->count();
-            $pendingSuratLainCount = PengajuanSuratLain::where('status_pengajuan_lain', 'menunggu')
+            $pendingSuratCount = PengajuanSurat::where('status_rt', 'menunggu')->count();
+            $pendingSuratLainCount = PengajuanSuratLain::where('status_rt_pengajuan_lain', 'menunggu')
             ->count();
 
             $totalNotif = $pendingCount + $pendingSuratCount + $pendingSuratLainCount;
@@ -53,7 +53,10 @@ class AppServiceProvider extends ServiceProvider
 
                 // Notifikasi belum dibaca (untuk badge dan dropdown atas)
                 $notifikasiBiasa = PengajuanSurat::with('warga')
-                    ->whereIn('status', ['disetujui', 'ditolak'])
+                    ->where(function ($q) {
+                        $q->whereIn('status_rt', ['disetujui', 'ditolak'])
+                        ->orWhereIn('status_rw', ['disetujui', 'ditolak']);
+                    })
                     ->where('warga_id', $warga->id_warga)
                     ->where('is_read', false)
                     ->orderBy('updated_at', 'desc')
@@ -61,7 +64,10 @@ class AppServiceProvider extends ServiceProvider
                     ->get();
 
                 $notifikasiLain = PengajuanSuratLain::with('warga')
-                    ->whereIn('status_pengajuan_lain', ['disetujui', 'ditolak'])
+                    ->where(function ($q) {
+                        $q->whereIn('status_rt_pengajuan_lain', ['disetujui', 'ditolak'])
+                        ->orWhereIn('status_rw_pengajuan_lain', ['disetujui', 'ditolak']);
+                    })
                     ->where('warga_id', $warga->id_warga)
                     ->where('is_read', false)
                     ->orderBy('updated_at', 'desc')
@@ -86,14 +92,20 @@ class AppServiceProvider extends ServiceProvider
 
                 // Semua notifikasi terbaru (untuk isi dropdown)
                 $notifikasiBiasaAll = PengajuanSurat::with('warga')
-                    ->whereIn('status', ['disetujui', 'ditolak'])
+                    ->where(function ($q) {
+                        $q->whereIn('status_rt', ['disetujui', 'ditolak'])
+                        ->orWhereIn('status_rw', ['disetujui', 'ditolak']);
+                    })
                     ->where('warga_id', $warga->id_warga)
                     ->orderBy('updated_at', 'desc')
                     ->take(5)
                     ->get();
 
                 $notifikasiLainAll = PengajuanSuratLain::with('warga')
-                    ->whereIn('status_pengajuan_lain', ['disetujui', 'ditolak'])
+                    ->where(function ($q) {
+                        $q->whereIn('status_rt_pengajuan_lain', ['disetujui', 'ditolak'])
+                        ->orWhereIn('status_rw_pengajuan_lain', ['disetujui', 'ditolak']);
+                    })
                     ->where('warga_id', $warga->id_warga)
                     ->orderBy('updated_at', 'desc')
                     ->take(5)
@@ -118,11 +130,17 @@ class AppServiceProvider extends ServiceProvider
                 $totalNotifBaru =
                 PengajuanSurat::where('warga_id', $warga->id_warga)
                     ->where('is_read', false)
-                    ->whereIn('status', ['disetujui', 'ditolak'])
+                    ->where(function ($q) {
+                        $q->whereIn('status_rt', ['disetujui', 'ditolak'])
+                        ->orWhereIn('status_rw', ['disetujui', 'ditolak']);
+                    })
                     ->count()
                 + PengajuanSuratLain::where('warga_id', $warga->id_warga)
                     ->where('is_read', false)
-                    ->whereIn('status_pengajuan_lain', ['disetujui', 'ditolak'])
+                    ->where(function ($q) {
+                        $q->whereIn('status_rt_pengajuan_lain', ['disetujui', 'ditolak'])
+                        ->orWhereIn('status_rw_pengajuan_lain', ['disetujui', 'ditolak']);
+                    })
                     ->count()
                 + HasilSuratTtdRw::where(function ($query) use ($warga) {
                     $query->whereHas('pengajuanSurat', function ($q) use ($warga) {
@@ -152,14 +170,14 @@ class AppServiceProvider extends ServiceProvider
                 ->pluck('pengajuan_id')->toArray();
 
             $pengajuanSuratBaru = PengajuanSurat::with(['warga.rt'])
-                ->where('status', 'disetujui')
+                ->where('status_rt', 'disetujui')
                 ->whereNotIn('id_pengajuan_surat', $pengajuanSuratDisetujuiIds)
                 ->orderBy('updated_at', 'desc')
                 ->take(5)
                 ->get();
 
             $pengajuanSuratLainBaru = PengajuanSuratLain::with(['warga.rt'])
-                ->where('status_pengajuan_lain', 'disetujui')
+                ->where('status_rt_pengajuan_lain', 'disetujui')
                 ->whereNotIn('id_pengajuan_surat_lain', $pengajuanSuratLainDisetujuiIds)
                 ->orderBy('updated_at', 'desc')
                 ->take(5)

@@ -24,6 +24,7 @@
                     <th class="p-3">Pekerjaan</th>
                     <th class="p-3">Alamat</th>
                     <th class="p-3">Status</th>
+                    <th class="p-3">Dokumen Persyaratan</th>
                     <th class="p-3">Aksi</th>
                 </tr>
             </thead>
@@ -49,7 +50,28 @@
                         <td class="p-3">{{ $surat->agama }}</td>
                         <td class="p-3">{{ $surat->pekerjaan }}</td>
                         <td class="p-3">{{ $surat->warga->scan_kk->alamat->nama_jalan }}</td>
-                        <td class="p-3">{{ ucfirst($surat->status) }}</td>
+                        <td class="p-3">{{ ucfirst($surat->status_rt) }}</td>
+                        <td class="p-3">
+                            @if(!empty($surat->pengajuan) && $surat->pengajuan->count() > 0)
+                                <ul class="list-disc pl-4">
+                                    @foreach($surat->pengajuan as $dok)
+                                        <li class="mb-2">
+                                            <p class="text-sm text-gray-700 mb-1">
+                                                {{ $dok->persyaratan->nama_persyaratan ?? 'Dokumen' }}
+                                            </p>
+                                            <img
+                                                src="{{ asset('storage/' . str_replace('public/', '', $dok->dokumen)) }}"
+                                                alt="Dokumen Persyaratan"
+                                                class="w-32 cursor-pointer"
+                                                onclick="showImageModal('{{ asset('storage/' . str_replace('public/', '', $dok->dokumen)) }}', '{{ $dok->persyaratan->nama_persyaratan }}')"
+                                            />
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <span class="text-gray-400">Tidak ada dokumen</span>
+                            @endif
+                        </td>
                         <td class="p-3 flex gap-2">
                             <button onclick="showModal('setuju', {{ $surat->id_pengajuan_surat }}, 'biasa')" class="px-3 py-1 bg-green-500 text-white rounded">Setujui</button>
                             <button onclick="showModal('tolak', {{ $surat->id_pengajuan_surat }}, 'biasa')" class="px-3 py-1 bg-red-500 text-white rounded">Tolak</button>
@@ -69,7 +91,7 @@
                         <td class="p-3">{{ $surat->agama_pengaju_lain }}</td>
                         <td class="p-3">{{ $surat->pekerjaan_pengaju_lain }}</td>
                         <td class="p-3">{{ $surat->warga->scan_kk->alamat->nama_jalan }}</td>
-                        <td class="p-3">{{ ucfirst($surat->status_pengajuan_lain) }}</td>
+                        <td class="p-3">{{ ucfirst($surat->status_rt_pengajuan_lain) }}</td>
                         <td class="p-3 flex gap-2">
                             <button onclick="showModal('setuju', {{ $surat->id_pengajuan_surat_lain }}, 'lain')" class="px-3 py-1 bg-green-500 text-white rounded">Setujui</button>
                             <button onclick="showModal('tolak', {{ $surat->id_pengajuan_surat_lain }}, 'lain')" class="px-3 py-1 bg-red-500 text-white rounded">Tolak</button>
@@ -109,7 +131,29 @@
     </div>
 </div>
 
+<!-- Modal untuk melihat gambar dokumen -->
+<div id="imageModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white p-4 rounded-lg shadow-lg max-w-3xl w-full relative">
+        <button onclick="closeImageModal()" class="absolute top-2 right-2 text-gray-600 hover:text-red-500 text-xl font-bold">&times;</button>
+        <img id="modalImage" src="" alt="Preview Gambar" class="w-full max-h-[80vh] object-contain rounded">
+    </div>
+</div>
+
+
 <script>
+        let currentImageUrl = '';
+        function showImageModal(imageUrl) {
+            currentImageUrl = imageUrl;
+            document.getElementById('modalImage').src = imageUrl;
+            document.getElementById('imageModal').classList.remove('hidden');
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.add('hidden');
+            document.getElementById('modalImage').src = '';
+            currentImageUrl = '';
+        }
+
 function showModal(aksi, id, jenis) {
     if (aksi === 'setuju' && jenis === 'biasa') {
         // Buat form dinamis dan langsung submit

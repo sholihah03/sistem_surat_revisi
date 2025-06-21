@@ -55,6 +55,8 @@
                 <th class="px-4 py-2">Nama Tujuan</th>
                 <th class="px-4 py-2">Deskripsi</th>
                 <th class="px-4 py-2">Nomor Surat</th>
+                <th class="px-4 py-2">Persyaratan Surat</th>
+                <th class="px-4 py-2">Keterangan Status Perkawinan</th>
                 <th class="px-4 py-2">Populer</th>
                 <th class="px-4 py-2">Aksi</th>
             </tr>
@@ -67,11 +69,44 @@
                     <td class="px-4 py-2">{{ $tujuan->deskripsi }}</td>
                     <td class="px-4 py-2">{{ $tujuan->nomor_surat }}</td>
                     <td class="px-4 py-2">
+                        @if ($tujuan->persyaratan->isNotEmpty())
+                            <ul class="list-disc list-inside">
+                                @foreach ($tujuan->persyaratan as $item)
+                                    <li>{{ $item->nama_persyaratan }}</li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <span class="text-gray-500 italic">Tidak ada</span>
+                        @endif
+                    </td>
+                    <td class="px-4 py-2">
+                        @if ($tujuan->persyaratan->isNotEmpty())
+                            <ul class="list-disc list-inside">
+                                @foreach ($tujuan->persyaratan as $item)
+                                    <li>{{ $item->keterangan ?? '-' }}</li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <span class="text-gray-500 italic">Tidak ada</span>
+                        @endif
+                    </td>
+                    <td class="px-4 py-2">
                         {{ $tujuan->status_populer ? 'Populer' : 'Biasa' }}
                     </td>
                     <td class="px-4 py-2">
                         <div class="flex flex-wrap gap-2">
-                            <button onclick="openEditModal('{{ $tujuan->id_tujuan_surat }}', '{{ $tujuan->nama_tujuan }}', `{{ $tujuan->deskripsi }}`, '{{ $tujuan->nomor_surat }}', '{{ $tujuan->status_populer }}')" class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600">Edit</button>
+                            <button
+                            onclick='openEditModal(
+                                {{ $tujuan->id_tujuan_surat }},
+                                @json($tujuan->nama_tujuan),
+                                @json($tujuan->deskripsi),
+                                @json($tujuan->nomor_surat),
+                                {{ $tujuan->status_populer }},
+                                @json($tujuan->persyaratan->map(function ($p) {
+                                    return ['id' => $p->id_persyaratan_surat, 'nama' => $p->nama_persyaratan, 'keterangan' => $p->keterangan];
+                                }))
+                            )'
+                            class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600">Edit</button>
                             <button onclick="openDeleteModal('{{ $tujuan->id_tujuan_surat }}', '{{ $tujuan->nama_tujuan }}')" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Hapus</button>
                         </div>
                     </td>
@@ -95,7 +130,7 @@
 
 <!-- Modal Tambah -->
 <div id="addModal" class="fixed inset-0 bg-black bg-opacity-30 hidden justify-center items-center z-50">
-    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         <h2 class="text-lg font-semibold text-gray-800 mb-4">Tambah Tujuan Surat</h2>
         <form action="{{ route('tujuanSurat.store') }}" method="POST">
             @csrf
@@ -118,6 +153,25 @@
                     <option value="1">Populer</option>
                 </select>
             </div>
+
+            <!-- Persyaratan Dinamis -->
+            <div class="mb-4">
+                <label class="block mb-2 text-sm font-medium">Persyaratan Surat (Opsional)</label>
+                <div id="persyaratanWrapper" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    <div class="flex gap-2 mb-2">
+                        <input type="text" name="persyaratan[]" class="w-full border rounded px-3 py-2" placeholder="Masukkan persyaratan...">
+                        <select name="keterangan[]" class="w-full border rounded px-3 py-2">
+                            <option value="">Pilih status perkawinan</option>
+                            <option value="belum">Belum</option>
+                            <option value="kawin">Kawin</option>
+                            <option value="janda">Janda</option>
+                            <option value="duda">Duda</option>
+                        </select>
+                        <button type="button" onclick="addPersyaratan()" class="bg-blue-500 text-white px-3 rounded">+</button>
+                    </div>
+                </div>
+            </div>
+
             <div class="flex justify-end space-x-2">
                 <button type="button" onclick="closeAddModal()" class="text-gray-600 hover:text-gray-800">Batal</button>
                 <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Simpan</button>
@@ -126,12 +180,14 @@
     </div>
 </div>
 
+
 <!-- Modal Edit -->
 <div id="editModal" class="fixed inset-0 bg-black bg-opacity-30 hidden justify-center items-center z-50">
     <div class="bg-white rounded-lg p-6 w-full max-w-md">
         <h2 class="text-lg font-semibold text-gray-800 mb-4">Edit Tujuan Surat</h2>
         <form id="editForm" method="POST">
             @csrf
+            @method('PUT')
             <div class="mb-4">
                 <label class="block mb-1 text-sm font-medium">Nama Tujuan</label>
                 <input id="editNama" name="nama_tujuan" class="w-full border rounded px-3 py-2" required>
@@ -150,6 +206,13 @@
                     <option value="0">Biasa</option>
                     <option value="1">Populer</option>
                 </select>
+            </div>
+            <div class="mb-4">
+                <label class="block mb-1 text-sm font-medium">Persyaratan Surat</label>
+                <div id="editPersyaratanWrapper" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
+                <button type="button" onclick="addEditPersyaratan()" class="mt-2 text-sm text-blue-600 hover:underline">
+                    + Tambah Persyaratan
+                </button>
             </div>
             <div class="flex justify-end space-x-2">
                 <button type="button" onclick="closeEditModal()" class="text-gray-600 hover:text-gray-800">Batal</button>
@@ -183,7 +246,7 @@
         document.getElementById('addModal').classList.add('hidden');
     }
 
-    function openEditModal(id, nama, deskripsi, nomor, status_populer) {
+    function openEditModal(id, nama, deskripsi, nomor, status_populer, persyaratan = []) {
         const form = document.getElementById('editForm');
         form.action = `/rw/tujuanSurat/update/${id}`;
         document.getElementById('editNama').value = nama;
@@ -192,6 +255,42 @@
         document.getElementById('editStatusPopuler').value = status_populer;
         document.getElementById('editModal').classList.remove('hidden');
         document.getElementById('editModal').classList.add('flex');
+        document.getElementById('editPersyaratanWrapper').innerHTML = '';
+        persyaratan.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'flex gap-2 mb-2';
+            div.innerHTML = `
+                <input type="hidden" name="persyaratan_id[]" value="${item.id}">
+                <input type="text" name="persyaratan[]" value="${item.nama}" class="w-full border rounded px-3 py-2">
+                <select name="keterangan[]" class="w-full border rounded px-3 py-2">
+                    <option value="">Pilih status perkawinan</option>
+                    <option value="belum" ${item.keterangan === 'belum' ? 'selected' : ''}>Belum</option>
+                    <option value="kawin" ${item.keterangan === 'kawin' ? 'selected' : ''}>Kawin</option>
+                    <option value="janda" ${item.keterangan === 'janda' ? 'selected' : ''}>Janda</option>
+                    <option value="duda" ${item.keterangan === 'duda' ? 'selected' : ''}>Duda</option>
+                </select>
+                <button type="button" onclick="removePersyaratan(this)" class="bg-red-500 text-white px-3 rounded">-</button>
+            `;
+            document.getElementById('editPersyaratanWrapper').appendChild(div);
+        });
+    }
+
+    function addEditPersyaratan() {
+        const wrapper = document.getElementById('editPersyaratanWrapper');
+        const div = document.createElement('div');
+        div.className = 'flex gap-2 mb-2';
+        div.innerHTML = `
+            <input type="text" name="persyaratan[]" class="w-full border rounded px-3 py-2" placeholder="Masukkan persyaratan...">
+            <select name="keterangan[]" class="w-full border rounded px-3 py-2">
+                <option value="">Pilih status perkawinan</option>
+                <option value="belum">Belum</option>
+                <option value="kawin">Kawin</option>
+                <option value="janda">Janda</option>
+                <option value="duda">Duda</option>
+            </select>
+            <button type="button" onclick="removePersyaratan(this)" class="bg-red-500 text-white px-3 rounded">-</button>
+        `;
+        wrapper.appendChild(div);
     }
 
     function closeEditModal() {
@@ -216,5 +315,40 @@
         document.getElementById('deleteModal').classList.remove('flex');
         document.getElementById('deleteModal').classList.add('hidden');
     }
+
+    function addPersyaratan() {
+        const wrapper = document.getElementById('persyaratanWrapper');
+        const div = document.createElement('div');
+        div.className = 'flex gap-2 mb-2';
+
+        div.innerHTML = `
+            <input type="text" name="persyaratan[]" class="w-full border rounded px-3 py-2" placeholder="Masukkan persyaratan...">
+            <select name="keterangan[]" class="w-full border rounded px-3 py-2">
+                <option value="">Pilih status perkawinan</option>
+                <option value="belum">Belum</option>
+                <option value="kawin">Kawin</option>
+                <option value="janda">Janda</option>
+                <option value="duda">Duda</option>
+            </select>
+            <button type="button" onclick="removePersyaratan(this)" class="bg-red-500 text-white px-3 rounded">-</button>
+        `;
+
+        wrapper.appendChild(div);
+    }
+
+    function removePersyaratan(button) {
+        const wrapper = button.parentElement;
+        const hiddenInput = wrapper.querySelector('input[name="persyaratan_id[]"]');
+        if (hiddenInput) {
+            const deletedId = hiddenInput.value;
+            const deleteInput = document.createElement('input');
+            deleteInput.type = 'hidden';
+            deleteInput.name = 'persyaratan_deleted[]';
+            deleteInput.value = deletedId;
+            document.getElementById('editForm').appendChild(deleteInput);
+        }
+        wrapper.remove();
+    }
+
 </script>
 @endsection

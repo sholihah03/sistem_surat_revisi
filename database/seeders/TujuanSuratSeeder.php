@@ -87,9 +87,21 @@ class TujuanSuratSeeder extends Seeder
                 'status_populer' => true
             ],
             [
-                'nama_tujuan' => 'Perkawinan/Perceraian/Rujuk',
+                'nama_tujuan' => 'Perkawinan',
                 'nomor_surat' => '474.2',
-                'deskripsi' => 'Surat pengantar untuk keperluan pencatatan pernikahan, perceraian, atau rujuk.',
+                'deskripsi' => 'Surat pengantar untuk keperluan pencatatan pernikahan.',
+                'status_populer' => true
+            ],
+            [
+                'nama_tujuan' => 'Perceraian',
+                'nomor_surat' => '474.2',
+                'deskripsi' => 'Surat pengantar untuk keperluan pencatatan perceraian.',
+                'status_populer' => true
+            ],
+            [
+                'nama_tujuan' => 'Rujuk',
+                'nomor_surat' => '474.2',
+                'deskripsi' => 'Surat pengantar untuk keperluan pencatatan rujuk.',
                 'status_populer' => true
             ],
             [

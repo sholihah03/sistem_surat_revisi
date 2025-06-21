@@ -34,9 +34,10 @@ class RiwayatSuratController extends Controller
         $pengajuanBiasa = PengajuanSurat::with('tujuanSurat')
         ->where('warga_id', $user->id_warga)
         ->where(function($query) {
-            $query->where('status', 'diproses')
+            $query->whereNull('status_rt')
+                ->orWhere('status_rt', 'menunggu')
                 ->orWhere(function($query2) {
-                    $query2->whereIn('status', ['disetujui', 'ditolak'])
+                    $query2->whereIn('status_rt', ['disetujui', 'ditolak'])
                             ->where('updated_at', '>=', now()->subDays(30));
                 });
         })
@@ -48,12 +49,14 @@ class RiwayatSuratController extends Controller
             return $item;
         });
 
+
         // Pengajuan dari tb_pengajuan_surat_lain (manual)
         $pengajuanLain = PengajuanSuratLain::where('warga_id', $user->id_warga)
         ->where(function($query) {
-            $query->where('status_pengajuan_lain', 'diproses')
+            $query->whereNull('status_rt_pengajuan_lain')
+                ->orWhere('status_rt_pengajuan_lain', 'menunggu')
                 ->orWhere(function($query2) {
-                    $query2->whereIn('status_pengajuan_lain', ['disetujui', 'ditolak'])
+                    $query2->whereIn('status_rt_pengajuan_lain', ['disetujui', 'ditolak'])
                             ->where('updated_at', '>=', now()->subDays(30));
                 });
         })
@@ -64,6 +67,7 @@ class RiwayatSuratController extends Controller
                 ->exists();
             return $item;
         });
+
 
         return view('warga.riwayatSurat', compact('pengajuanBiasa', 'pengajuanLain', 'suratSelesai', 'warga'));
     }

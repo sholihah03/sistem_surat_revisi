@@ -16,7 +16,8 @@ return new class extends Migration
             $table->foreignId('warga_id')->constrained('tb_wargas', 'id_warga')->onDelete('cascade');
             $table->foreignId('scan_kk_id')->constrained('tb_scan_kk', 'id_scan')->onDelete('cascade');
             $table->string('nomor_surat_pengajuan_lain', 225)->nullable();
-            $table->enum('status_pengajuan_lain', ['menunggu', 'ditolak', 'disetujui'])->default('menunggu');
+            $table->enum('status_rt_pengajuan_lain', ['menunggu', 'ditolak', 'disetujui'])->default('menunggu');
+            $table->enum('status_rw_pengajuan_lain', ['menunggu', 'ditolak', 'disetujui'])->default('menunggu');
             $table->string('tujuan_manual', 225)->nullable();
             $table->string('tempat_lahir_pengaju_lain', 225)->nullable();
             $table->date('tanggal_lahir_pengaju_lain')->nullable();

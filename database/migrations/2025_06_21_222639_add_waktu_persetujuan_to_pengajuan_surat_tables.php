@@ -9,36 +9,30 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::table('tb_pengajuan_surat', function (Blueprint $table) {
-            $table->boolean('is_read')->default(false)->after('status_rw');
+            $table->timestamp('waktu_persetujuan_rt')->nullable()->after('status_rt');
+            $table->timestamp('waktu_persetujuan_rw')->nullable()->after('status_rw');
         });
 
         Schema::table('tb_pengajuan_surat_lain', function (Blueprint $table) {
-            $table->boolean('is_read')->default(false)->after('status_rw_pengajuan_lain');
-        });
-
-        Schema::table('tb_hasil_surat_ttd_rw', function (Blueprint $table) {
-            $table->boolean('is_read')->default(false)->after('file_surat');
+            $table->timestamp('waktu_persetujuan_rt_lain')->nullable()->after('status_rt_pengajuan_lain');
+            $table->timestamp('waktu_persetujuan_rw_lain')->nullable()->after('status_rw_pengajuan_lain');
         });
     }
 
     /**
      * Reverse the migrations.
      */
-    public function down(): void
+    public function down()
     {
         Schema::table('tb_pengajuan_surat', function (Blueprint $table) {
-            $table->dropColumn('is_read');
+            $table->dropColumn(['waktu_persetujuan_rt', 'waktu_persetujuan_rw']);
         });
 
         Schema::table('tb_pengajuan_surat_lain', function (Blueprint $table) {
-            $table->dropColumn('is_read');
-        });
-
-        Schema::table('tb_hasil_surat_ttd_rw', function (Blueprint $table) {
-            $table->dropColumn('is_read');
+            $table->dropColumn(['waktu_persetujuan_rt_lain', 'waktu_persetujuan_rw_lain']);
         });
     }
 };

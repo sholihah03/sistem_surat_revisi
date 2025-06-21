@@ -16,26 +16,37 @@ class HistoriSuratController extends Controller
         $wargaId = Auth::guard('warga')->user()->id_warga;
         $warga = Auth::guard('warga')->user();
 
-        // Debugging: Periksa ID Warga
-        // dd(Auth::guard('warga')->user());
-
         // Ambil data pengajuan surat
         $pengajuanBiasa = PengajuanSurat::where('warga_id', $wargaId)
-            ->whereIn('status', ['disetujui', 'ditolak'])
+            ->where(function ($q) {
+                $q->whereIn('status_rt', ['disetujui', 'ditolak'])
+                ->orWhereIn('status_rw', ['disetujui', 'ditolak']);
+            })
             ->get();
 
         $pengajuanLain = PengajuanSuratLain::where('warga_id', $wargaId)
-            ->whereIn('status_pengajuan_lain', ['disetujui', 'ditolak'])
+            ->where(function ($q) {
+                $q->whereIn('status_rt_pengajuan_lain', ['disetujui', 'ditolak'])
+                ->orWhereIn('status_rw_pengajuan_lain', ['disetujui', 'ditolak']);
+            })
             ->get();
 
-        // Debugging: Periksa hasil query
-        // dd($pengajuanBiasa, $pengajuanLain);
 
         // Pisahkan berdasarkan status
-        $disetujuiBiasa = $pengajuanBiasa->where('status', 'disetujui');
-        $ditolakBiasa = $pengajuanBiasa->where('status', 'ditolak');
-        $disetujuiLain = $pengajuanLain->where('status_pengajuan_lain', 'disetujui');
-        $ditolakLain = $pengajuanLain->where('status_pengajuan_lain', 'ditolak');
+        $disetujuiBiasa = $pengajuanBiasa->filter(function ($item) {
+            return $item->status_rt === 'disetujui' || $item->status_rw === 'disetujui';
+        });
+        $ditolakBiasa = $pengajuanBiasa->filter(function ($item) {
+            return $item->status_rt === 'ditolak' || $item->status_rw === 'ditolak';
+        });
+
+        $disetujuiLain = $pengajuanLain->filter(function ($item) {
+            return $item->status_rt_pengajuan_lain === 'disetujui' || $item->status_rw_pengajuan_lain === 'disetujui';
+        });
+        $ditolakLain = $pengajuanLain->filter(function ($item) {
+            return $item->status_rt_pengajuan_lain === 'ditolak' || $item->status_rw_pengajuan_lain === 'ditolak';
+        });
+
 
         // Ambil data hasil surat dari tb_hasil_surat_ttd_rw yang terkait dengan warga login
         // Pertama dapatkan ID pengajuan warga dari 2 jenis pengajuan

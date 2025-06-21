@@ -36,7 +36,7 @@
                 <!-- Deskripsi -->
                 <p class="text-gray-600 mb-8 text-base leading-relaxed">
                     Data Anda saat ini sedang divalidasi oleh pihak RT.<br>
-                    Mohon menunggu hingga 24 jam untuk informasi berikutnya lewat Email atau WhatsApp.
+                    Mohon menunggu hingga 24 jam untuk informasi berikutnya lewat Email.
                 </p>
 
                 <!-- Tombol Tutup -->
