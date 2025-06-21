@@ -6,6 +6,7 @@ use App\Models\Rw;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 class ProfileRwController extends Controller
@@ -59,5 +60,24 @@ class ProfileRwController extends Controller
         ]);
 
         return redirect()->back()->with('uploadSuccess', 'Foto profil berhasil diperbarui.');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:6|confirmed',
+        ]);
+
+        $rw = auth()->guard('rw')->user(); // pastikan auth sudah login RW
+
+        if (!Hash::check($request->current_password, $rw->password)) {
+            return back()->withErrors(['current_password' => 'Password lama salah.']);
+        }
+
+        $rw->password = Hash::make($request->new_password);
+        $rw->save();
+
+        return back()->with('passwordUbahSuccess', 'Password berhasil diperbarui.');
     }
 }

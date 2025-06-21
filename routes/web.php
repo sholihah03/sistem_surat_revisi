@@ -72,6 +72,7 @@ Route::prefix('warga')->middleware(AuthenticateWarga::class)->group(function () 
     Route::get('/profileWarga', [ProfileWargaController::class, 'index'])->name('profileWarga');
     Route::post('/profileWarga/uploadFoto', [ProfileWargaController::class, 'uploadFoto'])->name('profileWarga.uploadFoto');
     Route::put('/profileWarga/update', [ProfileWargaController::class, 'update'])->name('profileWarga.update');
+    Route::put('/profileWarga-warga/ubah-password', [ProfileWargaController::class, 'updatePassword'])->name('profileWarga.updatePassword');
     Route::get('/pengajuanSuratWarga', [PengajuanSuratController::class, 'index'])->name('pengajuanSuratWarga');
     Route::get('/formPengajuanSuratWarga', [PengajuanSuratController::class, 'formPengajuanSurat'])->name('formPengajuanSurat');
     Route::post('/formPengajuanSuratWargaStore', [PengajuanSuratController::class, 'formPengajuanSuratStore'])->name('formPengajuanSuratStore');
@@ -117,7 +118,7 @@ Route::prefix('rt')->middleware(AuthenticateRt::class)->group(function () {
     Route::get('/profileRt', [ProfileRtController::class, 'index'])->name('profileRt');
     Route::post('/profileRtUpload', [ProfileRtController::class, 'updateProfileRtImage'])->name('uploadProfileRt');
     Route::put('/profileRtUploadData', [ProfileRtController::class, 'updateData'])->name('updateDataRt');
-
+    Route::post('/profileRtUpdatePassword', [ProfileRtController::class, 'updatePassword'])->name('updatePasswordRt');
 });
 
 
@@ -143,6 +144,7 @@ Route::prefix('rw')->middleware(AuthenticateRw::class)->group(function () {
     Route::get('/profileRw', [ProfileRwController::class, 'index'])->name('profileRw');
     Route::post('/profileRwUpload', [ProfileRwController::class, 'updateProfileRwImage'])->name('uploadProfileRw');
     Route::put('/profileRwUploadData', [ProfileRwController::class, 'updateData'])->name('updateDataRw');
+    Route::put('/profileRwUpdatePassword', [ProfileRwController::class, 'updatePassword'])->name('updatePassword');
     Route::get('/riwayatSurat', [RiwayatSuratRwController::class, 'index'])->name('riwayatSuratRw');
     Route::get('/surat/{id}/lihatRw', [RiwayatSuratRwController::class, 'lihatHasilSuratRw'])->name('rw.lihatHasilSurat');
 

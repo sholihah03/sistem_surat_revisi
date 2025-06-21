@@ -115,8 +115,13 @@
                             </div>
                         @endif
                         <div class="text-end mt-4">
-                            <button type="button" class="btn btn-primary shadow px-4 py-2" data-bs-toggle="modal" data-bs-target="#modalEditProfil">
+                            <button type="button" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg" data-bs-toggle="modal" data-bs-target="#modalEditProfil">
                                 Ubah
+                            </button>
+
+                            <!-- Tombol Ubah Password -->
+                            <button type="button" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg" data-bs-toggle="modal" data-bs-target="#modalUbahPassword">
+                                Ubah Password
                             </button>
                         </div>
                     </form>
@@ -132,7 +137,7 @@
                 <form action="{{ route('profileWarga.uploadFoto') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalUploadFotoLabel">Upload Foto Profil</h5>
+                        <h5 class="modal-title font-semibold" id="modalUploadFotoLabel">Upload Foto Profil</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -163,7 +168,7 @@
                 @csrf
                 @method('PUT')
                 <div class="modal-header">
-                <h5 class="modal-title" id="modalEditProfilLabel">Edit Profil Warga</h5>
+                <h5 class="modal-title font-semibold" id="modalEditProfilLabel">Edit Profil Warga</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
@@ -191,7 +196,7 @@
                         <small class="text-gray-500">Nomor harus diawali dengan 62 (otomatis), hanya masukkan nomor setelah kode negara.</small>
                     </div>
                     <div class="col-md-6">
-                    <label class="form-label">Email</label>
+                    <label class="form-label font-medium">Email</label>
                     <input type="email" class="form-control" name="email" value="{{ $warga->email }}">
                     </div>
                 </div>
@@ -205,6 +210,80 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Ubah Password -->
+<div class="modal fade" id="modalUbahPassword" tabindex="-1" aria-labelledby="modalUbahPasswordLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="{{ route('profileWarga.updatePassword') }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-header">
+                    <h5 class="modal-title font-semibold" id="modalUbahPasswordLabel">Ubah Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="block mb-1 text-sm font-semibold">Password Saat Ini</label>
+                    <div class="flex items-center border border-gray-300 rounded px-3 py-2 relative mt-1">
+                        <input type="password" name="current_password" id="current_password_rt"
+                            required minlength="6" maxlength="6"
+                            class="w-full bg-transparent focus:outline-none text-gray-700 pr-10">
+                        <button type="button" data-eye onclick="togglePassword('current_password_rt', this)" class="absolute right-3 text-gray-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7
+                                    -1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="block mb-1 text-sm font-semibold">Password Baru</label>
+                    <div class="flex items-center border border-gray-300 rounded px-3 py-2 relative mt-1">
+                        <input type="password" name="new_password" id="new_password_rt"
+                            required minlength="6" maxlength="6"
+                            class="w-full bg-transparent focus:outline-none text-gray-700 pr-10">
+                        <button type="button" data-eye onclick="togglePassword('new_password_rt', this)" class="absolute right-3 text-gray-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7
+                                    -1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="block mb-1 text-sm font-semibold">Konfirmasi Password Baru</label>
+                    <div class="flex items-center border border-gray-300 rounded px-3 py-2 relative mt-1">
+                        <input type="password" name="new_password_confirmation" id="confirm_password_rt"
+                            required minlength="6" maxlength="6"
+                            class="w-full bg-transparent focus:outline-none text-gray-700 pr-10">
+                        <button type="button" data-eye onclick="togglePassword('confirm_password_rt', this)" class="absolute right-3 text-gray-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7
+                                    -1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    </div>
+                    <small class="block text-red-500 font-semibold">Password minimal 6 karakter dan harus cocok saat dikonfirmasi.</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
     <script>
         let originalSrc = document.getElementById('profilePreview').src;
@@ -223,13 +302,64 @@
         }
 
         // Reset preview if modal ditutup (klik batal atau close modal)
-        const uploadModal = document.getElementById('modalUploadFoto');
+    const uploadModal = document.getElementById('modalUploadFoto');
         uploadModal.addEventListener('hidden.bs.modal', function () {
             const preview = document.getElementById('profilePreview');
             const input = document.getElementById('profileInput');
             preview.src = originalSrc;
             input.value = ""; // reset file input
         });
+
+    const modals = ['modalUploadFoto', 'modalEditProfil', 'modalUbahPassword'];
+
+    modals.forEach(modalId => {
+        const modalEl = document.getElementById(modalId);
+
+        if (modalEl) {
+            modalEl.addEventListener('hidden.bs.modal', function () {
+                // Reset semua form di dalam modal
+                const forms = modalEl.querySelectorAll('form');
+                forms.forEach(form => form.reset());
+
+                // Reset preview foto (khusus upload foto)
+                if (modalId === 'modalUploadFoto') {
+                    const preview = document.getElementById('profilePreview');
+                    const input = document.getElementById('profileInput');
+                    if (preview && originalSrc) preview.src = originalSrc;
+                    if (input) input.value = "";
+                }
+
+                // Reset input password ke type="password"
+                const inputs = modalEl.querySelectorAll('input[type="text"], input[type="password"]');
+                inputs.forEach(input => {
+                    if (input.type === "text" && input.getAttribute("data-password") === "true") {
+                        input.type = "password";
+                    }
+                });
+
+                // Reset icon mata
+                const eyeButtons = modalEl.querySelectorAll('button[data-eye]');
+                eyeButtons.forEach(btn => {
+                    const icon = btn.querySelector('svg');
+                    icon.classList.remove('text-blue-600');
+                });
+            });
+        }
+    });
+
+    function togglePassword(fieldId, btn) {
+        const input = document.getElementById(fieldId);
+        const icon = btn.querySelector('svg');
+        input.setAttribute("data-password", "true");
+
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.add("text-blue-600");
+        } else {
+            input.type = "password";
+            icon.classList.remove("text-blue-600");
+        }
+    }
     </script>
 
     <!-- Bootstrap JS -->

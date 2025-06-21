@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Warga;
 
+use App\Models\Wargas;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Wargas;
+use Illuminate\Support\Facades\Hash;
 
 class ProfileWargaController extends Controller
 {
@@ -53,5 +54,23 @@ class ProfileWargaController extends Controller
         return redirect()->back()->with('success', 'Profil berhasil diperbarui.');
     }
 
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:6|confirmed',
+        ]);
+
+        $user = Auth::guard('warga')->user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->with('error', 'Password lama tidak sesuai.');
+        }
+
+        $user->password = bcrypt($request->new_password);
+        $user->save();
+
+        return back()->with('success', 'Password berhasil diperbarui.');
+    }
 
 }

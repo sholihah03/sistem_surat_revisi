@@ -171,6 +171,10 @@ class AppServiceProvider extends ServiceProvider
 
             $pengajuanSuratBaru = PengajuanSurat::with(['warga.rt'])
                 ->where('status_rt', 'disetujui')
+                ->where(function($query) {
+                    $query->whereNull('status_rw')
+                        ->orWhere('status_rw', '!=', 'ditolak');
+                })
                 ->whereNotIn('id_pengajuan_surat', $pengajuanSuratDisetujuiIds)
                 ->orderBy('updated_at', 'desc')
                 ->take(5)
@@ -178,6 +182,10 @@ class AppServiceProvider extends ServiceProvider
 
             $pengajuanSuratLainBaru = PengajuanSuratLain::with(['warga.rt'])
                 ->where('status_rt_pengajuan_lain', 'disetujui')
+                ->where(function($query) {
+                    $query->whereNull('status_rw_pengajuan_lain')
+                        ->orWhere('status_rw_pengajuan_lain', '!=', 'ditolak');
+                })
                 ->whereNotIn('id_pengajuan_surat_lain', $pengajuanSuratLainDisetujuiIds)
                 ->orderBy('updated_at', 'desc')
                 ->take(5)

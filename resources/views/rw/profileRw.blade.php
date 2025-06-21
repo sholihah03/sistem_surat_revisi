@@ -7,13 +7,19 @@
         <br>Anda <strong class="text-red-500">wajib</strong> mengunggah scan tanda tangan digital jika belum melakukannya agar proses administrasi dapat berjalan lancar.
     </p>
 
-    <div class="md:flex md:space-x-6 space-y-6 md:space-y-0">
+    <div class="md:flex md:space-x-6 space-y-6 md:space-y-0 items-stretch">
         <!-- Card Profil -->
-        <div class="bg-white shadow-lg rounded-2xl p-6 md:w-1/2">
+        <div class="bg-white shadow-lg rounded-2xl p-6 md:w-1/2 h-full">
             <h1 class="text-xl font-bold mb-4 text-gray-800">Edit Profile RW</h1>
             @if (session('dataSuccess'))
                 <div class="bg-green-100 text-green-700 px-4 py-2 rounded mb-4">
                     {{ session('dataSuccess') }}
+                </div>
+            @endif
+
+            @if (session('passwordUbahSuccess'))
+                <div class="bg-green-100 text-green-700 px-4 py-2 rounded mb-4">
+                    {{ session('passwordUbahSuccess') }}
                 </div>
             @endif
 
@@ -102,11 +108,14 @@
                             </div>
                         </div>
 
-                        <!-- Tombol Edit Profil (tengah) -->
-                        <div class="mt-6">
+                        <!-- Tombol Edit Profil dan Ubah Password -->
+                        <div class="mt-3 flex justify-center gap-4">
                             <button onclick="openModal()"
                                 class="inline-block bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-6 rounded-lg transition">
                                 Edit Data
+                            </button>
+                            <button onclick="openPasswordModal()" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-lg">
+                                Ubah Password
                             </button>
                         </div>
                     </div>
@@ -196,6 +205,7 @@
             @endif
         </div>
     </div>
+
     <!-- Modal Edit -->
     <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden h-full w-full overflow-hidden">
         <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative box-border">
@@ -243,6 +253,76 @@
                     <button type="submit"
                         class="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-6 rounded-lg">
                         Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Ubah Password -->
+    <div id="passwordModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
+            <!-- Tombol Close Modal -->
+            <button onclick="closePasswordModal()" class="absolute top-2 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold">&times;</button>
+
+            <h2 class="text-xl font-bold text-center mb-1">Ubah Password</h2>
+            <small class="block text-red-500 mb-4 text-center">Password minimal 6 karakter dan harus cocok saat dikonfirmasi.</small>
+
+            <form action="{{ route('updatePassword') }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                <!-- Password Lama -->
+                <div class="mb-4">
+                    <label class="text-sm font-medium text-gray-700">Password Lama</label>
+                    <div class="flex items-center border border-gray-300 rounded px-3 py-2 relative mt-1">
+                        <input type="password" name="current_password" id="current_password"
+                            required minlength="6" maxlength="6"
+                            class="w-full bg-transparent focus:outline-none text-gray-700 pr-10">
+                        <button type="button" onclick="togglePassword('current_password', this)" class="absolute right-3 text-gray-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Password Baru -->
+                <div class="mb-4">
+                    <label class="text-sm font-medium text-gray-700">Password Baru</label>
+                    <div class="flex items-center border border-gray-300 rounded px-3 py-2 relative mt-1">
+                        <input type="password" name="new_password" id="new_password"
+                            required minlength="6" maxlength="6"
+                            class="w-full bg-transparent focus:outline-none text-gray-700 pr-10">
+                        <button type="button" onclick="togglePassword('new_password', this)" class="absolute right-3 text-gray-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Konfirmasi Password Baru -->
+                <div class="mb-4">
+                    <label class="text-sm font-medium text-gray-700">Konfirmasi Password Baru</label>
+                    <div class="flex items-center border border-gray-300 rounded px-3 py-2 relative mt-1">
+                        <input type="password" name="new_password_confirmation" id="new_password_confirmation"
+                            required minlength="6" maxlength="6"
+                            class="w-full bg-transparent focus:outline-none text-gray-700 pr-10">
+                        <button type="button" onclick="togglePassword('new_password_confirmation', this)" class="absolute right-3 text-gray-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-center mt-6">
+                    <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-white py-2 px-6 rounded-lg">
+                        Simpan Password
                     </button>
                 </div>
             </form>
@@ -331,6 +411,18 @@
         uploadForm.classList.add('hidden');
     });
 
+    function togglePassword(fieldId, btn) {
+        const input = document.getElementById(fieldId);
+        const icon = btn.querySelector('svg');
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.add('text-blue-600');
+        } else {
+            input.type = "password";
+            icon.classList.remove('text-blue-600');
+        }
+    }
+
     function openModal() {
         document.getElementById('editModal').classList.remove('hidden');
     }
@@ -356,5 +448,14 @@
     function closeImageModal() {
         document.getElementById('imageModal').classList.add('hidden');
     }
+
+    function openPasswordModal() {
+        document.getElementById('passwordModal').classList.remove('hidden');
+    }
+
+    function closePasswordModal() {
+        document.getElementById('passwordModal').classList.add('hidden');
+    }
+
 </script>
 @endsection
