@@ -107,7 +107,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9" class="text-center text-gray-500 py-4"><strong>Belum ada surat yang masuk</strong></td>
+                        <td colspan="10" class="text-center text-gray-500 py-4"><strong>Belum ada surat yang masuk</strong></td>
                     </tr>
                 @endforelse
             </tbody>

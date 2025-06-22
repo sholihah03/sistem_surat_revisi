@@ -36,26 +36,34 @@
         </thead>
         <tbody>
             @php $no = 1; @endphp
-            @foreach ($rtList as $rt)
-                <tr class="border-t">
-                    <td class="px-4 py-2">{{ $no++ }}</td>
-                    <td class="px-4 py-2">RT {{ $rt->no_rt }}</td>
-                    <td class="px-4 py-2">{{ $rt->nama_lengkap_rt }}</td>
-                    <td class="px-4 py-2">{{ $rt->no_hp_rt }}</td>
-                    <td class="px-4 py-2">{{ $rt->email_rt }}</td>
-                    <td class="px-4 py-2">
-                        @if($rt->wargas->count() > 0)
-                            <ul class="list-disc list-inside">
-                                @foreach($rt->wargas as $warga)
-                                    <li>{{ $warga->nama_lengkap }}</li>
-                                @endforeach
-                            </ul>
-                        @else
-                            <span class="text-gray-400">Belum ada warga</span>
-                        @endif
+            @if ($rtList->isEmpty())
+                <tr>
+                    <td colspan="6" class="text-center text-gray-500 py-4">
+                        Belum ada akun RT.
                     </td>
                 </tr>
-            @endforeach
+            @else
+                @foreach ($rtList as $rt)
+                    <tr class="border-t">
+                        <td class="px-4 py-2">{{ $no++ }}</td>
+                        <td class="px-4 py-2">RT {{ $rt->no_rt }}</td>
+                        <td class="px-4 py-2">{{ $rt->nama_lengkap_rt }}</td>
+                        <td class="px-4 py-2">{{ $rt->no_hp_rt }}</td>
+                        <td class="px-4 py-2">{{ $rt->email_rt }}</td>
+                        <td class="px-4 py-2">
+                            @if($rt->wargas->count() > 0)
+                                <ul class="list-disc list-inside">
+                                    @foreach($rt->wargas as $warga)
+                                        <li>{{ $warga->nama_lengkap }}</li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <span class="text-gray-400">Belum ada warga</span>
+                            @endif
+                        </td>
+                    </tr>
+                @endforeach
+            @endif
         </tbody>
     </table>
 </div>

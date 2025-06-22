@@ -243,7 +243,14 @@
         document.getElementById('addModal').classList.add('flex');
     }
     function closeAddModal() {
-        document.getElementById('addModal').classList.add('hidden');
+        // document.getElementById('addModal').classList.add('hidden');
+        const modal = document.getElementById('addModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+
+        // Reset form edit akun
+        const form = modal.querySelector('form');
+        if (form) form.reset();
     }
 
     function openEditModal(id, nama, deskripsi, nomor, status_populer, persyaratan = []) {
@@ -294,7 +301,14 @@
     }
 
     function closeEditModal() {
-        document.getElementById('editModal').classList.add('hidden');
+        // document.getElementById('editModal').classList.add('hidden');
+        const modal = document.getElementById('editModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+
+        // Reset form edit akun
+        const form = modal.querySelector('form');
+        if (form) form.reset();
     }
 
     function closeModal() {
