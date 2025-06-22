@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 
 class ProfileRwController extends Controller
@@ -64,20 +65,35 @@ class ProfileRwController extends Controller
 
     public function updatePassword(Request $request)
     {
-        $request->validate([
+        /** @var \App\Models\Rw $rw */
+        $rw = auth()->guard('rw')->user();
+
+        $validator = Validator::make($request->all(), [
             'current_password' => 'required',
             'new_password' => 'required|min:6|confirmed',
+        ], [
+            'current_password.required' => 'Password lama wajib diisi.',
+            'new_password.required' => 'Password baru wajib diisi.',
+            'new_password.min' => 'Password baru minimal 6 karakter.',
+            'new_password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
-        $rw = auth()->guard('rw')->user(); // pastikan auth sudah login RW
+        // Tambahkan validasi custom setelah validasi utama
+        $validator->after(function ($validator) use ($request, $rw) {
+            if (!Hash::check($request->current_password, $rw->password)) {
+                $validator->errors()->add('current_password', 'Password lama salah.');
+            }
+        });
 
-        if (!Hash::check($request->current_password, $rw->password)) {
-            return back()->withErrors(['current_password' => 'Password lama salah.']);
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
         }
 
+        // Update password
         $rw->password = Hash::make($request->new_password);
         $rw->save();
 
         return back()->with('passwordUbahSuccess', 'Password berhasil diperbarui.');
     }
+
 }

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class ProfileWargaController extends Controller
 {
@@ -56,18 +57,32 @@ class ProfileWargaController extends Controller
 
     public function updatePassword(Request $request)
     {
-        $request->validate([
+        /** @var \App\Models\Wargas $user */
+        $user = auth()->guard('warga')->user();
+
+        $validator = Validator::make($request->all(), [
             'current_password' => 'required',
             'new_password' => 'required|min:6|confirmed',
+        ], [
+            'current_password.required' => 'Password lama wajib diisi.',
+            'new_password.required' => 'Password baru wajib diisi.',
+            'new_password.min' => 'Password baru minimal 6 karakter.',
+            'new_password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
-        $user = Auth::guard('warga')->user();
+        // Tambahkan validasi custom setelah validasi utama
+        $validator->after(function ($validator) use ($request, $user) {
+            if (!Hash::check($request->current_password, $user->password)) {
+                $validator->errors()->add('current_password', 'Password lama salah.');
+            }
+        });
 
-        if (!Hash::check($request->current_password, $user->password)) {
-            return back()->with('error', 'Password lama tidak sesuai.');
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
         }
 
-        $user->password = bcrypt($request->new_password);
+        // Update password
+        $user->password = Hash::make($request->new_password);
         $user->save();
 
         return back()->with('success', 'Password berhasil diperbarui.');

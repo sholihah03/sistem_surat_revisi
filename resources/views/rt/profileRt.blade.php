@@ -29,7 +29,22 @@
                 </div>
             @endif
 
-            @if ($errors->any())
+            @if (
+                $errors->any() &&
+                !($errors->has('current_password') ||
+                $errors->has('new_password') ||
+                $errors->has('new_password_confirmation'))
+            )
+                <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
+                    <ul class="list-disc pl-5">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            {{-- @if ($errors->any())
                 <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
                     <ul class="list-disc pl-5">
                         @foreach ($errors->all() as $error)
@@ -37,7 +52,7 @@
                         @endforeach
                     </ul>
                 </div>
-            @endif
+            @endif --}}
             <div class="md:flex items-center space-y-6 md:space-y-0 md:space-x-10">
                 <!-- Foto Profil + Upload -->
                 <div class="flex-shrink-0 mx-auto md:mx-0 text-center">
@@ -143,7 +158,12 @@
                 </div>
             @endif
 
-            @if ($errors->any())
+            @if (
+                $errors->any() &&
+                !($errors->has('current_password') ||
+                $errors->has('new_password') ||
+                $errors->has('new_password_confirmation'))
+            )
                 <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
                     <ul class="list-disc pl-5">
                         @foreach ($errors->all() as $error)
@@ -152,6 +172,16 @@
                     </ul>
                 </div>
             @endif
+
+            {{-- @if ($errors->any())
+                <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
+                    <ul class="list-disc pl-5">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif --}}
             <!-- Jika tanda tangan belum ada -->
             @if (empty($rt->ttd_digital) && empty($rt->ttd_digital_bersih))
                 <form action="{{ route('scanTtdRtUpload') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
@@ -267,6 +297,25 @@
 
             <h2 class="text-xl font-bold mb-1">Ubah Password</h2>
             <small class="block text-red-500 mb-4">Password minimal 6 karakter dan harus cocok saat dikonfirmasi.</small>
+            @if (
+                $errors->has('current_password') ||
+                $errors->has('new_password') ||
+                $errors->has('new_password_confirmation')
+            )
+                <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
+                    <ul class="list-disc pl-5">
+                        @foreach ($errors->get('current_password') as $message)
+                            <li>{{ $message }}</li>
+                        @endforeach
+                        @foreach ($errors->get('new_password') as $message)
+                            <li>{{ $message }}</li>
+                        @endforeach
+                        @foreach ($errors->get('new_password_confirmation') as $message)
+                            <li>{{ $message }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
             @if(session('passwordSuccess'))
                 <div class="bg-green-100 text-green-700 px-4 py-2 rounded mb-4">
@@ -431,6 +480,29 @@
         uploadForm.classList.add('hidden');
     });
 
+    // RESET SEMUA INPUT & PASSWORD VISIBILITY SAAT MODAL DITUTUP
+    function resetModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+
+        // Reset semua form di modal
+        const forms = modal.querySelectorAll('form');
+        forms.forEach(form => form.reset());
+
+        // Set kembali semua input type ke "password"
+        const passwordInputs = modal.querySelectorAll('input[type="text"]');
+        passwordInputs.forEach(input => {
+            if (input.name.includes('password')) {
+                input.type = 'password';
+            }
+        });
+
+        // Hapus class warna dari icon svg
+        modal.querySelectorAll('button svg').forEach(svg => {
+            svg.classList.remove('text-blue-600');
+        });
+    }
+
     function togglePassword(fieldId, btn) {
         const input = document.getElementById(fieldId);
         const icon = btn.querySelector('svg');
@@ -447,17 +519,20 @@
         document.getElementById('editModal').classList.remove('hidden');
     }
 
+    // Tutup Modal Edit
     function closeModal() {
         document.getElementById('editModal').classList.add('hidden');
+        resetModal('editModal');
     }
 
     function openModalTtd() {
         document.getElementById('editTtdModal').classList.remove('hidden');
     }
 
-    // Fungsi untuk menutup modal
+    // Tutup Modal TTD
     function closeModalTtd() {
         document.getElementById('editTtdModal').classList.add('hidden');
+        resetModal('editTtdModal');
     }
 
     function showImageModal(imageSrc) {
@@ -472,8 +547,32 @@
     function openPasswordModal() {
         document.getElementById('passwordModal').classList.remove('hidden');
     }
+
+    // Tutup Modal Password
     function closePasswordModal() {
-        document.getElementById('passwordModal').classList.add('hidden');
+        // document.getElementById('passwordModal').classList.add('hidden');
+        // resetModal('passwordModal');
+        const modal = document.getElementById('passwordModal');
+        modal.classList.add('hidden');
+        resetModal('passwordModal');
+
+        // Hapus pesan error dari modal secara manual
+        const errorBox = modal.querySelector('.bg-red-100');
+        if (errorBox) {
+            errorBox.remove();
+        }
     }
 </script>
+
+{{-- Jika ada error validasi pada ubah password, otomatis buka modal saat halaman dimuat / modal tetap terbuka --}}
+@if ($errors->has('current_password') || $errors->has('new_password') || $errors->has('new_password_confirmation'))
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('passwordModal');
+        if (modal.classList.contains('hidden')) {
+            modal.classList.remove('hidden');
+        }
+    });
+</script>
+@endif
 @endsection

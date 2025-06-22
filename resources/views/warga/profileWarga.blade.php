@@ -212,78 +212,97 @@
     </div>
 
     <!-- Modal Ubah Password -->
-<div class="modal fade" id="modalUbahPassword" tabindex="-1" aria-labelledby="modalUbahPasswordLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <form action="{{ route('profileWarga.updatePassword') }}" method="POST">
-                @csrf
-                @method('PUT')
-                <div class="modal-header">
-                    <h5 class="modal-title font-semibold" id="modalUbahPasswordLabel">Ubah Password</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="block mb-1 text-sm font-semibold">Password Saat Ini</label>
-                    <div class="flex items-center border border-gray-300 rounded px-3 py-2 relative mt-1">
-                        <input type="password" name="current_password" id="current_password_rt"
-                            required minlength="6" maxlength="6"
-                            class="w-full bg-transparent focus:outline-none text-gray-700 pr-10">
-                        <button type="button" data-eye onclick="togglePassword('current_password_rt', this)" class="absolute right-3 text-gray-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7
-                                    -1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                            </svg>
-                        </button>
+    <div class="modal fade" id="modalUbahPassword" tabindex="-1" aria-labelledby="modalUbahPasswordLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="{{ route('profileWarga.updatePassword') }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-header">
+                        <h5 class="modal-title font-semibold" id="modalUbahPasswordLabel">Ubah Password</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                     </div>
+                    @if (
+                            $errors->has('current_password') ||
+                            $errors->has('new_password') ||
+                            $errors->has('new_password_confirmation')
+                        )
+                            <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-2">
+                                <ul class="list-disc pl-5">
+                                    @foreach ($errors->get('current_password') as $message)
+                                        <li>{{ $message }}</li>
+                                    @endforeach
+                                    @foreach ($errors->get('new_password') as $message)
+                                        <li>{{ $message }}</li>
+                                    @endforeach
+                                    @foreach ($errors->get('new_password_confirmation') as $message)
+                                        <li>{{ $message }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="block mb-1 text-sm font-semibold">Password Saat Ini</label>
+                        <div class="flex items-center border border-gray-300 rounded px-3 py-2 relative mt-1">
+                            <input type="password" name="current_password" id="current_password_rt"
+                                required minlength="6" maxlength="6"
+                                class="w-full bg-transparent focus:outline-none text-gray-700 pr-10">
+                            <button type="button" data-eye onclick="togglePassword('current_password_rt', this)" class="absolute right-3 text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7
+                                        -1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="block mb-1 text-sm font-semibold">Password Baru</label>
+                        <div class="flex items-center border border-gray-300 rounded px-3 py-2 relative mt-1">
+                            <input type="password" name="new_password" id="new_password_rt"
+                                required minlength="6" maxlength="6"
+                                class="w-full bg-transparent focus:outline-none text-gray-700 pr-10">
+                            <button type="button" data-eye onclick="togglePassword('new_password_rt', this)" class="absolute right-3 text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7
+                                        -1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="block mb-1 text-sm font-semibold">Konfirmasi Password Baru</label>
+                        <div class="flex items-center border border-gray-300 rounded px-3 py-2 relative mt-1">
+                            <input type="password" name="new_password_confirmation" id="confirm_password_rt"
+                                required minlength="6" maxlength="6"
+                                class="w-full bg-transparent focus:outline-none text-gray-700 pr-10">
+                            <button type="button" data-eye onclick="togglePassword('confirm_password_rt', this)" class="absolute right-3 text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7
+                                        -1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        </div>
+                        <small class="block text-red-500 font-semibold">Password minimal 6 karakter dan harus cocok saat dikonfirmasi.</small>
                     </div>
-                    <div class="mb-3">
-                        <label class="block mb-1 text-sm font-semibold">Password Baru</label>
-                    <div class="flex items-center border border-gray-300 rounded px-3 py-2 relative mt-1">
-                        <input type="password" name="new_password" id="new_password_rt"
-                            required minlength="6" maxlength="6"
-                            class="w-full bg-transparent focus:outline-none text-gray-700 pr-10">
-                        <button type="button" data-eye onclick="togglePassword('new_password_rt', this)" class="absolute right-3 text-gray-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7
-                                    -1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                            </svg>
-                        </button>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan Password</button>
                     </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="block mb-1 text-sm font-semibold">Konfirmasi Password Baru</label>
-                    <div class="flex items-center border border-gray-300 rounded px-3 py-2 relative mt-1">
-                        <input type="password" name="new_password_confirmation" id="confirm_password_rt"
-                            required minlength="6" maxlength="6"
-                            class="w-full bg-transparent focus:outline-none text-gray-700 pr-10">
-                        <button type="button" data-eye onclick="togglePassword('confirm_password_rt', this)" class="absolute right-3 text-gray-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7
-                                    -1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                            </svg>
-                        </button>
-                    </div>
-                    </div>
-                    <small class="block text-red-500 font-semibold">Password minimal 6 karakter dan harus cocok saat dikonfirmasi.</small>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan Password</button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
     <script>
         let originalSrc = document.getElementById('profilePreview').src;
@@ -345,6 +364,36 @@
                 });
             });
         }
+
+        // Reset khusus modal ubah password, termasuk hapus error dan reset input/icon
+        const modalUbahPassword = document.getElementById('modalUbahPassword');
+        if (modalUbahPassword) {
+            modalUbahPassword.addEventListener('hidden.bs.modal', function () {
+                // Reset form
+                const form = modalUbahPassword.querySelector('form');
+                if (form) form.reset();
+
+                // Hilangkan pesan error (hapus elemen)
+                const errorAlert = modalUbahPassword.querySelector('.bg-red-100');
+                if (errorAlert) errorAlert.remove();
+
+                // Reset input type ke password
+                const inputs = modalUbahPassword.querySelectorAll('input[type="text"], input[type="password"]');
+                inputs.forEach(input => {
+                    if (input.type === "text" && input.getAttribute("data-password") === "true") {
+                        input.type = "password";
+                    }
+                });
+
+                // Reset icon mata
+                const eyeButtons = modalUbahPassword.querySelectorAll('button[data-eye]');
+                eyeButtons.forEach(btn => {
+                    const icon = btn.querySelector('svg');
+                    icon.classList.remove('text-blue-600');
+                });
+            });
+        }
+
     });
 
     function togglePassword(fieldId, btn) {
@@ -361,6 +410,16 @@
         }
     }
     </script>
+
+{{-- Jika ada error validasi pada ubah password, otomatis buka modal saat halaman dimuat / modal tetap terbuka --}}
+    @if ($errors->has('current_password') || $errors->has('new_password') || $errors->has('new_password_confirmation'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = new bootstrap.Modal(document.getElementById('modalUbahPassword'));
+            modal.show();
+        });
+    </script>
+    @endif
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
