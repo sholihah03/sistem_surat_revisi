@@ -17,10 +17,8 @@ class Otp extends Model
         'warga_id',
         'kode_otp',
         'expired_at',
-        'sudah_dipakai',
+        'is_used',
         'jenis_otp',
-        'isValid',
-        'pakai',
     ];
 
     public function warga()
