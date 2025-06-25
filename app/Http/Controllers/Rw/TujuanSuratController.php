@@ -82,8 +82,8 @@ class TujuanSuratController extends Controller
 
         // Update atau tambah persyaratan baru
         $ids = $request->persyaratan_id ?? [];
-        $names = $request->persyaratan;
-        $keterangans = $request->keterangan;
+        $names = $request->persyaratan ?? [];
+        $keterangans = $request->keterangan ?? [];
 
         foreach ($names as $index => $name) {
             $keterangan = $keterangans[$index] ?? null;

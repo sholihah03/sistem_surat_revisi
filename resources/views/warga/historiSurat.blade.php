@@ -156,8 +156,9 @@
                 @endif
             </div>
         </div>
-
     </div>
+
+        @include('components.modal-timeout')
 
     <script>
         const tab1Btn = document.getElementById('tab-1-btn');

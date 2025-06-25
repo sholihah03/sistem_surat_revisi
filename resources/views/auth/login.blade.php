@@ -196,6 +196,8 @@
         </div>
     </div>
 
+    @include('components.modal-timeout')
+
     <script>
         function togglePassword() {
             const input = document.getElementById('password');

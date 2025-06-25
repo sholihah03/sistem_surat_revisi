@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Rw;
 
 use Carbon\Carbon;
 use App\Models\Wargas;
-use App\Models\HasilSurat;
 use Illuminate\Support\Str;
 use App\Mail\SuratDitolakRw;
 use Illuminate\Http\Request;
@@ -32,9 +31,13 @@ class ManajemenSuratWargaController extends Controller
         $ttdDigital = $rw->ttd_digital;
         $showModalUploadTtdRw = empty($ttdDigital);
 
-        $surats = HasilSuratTtdRt::whereDoesntHave('hasilSuratTtdRw', function ($query) {
-            $query->whereColumn('jenis', 'tb_hasil_surat_ttd_rt.jenis')
-            ->whereColumn('pengajuan_id', 'tb_hasil_surat_ttd_rt.pengajuan_id');
+        $surats = HasilSuratTtdRt::where(function ($query) {
+        $query->where('jenis', 'biasa')
+                ->whereDoesntHave('hasilSuratTtdRwBiasa');
+        })
+        ->orWhere(function ($query) {
+            $query->where('jenis', 'lain')
+                ->whereDoesntHave('hasilSuratTtdRwLain');
         })
         ->where(function ($query) use ($idRwLogin) {
             $query->whereHas('pengajuanSurat', function ($q) use ($idRwLogin) {
@@ -67,21 +70,28 @@ class ManajemenSuratWargaController extends Controller
     public function setujui(Request $request)
     {
         Carbon::setLocale('id');
-        $pengajuanId = $request->pengajuan_id;
         $jenis = $request->jenis;
+        $pengajuanSuratId = $request->pengajuan_surat_id;
+        $pengajuanSuratLainId = $request->pengajuan_surat_lain_id;
 
-        $suratRt = HasilSuratTtdRt::where('pengajuan_id', $pengajuanId)
-                    ->where('jenis', $jenis)
-                    ->first();
+        if ($jenis === 'biasa') {
+            $suratRt = HasilSuratTtdRt::where('pengajuan_surat_id', $pengajuanSuratId)
+                ->where('jenis', $jenis)
+                ->first();
+
+            $pengajuan = PengajuanSurat::with(['warga.rt.rw', 'warga.scan_KK.alamat', 'tujuanSurat'])
+                ->find($pengajuanSuratId);
+        } else {
+            $suratRt = HasilSuratTtdRt::where('pengajuan_surat_lain_id', $pengajuanSuratLainId)
+                ->where('jenis', $jenis)
+                ->first();
+
+            $pengajuan = PengajuanSuratLain::with(['warga.rt.rw', 'warga.scan_KK.alamat'])
+                ->find($pengajuanSuratLainId);
+        }
 
         if (!$suratRt) {
             return back()->with('error', 'Surat dari RT belum tersedia.');
-        }
-
-        if ($jenis === 'biasa') {
-            $pengajuan = PengajuanSurat::with(['warga.rt.rw', 'warga.scan_KK.alamat', 'tujuanSurat'])->find($pengajuanId);
-        } else {
-            $pengajuan = PengajuanSuratLain::with(['warga.rt.rw', 'warga.scan_KK.alamat'])->find($pengajuanId);
         }
 
         if (!$pengajuan) {
@@ -170,17 +180,18 @@ class ManajemenSuratWargaController extends Controller
         Storage::put($filepath, $pdfContentFinal);
 
         HasilSuratTtdRw::updateOrCreate(
-            [
-                'jenis' => $jenis,
-                'pengajuan_id' => $pengajuanId,
-            ],
-            [
-                'file_surat' => $filepath,
-                'token' => $token,
-                'hash_dokumen' => $hashDokumen,
-                'waktu_ttd' => $waktuTtd,
-            ]
-        );
+        [
+            'jenis' => $jenis,
+            'pengajuan_surat_id' => $jenis === 'biasa' ? $pengajuanSuratId : null,
+            'pengajuan_surat_lain_id' => $jenis === 'lain' ? $pengajuanSuratLainId : null,
+        ],
+        [
+            'file_surat' => $filepath,
+            'token' => $token,
+            'hash_dokumen' => $hashDokumen,
+            'waktu_ttd' => $waktuTtd,
+        ]
+    );
 
         if (!empty($pengajuan->warga->email)) {
             Mail::to($pengajuan->warga->email)->send(new SuratDisetujuiRw($pengajuan));
@@ -195,12 +206,13 @@ class ManajemenSuratWargaController extends Controller
 
     public function tolak(Request $request)
     {
-        $pengajuanId = $request->pengajuan_id;
+        $pengajuanSuratId = $request->pengajuan_surat_id;
+        $pengajuanSuratLainId = $request->pengajuan_surat_lain_id;
         $jenis = $request->jenis;
         $alasan = $request->alasan_penolakan;
 
         if ($jenis === 'biasa') {
-            $pengajuan = PengajuanSurat::with('warga.rt')->find($pengajuanId);
+            $pengajuan = PengajuanSurat::with('warga.rt')->find($pengajuanSuratId);
             if ($pengajuan) {
                 $pengajuan->status_rw = 'ditolak';
                 $pengajuan->waktu_persetujuan_rw = now();
@@ -216,7 +228,7 @@ class ManajemenSuratWargaController extends Controller
                 }
             }
         } else {
-            $pengajuan = PengajuanSuratLain::with('warga.rt')->find($pengajuanId);
+            $pengajuan = PengajuanSuratLain::with('warga.rt')->find($pengajuanSuratLainId);
             if ($pengajuan) {
                 $pengajuan->status_rw_pengajuan_lain = 'ditolak';
                 $pengajuan->waktu_persetujuan_rw_lain = now();
@@ -255,12 +267,12 @@ class ManajemenSuratWargaController extends Controller
             'warga.rt.rw',
             'warga.scan_KK.alamat',
             'tujuanSurat'
-            ])->where('id_pengajuan_surat', $hasilSurat->pengajuan_id)->first();
+            ])->where('id_pengajuan_surat', $hasilSurat->pengajuan_surat_id)->first();
         } else {
             $pengajuan = PengajuanSuratLain::with([
                 'warga.rt.rw',
                 'warga.scan_KK.alamat'
-            ])->where('id_pengajuan_surat_lain', $hasilSurat->pengajuan_id)->first();
+            ])->where('id_pengajuan_surat_lain', $hasilSurat->pengajuan_surat_lain_id)->first();
         }
 
         if (!$pengajuan) {

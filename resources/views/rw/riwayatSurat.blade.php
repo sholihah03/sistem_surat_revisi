@@ -40,144 +40,180 @@
                     <th class="px-4 py-2">Hasil Surat</th>
                 </tr>
             </thead>
-<tbody>
-    @php $no = 1; @endphp
+            <tbody>
+                @php $no = 1; @endphp
+                {{-- Tampilkan surat yang disetujui --}}
+                @foreach($hasilSuratDisetujui as $item)
+                <tr>
+                    <td class="px-4 py-2">{{ $no++ }}</td>
+                    <td class="px-4 py-2">
+                        @if($item->jenis === 'biasa')
+                            {{ $item->pengajuanSurat->warga->nama_lengkap ?? '-' }}
+                        @else
+                            {{ $item->pengajuanSuratLain->warga->nama_lengkap ?? '-' }}
+                        @endif
+                    </td>
+                    <td class="px-4 py-2">{{ ucfirst($item->jenis) }}</td>
+                    <td class="px-4 py-2">
+                        @if($item->jenis === 'biasa')
+                            {{ $item->pengajuanSurat->tujuanSurat->nama_tujuan ?? '-' }}
+                        @else
+                            {{ $item->pengajuanSuratLain->tujuan_manual ?? '-' }}
+                        @endif
+                    </td>
+                    <td class="px-4 py-2">
+                        @if($item->jenis === 'biasa')
+                            {{ $item->pengajuanSurat->tujuanSurat->nomor_surat ?? '-' }}
+                        @else
+                            {{ $item->pengajuanSuratLain->nomor_surat_pengajuan_lain ?? '-' }}
+                        @endif
+                    </td>
+                    <td class="px-4 py-2">
+                        @if($item->jenis === 'biasa')
+                            {{ $item->pengajuanSurat && $item->pengajuanSurat->waktu_persetujuan_rw ? \Carbon\Carbon::parse($item->pengajuanSurat->waktu_persetujuan_rw)->translatedFormat('d F Y') : '-' }}
+                        @else
+                            {{ $item->pengajuanSuratLain && $item->pengajuanSuratLain->waktu_persetujuan_rw_pengajuan_lain ? \Carbon\Carbon::parse($item->pengajuanSuratLain->waktu_persetujuan_rw_pengajuan_lain)->translatedFormat('d F Y') : '-' }}
+                        @endif
+                    </td>
+                    <td class="px-4 py-2">
+                        @if($item->jenis === 'biasa')
+                            {{ $item->pengajuanSurat->status_rw ?? '-' }}
+                        @else
+                            {{ $item->pengajuanSuratLain->status_rw_pengajuan_lain ?? '-' }}
+                        @endif
+                    </td>
+                    <td class="px-4 py-2">
+                        @if($item->jenis === 'biasa')
+                            {{ $item->pengajuanSurat->alasan_penolakan_pengajuan ?? 'Tidak Ada' }}
+                        @else
+                            {{ $item->pengajuanSuratLain->alasan_penolakan_pengajuan_lain ?? 'Tidak Ada' }}
+                        @endif
+                    </td>
+                    <td class="px-4 py-2">
+                        @php
+                            $isSuratBiasa = $item->jenis === 'biasa';
+                            $pengajuan = $isSuratBiasa ? $item->pengajuanSurat : $item->pengajuanSuratLain;
+                        @endphp
+                        @if($isSuratBiasa && $pengajuan->pengajuan->isNotEmpty())
+                            <ul class="list-disc pl-4">
+                                @foreach ($pengajuan->pengajuan as $dokumen)
+                                    <li class="mb-2">
+                                        <p class="text-sm text-gray-700 mb-1">
+                                            {{ $dokumen->persyaratan->nama_persyaratan ?? 'Dokumen' }}
+                                        </p>
+                                        <img
+                                            src="{{ asset('storage/' . str_replace('public/', '', $dokumen->dokumen)) }}"
+                                            alt="Dokumen Persyaratan"
+                                            class="w-32 cursor-pointer"
+                                            onclick="showImageModal('{{ asset('storage/' . str_replace('public/', '', $dokumen->dokumen)) }}', '{{ $dokumen->persyaratan->nama_persyaratan }}')"
+                                        />
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <span class="text-gray-400">Tidak ada dokumen</span>
+                        @endif
+                    </td>
+                    <td class="px-4 py-2">
+                        @if(!empty($item->id_hasil_surat_ttd_rw))
+                            <button
+                                onclick="showHasilSuratModal('{{ route('rw.lihatHasilSurat', ['id' => $item->id_hasil_surat_ttd_rw]) }}')"
+                                class="btn btn-info lihat-surat px-3 py-1 bg-yellow-500 text-white font-semibold rounded"
+                            >
+                                Lihat Surat
+                            </button>
+                        @else
+                            <span class="text-gray-400">Surat tidak tersedia</span>
+                        @endif
+                    </td>
+                </tr>
+                @endforeach
 
-    {{-- Tampilkan surat yang disetujui --}}
-    @foreach($hasilSuratDisetujui as $item)
-    <tr>
-        <td class="px-4 py-2">{{ $no++ }}</td>
-        <td class="px-4 py-2">
-            @if($item->jenis === 'biasa')
-                {{ $item->pengajuanSurat->warga->nama_lengkap ?? '-' }}
-            @else
-                {{ $item->pengajuanSuratLain->warga->nama_lengkap ?? '-' }}
-            @endif
-        </td>
-        <td class="px-4 py-2">{{ ucfirst($item->jenis) }}</td>
-        <td class="px-4 py-2">
-            @if($item->jenis === 'biasa')
-                {{ $item->pengajuanSurat->tujuanSurat->nama_tujuan ?? '-' }}
-            @else
-                {{ $item->pengajuanSuratLain->tujuan_manual ?? '-' }}
-            @endif
-        </td>
-        <td class="px-4 py-2">
-            @if($item->jenis === 'biasa')
-                {{ $item->pengajuanSurat->tujuanSurat->nomor_surat ?? '-' }}
-            @else
-                {{ $item->pengajuanSuratLain->nomor_surat_pengajuan_lain ?? '-' }}
-            @endif
-        </td>
-        <td class="px-4 py-2">
-            @if($item->jenis === 'biasa')
-                {{ $item->pengajuanSurat && $item->pengajuanSurat->waktu_persetujuan_rw ? \Carbon\Carbon::parse($item->pengajuanSurat->waktu_persetujuan_rw)->translatedFormat('d F Y') : '-' }}
-            @else
-                {{ $item->pengajuanSuratLain && $item->pengajuanSuratLain->waktu_persetujuan_rw_pengajuan_lain ? \Carbon\Carbon::parse($item->pengajuanSuratLain->waktu_persetujuan_rw_pengajuan_lain)->translatedFormat('d F Y') : '-' }}
-            @endif
-        </td>
-        <td class="px-4 py-2">
-            @if($item->jenis === 'biasa')
-                {{ $item->pengajuanSurat->status_rw ?? '-' }}
-            @else
-                {{ $item->pengajuanSuratLain->status_rw_pengajuan_lain ?? '-' }}
-            @endif
-        </td>
-        <td class="px-4 py-2">
-            @if($item->jenis === 'biasa')
-                {{ $item->pengajuanSurat->alasan_penolakan_pengajuan ?? 'Tidak Ada' }}
-            @else
-                {{ $item->pengajuanSuratLain->alasan_penolakan_pengajuan_lain ?? 'Tidak Ada' }}
-            @endif
-        </td>
-        <td class="px-4 py-2">
-            @php
-                $isSuratBiasa = $item->jenis === 'biasa';
-                $pengajuan = $isSuratBiasa ? $item->pengajuanSurat : $item->pengajuanSuratLain;
-            @endphp
-            @if($isSuratBiasa && $pengajuan->pengajuan->isNotEmpty())
-                <ul class="list-disc pl-4">
-                    @foreach ($pengajuan->pengajuan as $dokumen)
-                        <li class="mb-2">
-                            <p class="text-sm text-gray-700 mb-1">
-                                {{ $dokumen->persyaratan->nama_persyaratan ?? 'Dokumen' }}
-                            </p>
-                            <img
-                                src="{{ asset('storage/' . str_replace('public/', '', $dokumen->dokumen)) }}"
-                                alt="Dokumen Persyaratan"
-                                class="w-32 cursor-pointer"
-                                onclick="showImageModal('{{ asset('storage/' . str_replace('public/', '', $dokumen->dokumen)) }}', '{{ $dokumen->persyaratan->nama_persyaratan }}')"
-                            />
-                        </li>
-                    @endforeach
-                </ul>
-            @else
-                <span class="text-gray-400">Tidak ada dokumen</span>
-            @endif
-        </td>
-<td class="px-4 py-2">
-    @if(!empty($item->id_hasil_surat_ttd_rw))
-        <button
-            onclick="showHasilSuratModal('{{ route('rw.lihatHasilSurat', ['id' => $item->id_hasil_surat_ttd_rw]) }}')"
-            class="btn btn-info lihat-surat px-3 py-1 bg-yellow-500 text-white font-semibold rounded"
-        >
-            Lihat Surat
-        </button>
-    @else
-        <span class="text-gray-400">Surat tidak tersedia</span>
-    @endif
-</td>
+                {{-- Tampilkan surat yang ditolak (jenis biasa) --}}
+                @foreach($pengajuanDitolakBiasa as $item)
+                <tr>
+                    <td class="px-4 py-2">{{ $no++ }}</td>
+                    <td class="px-4 py-2">{{ $item->warga->nama_lengkap ?? '-' }}</td>
+                    <td class="px-4 py-2">Biasa</td>
+                    <td class="px-4 py-2">{{ $item->tujuanSurat->nama_tujuan ?? '-' }}</td>
+                    <td class="px-4 py-2">{{ $item->tujuanSurat->nomor_surat ?? '-' }}</td>
+                    <td class="px-4 py-2">
+                        {{ $item->waktu_persetujuan_rw ? \Carbon\Carbon::parse($item->waktu_persetujuan_rw)->translatedFormat('d F Y') : '-' }}
+                    </td>
+                    <td class="px-4 py-2 text-red-600 font-semibold">Ditolak</td>
+                    <td class="px-4 py-2">{{ $item->alasan_penolakan_pengajuan ?? '-' }}</td>
+                    <td class="px-4 py-2">
+                        @if($item->pengajuan && $item->pengajuan->isNotEmpty())
+                            <ul class="list-disc pl-4">
+                                @foreach ($item->pengajuan as $dokumen)
+                                    <li class="mb-2">
+                                        <p class="text-sm text-gray-700 mb-1">
+                                            {{ $dokumen->persyaratan->nama_persyaratan ?? 'Dokumen' }}
+                                        </p>
+                                        <img
+                                            src="{{ asset('storage/' . str_replace('public/', '', $dokumen->dokumen)) }}"
+                                            alt="Dokumen Persyaratan"
+                                            class="w-32 cursor-pointer"
+                                            onclick="showImageModal('{{ asset('storage/' . str_replace('public/', '', $dokumen->dokumen)) }}', '{{ $dokumen->persyaratan->nama_persyaratan }}')"
+                                        />
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <span class="text-gray-500 font-semibold">Tidak Ada</span>
+                        @endif
+                    </td>
+                    <td class="px-4 py-2"><span class="text-gray-500 font-semibold">Tidak Ada</span></td>
+                </tr>
+                @endforeach
 
+                {{-- Tampilkan surat yang ditolak (jenis lain) --}}
+                @foreach($pengajuanDitolakLain as $item)
+                <tr>
+                    <td class="px-4 py-2">{{ $no++ }}</td>
+                    <td class="px-4 py-2">{{ $item->warga->nama_lengkap ?? '-' }}</td>
+                    <td class="px-4 py-2">Lain</td>
+                    <td class="px-4 py-2">{{ $item->tujuan_manual ?? '-' }}</td>
+                    <td class="px-4 py-2">{{ $item->nomor_surat_pengajuan_lain ?? '-' }}</td>
+                    <td class="px-4 py-2">
+                        {{ $item->waktu_persetujuan_rw_pengajuan_lain ? \Carbon\Carbon::parse($item->waktu_persetujuan_rw_pengajuan_lain)->translatedFormat('d F Y') : '-' }}
+                    </td>
+                    <td class="px-4 py-2 text-red-600 font-semibold">Ditolak</td>
+                    <td class="px-4 py-2">{{ $item->alasan_penolakan_pengajuan_lain ?? '-' }}</td>
+                    <td class="px-4 py-2">
+                        @if($item->pengajuan && $item->pengajuan->isNotEmpty())
+                            <ul class="list-disc pl-4">
+                                @foreach ($item->pengajuan as $dokumen)
+                                    <li class="mb-2">
+                                        <p class="text-sm text-gray-700 mb-1">
+                                            {{ $dokumen->persyaratan->nama_persyaratan ?? 'Dokumen' }}
+                                        </p>
+                                        <img
+                                            src="{{ asset('storage/' . str_replace('public/', '', $dokumen->dokumen)) }}"
+                                            alt="Dokumen Persyaratan"
+                                            class="w-32 cursor-pointer"
+                                            onclick="showImageModal('{{ asset('storage/' . str_replace('public/', '', $dokumen->dokumen)) }}', '{{ $dokumen->persyaratan->nama_persyaratan }}')"
+                                        />
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <span class="text-gray-500 font-semibold">Tidak Ada</span>
+                        @endif
+                    </td>
+                    <td class="px-4 py-2"><span class="text-gray-500 font-semibold">Tidak Ada</span></td>
+                </tr>
+                @endforeach
 
-
-
-    </tr>
-    @endforeach
-
-    {{-- Tampilkan surat yang ditolak (jenis biasa) --}}
-    @foreach($pengajuanDitolakBiasa as $item)
-    <tr>
-        <td class="px-4 py-2">{{ $no++ }}</td>
-        <td class="px-4 py-2">{{ $item->warga->nama_lengkap ?? '-' }}</td>
-        <td class="px-4 py-2">Biasa</td>
-        <td class="px-4 py-2">{{ $item->tujuanSurat->nama_tujuan ?? '-' }}</td>
-        <td class="px-4 py-2">{{ $item->tujuanSurat->nomor_surat ?? '-' }}</td>
-        <td class="px-4 py-2">
-            {{ $item->waktu_persetujuan_rw ? \Carbon\Carbon::parse($item->waktu_persetujuan_rw)->translatedFormat('d F Y') : '-' }}
-        </td>
-        <td class="px-4 py-2 text-red-600 font-semibold">Ditolak</td>
-        <td class="px-4 py-2">{{ $item->alasan_penolakan_pengajuan ?? '-' }}</td>
-        <td class="px-4 py-2"><span class="text-gray-500 font-semibold">Tidak Ada</span></td>
-    </tr>
-    @endforeach
-
-    {{-- Tampilkan surat yang ditolak (jenis lain) --}}
-    @foreach($pengajuanDitolakLain as $item)
-    <tr>
-        <td class="px-4 py-2">{{ $no++ }}</td>
-        <td class="px-4 py-2">{{ $item->warga->nama_lengkap ?? '-' }}</td>
-        <td class="px-4 py-2">Lain</td>
-        <td class="px-4 py-2">{{ $item->tujuan_manual ?? '-' }}</td>
-        <td class="px-4 py-2">{{ $item->nomor_surat_pengajuan_lain ?? '-' }}</td>
-        <td class="px-4 py-2">
-            {{ $item->waktu_persetujuan_rw_pengajuan_lain ? \Carbon\Carbon::parse($item->waktu_persetujuan_rw_pengajuan_lain)->translatedFormat('d F Y') : '-' }}
-        </td>
-        <td class="px-4 py-2 text-red-600 font-semibold">Ditolak</td>
-        <td class="px-4 py-2">{{ $item->alasan_penolakan_pengajuan_lain ?? '-' }}</td>
-        <td class="px-4 py-2"><span class="text-gray-500 font-semibold">Tidak Ada</span></td>
-    </tr>
-    @endforeach
-
-    {{-- Jika semua kosong --}}
-    @if($hasilSuratDisetujui->isEmpty() && $pengajuanDitolakBiasa->isEmpty() && $pengajuanDitolakLain->isEmpty())
-    <tr>
-        <td colspan="9" class="text-center text-gray-500 py-4">
-            Belum ada surat yang disetujui atau ditolak.
-        </td>
-    </tr>
-    @endif
-</tbody>
-
+                {{-- Jika semua kosong --}}
+                @if($hasilSuratDisetujui->isEmpty() && $pengajuanDitolakBiasa->isEmpty() && $pengajuanDitolakLain->isEmpty())
+                <tr>
+                    <td colspan="9" class="text-center text-gray-500 py-4">
+                        Belum ada surat yang disetujui atau ditolak.
+                    </td>
+                </tr>
+                @endif
+            </tbody>
         </table>
     </div>
 </div>

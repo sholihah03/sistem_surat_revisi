@@ -57,6 +57,8 @@
         </form>
     </div>
 
+    @include('components.modal-timeout')
+
     <script>
             let countdown = 60;
     let interval; // Ubah dari const ke let

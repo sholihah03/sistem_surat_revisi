@@ -26,7 +26,7 @@
 
     <div class="bg-white bg-opacity-80 p-4 md:p-6 rounded-xl w-full">
         <div class="overflow-x-auto bg-white shadow rounded-lg">
-            <div class="max-h-[280px] overflow-y-auto">
+            <div class="max-h-[500px] overflow-y-auto">
                 <table class="min-w-full text-sm text-left">
                     <thead class="bg-gray-100 sticky top-0 z-10">
                         <tr>

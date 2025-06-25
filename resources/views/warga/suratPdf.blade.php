@@ -18,5 +18,6 @@
     <div class="mt-4">
         <a href="{{ $fileUrl }}" target="_blank" class="text-blue-600 hover:underline">Buka di tab baru</a>
     </div>
+    @include('components.modal-timeout')
 </body>
 </html>

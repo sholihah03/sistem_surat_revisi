@@ -36,7 +36,7 @@ class VerifikasiSuratController extends Controller
     public function proses(Request $request)
     {
         Carbon::setLocale('id');
-        $id = $request->id;
+        $id = $request->pengajuan_surat_id ?? $request->pengajuan_surat_lain_id ?? $request->id;
         $jenis = $request->jenis;
         $aksi = $request->aksi;
 
@@ -70,9 +70,10 @@ class VerifikasiSuratController extends Controller
             HasilSuratTtdRt::updateOrCreate(
                 [
                     'jenis' => 'biasa',
-                    'pengajuan_id' => $data->id_pengajuan_surat,
+                    'pengajuan_surat_id' => $data->id_pengajuan_surat,
                 ],
                 [
+                    'pengajuan_surat_lain_id' => null,
                     'file_surat' => 'public/hasil_surat/ttd_rt/' . $filename,
                 ]
             );
@@ -137,9 +138,10 @@ class VerifikasiSuratController extends Controller
                 HasilSuratTtdRt::updateOrCreate(
                     [
                         'jenis' => 'lain',
-                        'pengajuan_id' => $data->id_pengajuan_surat_lain,
+                        'pengajuan_surat_lain_id' => $data->id_pengajuan_surat_lain,
                     ],
                     [
+                        'pengajuan_surat_id' => null,
                         'file_surat' => 'public/hasil_surat/ttd_rt/' . $filename,
                     ]
                 );

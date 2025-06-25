@@ -133,5 +133,7 @@
       </div>
     </div>
   </div>
+
+  @include('components.modal-timeout')
 </body>
 </html>

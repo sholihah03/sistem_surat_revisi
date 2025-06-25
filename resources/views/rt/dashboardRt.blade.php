@@ -78,7 +78,7 @@
                 </div>
             </div>
             <!-- Profile Icon -->
-            <a href="{{ route('profileRt') }}" class="rounded-full overflow-hidden w-8 h-8 bg-blue-100 hover:ring-2 hover:ring-blue-400 block">
+            <a href="{{ route('profileRt') }}" id="profileLink" class="rounded-full overflow-hidden w-8 h-8 bg-blue-100 hover:ring-2 hover:ring-blue-400 block">
                 @if ($profile_rt)
                     <img src="{{ asset('storage/profile_rt/' . $profile_rt) }}" alt="Profile" class="w-full h-full object-cover">
                 @else
@@ -104,6 +104,8 @@
             @yield('content')
         </main>
     </div>
+
+    @include('components.modal-timeout')
 
     <!-- Toggle Sidebar Script -->
     <script>

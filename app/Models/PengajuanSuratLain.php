@@ -50,4 +50,14 @@ class PengajuanSuratLain extends Model
         return $this->tujuanSurat ? $this->tujuanSurat->nama_tujuan : '-';
     }
 
+        public function hasilSuratTtdRt()
+    {
+        return $this->hasOne(HasilSuratTtdRt::class, 'pengajuan_surat_lain_id', 'id_pengajuan_surat_lain');
+    }
+
+    public function hasilSuratTtdRw()
+    {
+        return $this->hasOne(HasilSuratTtdRw::class, 'pengajuan_surat_lain_id', 'id_pengajuan_surat_lain');
+    }
+
 }

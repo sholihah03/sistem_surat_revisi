@@ -61,7 +61,7 @@ class RiwayatSuratRwController extends Controller
             ->get();
 
         // 2. Surat yang ditolak (tidak ada di tb_hasil_surat_ttd_rw)
-        $pengajuanDitolakBiasa = PengajuanSurat::with(['warga', 'tujuanSurat'])
+        $pengajuanDitolakBiasa = PengajuanSurat::with(['warga', 'tujuanSurat', 'pengajuan.persyaratan'])
             ->where('status_rw', 'ditolak')
             ->whereIn('warga_id', $warga_ids)
             ->when($keyword, function ($query) use ($keyword) {
@@ -75,7 +75,7 @@ class RiwayatSuratRwController extends Controller
             })
             ->get();
 
-        $pengajuanDitolakLain = PengajuanSuratLain::with(['warga'])
+        $pengajuanDitolakLain = PengajuanSuratLain::with(['warga', 'pengajuan.persyaratan'])
             ->where('status_rw_pengajuan_lain', 'ditolak')
             ->whereIn('warga_id', $warga_ids)
             ->when($keyword, function ($query) use ($keyword) {

@@ -10,14 +10,14 @@
 @if(session('success'))
 <div id="successModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 sm:p-8 relative w-[90%] max-w-md sm:max-w-lg text-center animate-scale">
-        <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+        <button onclick="closeSuccessModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
         <div class="flex justify-center mb-6">
             <img src="https://img.icons8.com/color/96/000000/ok--v1.png" alt="Success Icon" class="w-20 h-20">
         </div>
         <h2 class="text-2xl font-bold mb-4 text-gray-800 whitespace-nowrap">
             {{ session('success') }}
         </h2>
-        <button onclick="closeModal()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg">
+        <button onclick="closeSuccessModal()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg">
             Tutup
         </button>
     </div>
@@ -45,7 +45,7 @@
                 @forelse($surats as $index => $surat)
                     @php
                         $isSuratBiasa = $surat->jenis === 'biasa';
-                        $pengajuan = $isSuratBiasa ? $surat->pengajuanSurat : $surat->pengajuanSuratLain;
+                        $pengajuan = $isSuratBiasa ? $surat->pengajuanSurat ?? null : $surat->pengajuanSuratLain ?? null;
                         $warga = $pengajuan->warga ?? null;
                     @endphp
                     <tr class="border-t">
@@ -69,7 +69,7 @@
                             @endif
                         </td>
                         <td class="px-4 py-2">
-                            @if($isSuratBiasa && $pengajuan->pengajuan->isNotEmpty())
+                            @if($isSuratBiasa && $pengajuan?->pengajuan && $pengajuan->pengajuan->isNotEmpty())
                                 <ul class="list-disc pl-4">
                                     @foreach ($pengajuan->pengajuan as $item)
                                         <li class="mb-2">
@@ -92,17 +92,34 @@
                         <td class="px-4 py-2">
                             <form class="mb-2" method="POST" action="{{ route('rw.setujuiSurat') }}">
                                 @csrf
-                                <input type="hidden" name="pengajuan_id" value="{{ $surat->pengajuan_id }}">
+                                @if ($isSuratBiasa)
+                                    <input type="hidden" name="pengajuan_surat_id" value="{{ $surat->pengajuan_surat_id }}">
+                                @else
+                                    <input type="hidden" name="pengajuan_surat_lain_id" value="{{ $surat->pengajuan_surat_lain_id }}">
+                                @endif
                                 <input type="hidden" name="jenis" value="{{ $surat->jenis }}">
-                                <button type="submit" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
+                                {{-- <button type="submit" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
+                                    Setujui
+                                </button> --}}
+                                <button type="button"
+                                    onclick="showConfirmModal('{{ $surat->pengajuan_surat_id ?? $surat->pengajuan_surat_lain_id }}', '{{ $surat->jenis }}')"
+                                    class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
                                     Setujui
                                 </button>
                             </form>
-                            <button type="button"
-                                onclick="showModal('{{ $surat->pengajuan_id }}', '{{ $surat->jenis }}')"
-                                class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
-                                Tolak
-                            </button>
+                            @if ($isSuratBiasa)
+                                <button type="button"
+                                    onclick="showModal('{{ $surat->pengajuan_surat_id }}', '{{ $surat->jenis }}', 'biasa')"
+                                    class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                                    Tolak
+                                </button>
+                            @else
+                                <button type="button"
+                                    onclick="showModal('{{ $surat->pengajuan_surat_lain_id }}', '{{ $surat->jenis }}', 'lain')"
+                                    class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                                    Tolak
+                                </button>
+                            @endif
                         </td>
                     </tr>
                 @empty
@@ -123,12 +140,29 @@
     </div>
 </div>
 
+<!-- Modal konfirmasi setujui -->
+<div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white p-6 rounded shadow w-full max-w-md text-center">
+        <h2 class="text-xl font-bold mb-4 text-gray-800">Konfirmasi Persetujuan</h2>
+        <p class="text-gray-600 mb-6">Apakah Anda yakin ingin menyetujui pengajuan surat ini?</p>
+        <form id="confirmForm" method="POST" action="{{ route('rw.setujuiSurat') }}">
+            @csrf
+            <input type="hidden" name="jenis" id="confirmJenis">
+            <input type="hidden" id="confirmId">
+            <div class="flex justify-center gap-4">
+                <button type="button" onclick="closeConfirmModal()" class="px-4 py-2 bg-gray-300 rounded">Batal</button>
+                <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded">Ya, Setujui</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Modal alasan ditolak -->
 <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
     <div class="bg-white p-6 rounded shadow w-full max-w-md">
         <form id="modalForm" method="POST" action="{{ route('rw.tolakSurat') }}">
             @csrf
-            <input type="hidden" name="pengajuan_id" id="formId">
+            <input type="hidden" id="formId">
             <input type="hidden" name="jenis" id="formJenis">
             <input type="hidden" name="aksi" id="formAksi">
 
@@ -164,7 +198,32 @@
         currentImageUrl = '';
     }
 
-    function showModal(id, jenis) {
+    function showConfirmModal(id, jenis) {
+        document.getElementById('confirmForm').reset();
+
+        if (jenis === 'biasa') {
+            document.getElementById('confirmId').setAttribute('name', 'pengajuan_surat_id');
+        } else {
+            document.getElementById('confirmId').setAttribute('name', 'pengajuan_surat_lain_id');
+        }
+
+        document.getElementById('confirmId').value = id;
+        document.getElementById('confirmJenis').value = jenis;
+        document.getElementById('confirmModal').classList.remove('hidden');
+    }
+
+    function closeConfirmModal() {
+        document.getElementById('confirmModal').classList.add('hidden');
+        document.getElementById('confirmId').value = '';
+        document.getElementById('confirmJenis').value = '';
+    }
+
+    function showModal(id, jenis, tipe) {
+        if (tipe === 'biasa') {
+            document.getElementById('formId').setAttribute('name', 'pengajuan_surat_id');
+        } else {
+            document.getElementById('formId').setAttribute('name', 'pengajuan_surat_lain_id');
+        }
         document.getElementById('formId').value = id;
         document.getElementById('formJenis').value = jenis;
         document.getElementById('formAksi').value = 'tolak';
@@ -184,10 +243,13 @@
         document.querySelector('[name=alasan_penolakan]').value = '';
     }
 
-    function closeModal() {
+    function closeSuccessModal() {
         const modal = document.getElementById('successModal');
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
     }
+
 </script>
 @endsection

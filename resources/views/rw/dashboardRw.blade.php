@@ -29,6 +29,7 @@
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-green-100 via-white to-yellow-100 font-inter">
+
     <!-- Navbar -->
     <header class="fixed top-0 left-0 right-0 bg-white shadow-md p-4 flex justify-between items-center z-50">
         <h2 class="text-xl font-bold text-green-700">Dashboard RW</h2>
@@ -91,7 +92,7 @@
             </div>
 
             <!-- Profile Icon -->
-            <a href="{{ route('profileRw') }}" class="rounded-full overflow-hidden w-8 h-8 bg-green-100 hover:ring-2 hover:ring-green-400 block">
+            <a href="{{ route('profileRw') }}" id="profileLink" class="rounded-full overflow-hidden w-8 h-8 bg-green-100 hover:ring-2 hover:ring-green-400 block">
                 @if ($profile_rw)
                     <img src="{{ asset('storage/profile_rw/' . $profile_rw) }}" alt="Profile" class="w-full h-full object-cover">
                 @else
@@ -117,6 +118,7 @@
         </main>
     </div>
 
+@include('components.modal-timeout')
     <!-- Toggle Sidebar Script -->
     <script>
         const btn = document.getElementById('menu-button');

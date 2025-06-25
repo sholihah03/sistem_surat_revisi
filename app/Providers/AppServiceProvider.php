@@ -163,11 +163,15 @@ class AppServiceProvider extends ServiceProvider
             $profile_rw = Auth::guard('rw')->user()->profile_rw ?? null;
             // Ambil pengajuan biasa yang sudah ada hasilnya
             $pengajuanSuratDisetujuiIds = HasilSuratTtdRw::where('jenis', 'biasa')
-                ->pluck('pengajuan_id')->toArray();
+                ->whereNotNull('pengajuan_surat_id')
+                ->pluck('pengajuan_surat_id')
+                ->toArray();
 
             // Ambil pengajuan lain yang sudah ada hasilnya
             $pengajuanSuratLainDisetujuiIds = HasilSuratTtdRw::where('jenis', 'lain')
-                ->pluck('pengajuan_id')->toArray();
+                ->whereNotNull('pengajuan_surat_lain_id')
+                ->pluck('pengajuan_surat_lain_id')
+                ->toArray();
 
             $pengajuanSuratBaru = PengajuanSurat::with(['warga.rt'])
                 ->where('status_rt', 'disetujui')

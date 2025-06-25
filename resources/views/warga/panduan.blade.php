@@ -74,5 +74,7 @@
             Semoga panduan ini bisa membantu Anda menggunakan layanan surat dengan lebih mudah. Terima kasih atas partisipasinya dalam sistem pelayanan warga berbasis digital ini.
         </div>
     </section>
+
+    @include('components.modal-timeout')
 </body>
 </html>

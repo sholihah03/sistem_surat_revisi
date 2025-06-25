@@ -129,12 +129,15 @@ class RiwayatSuratWargaController extends Controller
         $pengajuanLain = $pengajuanLain->get();
 
         // Ambil hasil surat seperti biasa, sesuaikan id pengajuan
-        $hasilSurat = HasilSuratTtdRt::whereIn('jenis', ['biasa', 'lain'])
-            ->whereIn('pengajuan_id', $pengajuanBiasa->pluck('id_pengajuan_surat')->merge($pengajuanLain->pluck('id_pengajuan_surat_lain')))
-            ->get()
-            ->keyBy(function($item) {
-                return $item->jenis.'-'.$item->pengajuan_id;
-            });
+        $hasilSurat = HasilSuratTtdRt::whereIn('jenis', ['biasa', 'lain'])->get()
+        ->keyBy(function($item) {
+            if ($item->jenis === 'biasa') {
+                return 'biasa-' . $item->pengajuan_surat_id;
+            } elseif ($item->jenis === 'lain') {
+                return 'lain-' . $item->pengajuan_surat_lain_id;
+            }
+            return null;
+        });
 
         $profile_rt = Auth::guard('rt')->user()->profile_rt;
 

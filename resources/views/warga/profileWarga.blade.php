@@ -14,6 +14,7 @@
 
 <body class="min-h-screen bg-yellow-50">
     @include('komponen.nav')
+
     <!-- Breadcrumb -->
     <nav class="max-w-7xl mx-auto px-4 pt-6 text-sm text-gray-600">
     <ol class="flex items-center space-x-2">
@@ -303,6 +304,8 @@
             </div>
         </div>
     </div>
+
+    @include('components.modal-timeout')
 
     <script>
         let originalSrc = document.getElementById('profilePreview').src;

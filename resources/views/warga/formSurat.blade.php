@@ -71,5 +71,7 @@
     </form>
   </div>
 
+  @include('components.modal-timeout')
+
 </body>
 </html>

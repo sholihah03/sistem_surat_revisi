@@ -93,8 +93,8 @@
                         <td class="p-3">{{ $surat->warga->scan_kk->alamat->nama_jalan }}</td>
                         <td class="p-3">{{ ucfirst($surat->status_rt_pengajuan_lain) }}</td>
                         <td class="p-3 flex gap-2">
-                            <button onclick="showModal('setuju', {{ $surat->id_pengajuan_surat_lain }}, 'lain')" class="px-3 py-1 bg-green-500 text-white rounded">Setujui</button>
-                            <button onclick="showModal('tolak', {{ $surat->id_pengajuan_surat_lain }}, 'lain')" class="px-3 py-1 bg-red-500 text-white rounded">Tolak</button>
+                            <button type="button" onclick="showModal('setuju', {{ $surat->id_pengajuan_surat_lain }}, 'lain')" class="px-3 py-1 bg-green-500 text-white rounded">Setujui</button>
+                            <button type="button" onclick="showModal('tolak', {{ $surat->id_pengajuan_surat_lain }}, 'lain')" class="px-3 py-1 bg-red-500 text-white rounded">Tolak</button>
                         </td>
                     </tr>
                     @endforeach
@@ -109,7 +109,7 @@
     <div class="bg-white p-6 rounded shadow w-full max-w-md">
         <form id="modalForm" method="POST" action="{{ route('verifikasiSuratProses') }}">
             @csrf
-            <input type="hidden" name="id" id="formId">
+            <input type="hidden" id="formId" name="pengajuan_surat_id">
             <input type="hidden" name="jenis" id="formJenis">
             <input type="hidden" name="aksi" id="formAksi">
 
@@ -155,8 +155,10 @@
         }
 
 function showModal(aksi, id, jenis) {
+    console.log('showModal called:', aksi, id, jenis);
+
+    // Jika surat jenis biasa dan disetujui → langsung proses (tanpa modal)
     if (aksi === 'setuju' && jenis === 'biasa') {
-        // Buat form dinamis dan langsung submit
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = "{{ route('verifikasiSuratProses') }}";
@@ -169,7 +171,7 @@ function showModal(aksi, id, jenis) {
 
         const inputId = document.createElement('input');
         inputId.type = 'hidden';
-        inputId.name = 'id';
+        inputId.name = 'id'; // 👈 PENTING: Sesuai controller $request->id
         inputId.value = id;
         form.appendChild(inputId);
 
@@ -190,17 +192,23 @@ function showModal(aksi, id, jenis) {
         return;
     }
 
-    // Reset input dan tampilkan modal untuk selain "biasa disetujui"
-    document.getElementById('formId').value = id;
+    // Jika bukan jenis biasa atau tolak, munculkan modal
+    const formIdInput = document.getElementById('formId');
+    formIdInput.value = id;
+    formIdInput.name = (jenis === 'biasa') ? 'pengajuan_surat_id' : 'pengajuan_surat_lain_id';
+
     document.getElementById('formAksi').value = aksi;
     document.getElementById('formJenis').value = jenis;
 
+    // Reset input tambahan
     document.getElementById('inputNomorSurat').classList.add('hidden');
     document.getElementById('inputAlasanTolak').classList.add('hidden');
 
     if (aksi === 'setuju' && jenis === 'lain') {
         document.getElementById('inputNomorSurat').classList.remove('hidden');
-    } else if (aksi === 'tolak') {
+    }
+
+    if (aksi === 'tolak') {
         document.getElementById('inputAlasanTolak').classList.remove('hidden');
     }
 
@@ -210,6 +218,17 @@ function showModal(aksi, id, jenis) {
 
 function closeModal() {
     document.getElementById('modal').classList.add('hidden');
+
+    const formIdInput = document.getElementById('formId');
+    formIdInput.value = '';
+    formIdInput.removeAttribute('name');
+    formIdInput.name = 'pengajuan_surat_id';
+
+    document.getElementById('formAksi').value = '';
+    document.getElementById('formJenis').value = '';
+
+    document.querySelector('[name=alasan_penolakan]').value = '';
+    document.querySelector('[name=nomor_surat]').value = '';
 }
 </script>
 @endsection

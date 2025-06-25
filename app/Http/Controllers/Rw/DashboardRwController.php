@@ -137,8 +137,15 @@ class DashboardRwController extends Controller
 
         $totalSuratDisetujui = $suratDisetujuiBiasa + $suratDisetujuiLain;
 
-        $suratBelumTtdRwCount = HasilSuratTtdRt::whereDoesntHave('hasilSuratTtdRw', function ($query) {
-            $query->whereColumn('jenis', 'tb_hasil_surat_ttd_rt.jenis');
+        $suratBelumTtdRwCount = HasilSuratTtdRt::where(function ($query) {
+            $query->where(function ($q) {
+                $q->whereNotNull('pengajuan_surat_id')
+                ->whereDoesntHave('hasilSuratTtdRwBiasa');
+            })
+            ->orWhere(function ($q) {
+                $q->whereNotNull('pengajuan_surat_lain_id')
+                ->whereDoesntHave('hasilSuratTtdRwLain');
+            });
         })
         ->where(function ($query) use ($rwId) {
             $query->whereHas('pengajuanSurat.warga.rt', function ($q) use ($rwId) {
@@ -149,6 +156,7 @@ class DashboardRwController extends Controller
             });
         })
         ->count();
+
 
         return view('rw.mainRw', [
             'totalSuratMasuk' => $totalSuratMasuk,

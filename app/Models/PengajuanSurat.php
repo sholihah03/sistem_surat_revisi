@@ -62,4 +62,14 @@ class PengajuanSurat extends Model
         return $this->tujuan_manual ?: '-';
     }
 
+    public function hasilSuratTtdRt()
+    {
+        return $this->hasOne(HasilSuratTtdRt::class, 'pengajuan_surat_id', 'id_pengajuan_surat');
+    }
+
+    public function hasilSuratTtdRw()
+    {
+        return $this->hasOne(HasilSuratTtdRw::class, 'pengajuan_surat_id', 'id_pengajuan_surat');
+    }
+
 }

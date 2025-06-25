@@ -73,6 +73,8 @@
         </div>
     </div>
 
+    @include('components.modal-timeout')
+
     <script>
         function closeModal() {
             document.getElementById('errorModal')?.remove();

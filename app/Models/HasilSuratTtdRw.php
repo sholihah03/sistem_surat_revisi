@@ -14,7 +14,8 @@ class HasilSuratTtdRw extends Model
 
     protected $fillable = [
         'jenis',
-        'pengajuan_id',
+        'pengajuan_surat_id',
+        'pengajuan_surat_lain_id',
         'file_surat',
         'is_read',
         'token',
@@ -24,11 +25,11 @@ class HasilSuratTtdRw extends Model
     // Relasi opsional (jika ingin digunakan)
     public function pengajuanSurat()
     {
-        return $this->belongsTo(PengajuanSurat::class, 'pengajuan_id');
+        return $this->belongsTo(PengajuanSurat::class, 'pengajuan_surat_id');
     }
 
     public function pengajuanSuratLain()
     {
-        return $this->belongsTo(PengajuanSuratLain::class, 'pengajuan_id');
+        return $this->belongsTo(PengajuanSuratLain::class, 'pengajuan_surat_lain_id');
     }
 }

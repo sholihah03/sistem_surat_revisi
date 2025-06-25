@@ -154,6 +154,8 @@
         </div>
     </div>
 
+    @include('components.modal-timeout')
+
     <script>
         function validateLength(input) {
             // Batasi input hanya 16 digit

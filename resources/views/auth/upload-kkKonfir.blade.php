@@ -97,5 +97,7 @@
         @endif
     </div>
 
+    @include('components.modal-timeout')
+
 </body>
 </html>

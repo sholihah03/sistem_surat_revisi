@@ -86,6 +86,8 @@
         </form>
     </div>
 
+    @include('components.modal-timeout')
+
     <script>
         function togglePassword(inputId, iconId) {
             const input = document.getElementById(inputId);
