@@ -10,6 +10,7 @@ use App\Http\Middleware\AuthenticateWarga;
 use App\Http\Controllers\UploadKKController;
 use App\Http\Controllers\Rt\BankDataController;
 use App\Http\Controllers\BuatPasswordController;
+use App\Http\Controllers\LupaPasswordController;
 use App\Http\Controllers\Rt\DataWargaController;
 use App\Http\Controllers\Rt\ProfileRtController;
 use App\Http\Controllers\Rw\ProfileRwController;
@@ -44,6 +45,17 @@ Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::get('/daftar', [DaftarController::class, 'index'])->name('daftar');
 Route::post('/daftar', [DaftarController::class, 'store']);
+
+// Halaman lupa password
+Route::get('/lupa-password', [LupaPasswordController::class, 'index'])->name('emailLupaPassword');
+Route::post('/lupa-password', [LupaPasswordController::class, 'kirimOtp'])->name('password.kirimOtp');
+
+// Verifikasi OTP reset password
+Route::get('/verifikasi-otp-reset', [OTPController::class, 'indexReset'])->name('otp.indexReset');
+Route::post('/verifikasi-otp-reset', [OTPController::class, 'verifikasiReset'])->name('otp.verifikasiReset');
+
+Route::get('/buat-password-baru', [LupaPasswordController::class, 'formPasswordBaru'])->name('buatPasswordBaru');
+Route::post('/buat-password-baru', [LupaPasswordController::class, 'simpanPasswordBaru'])->name('buatPasswordBaru.simpan');
 
 Route::get('/otp', [OTPController::class, 'index'])->name('otp');
 Route::post('/otp/verifikasi', [OTPController::class, 'verifikasi'])->name('otp.verifikasi');

@@ -21,6 +21,11 @@ class BuatPasswordController extends Controller
         $request->validate([
             'password' => 'required|string|confirmed|min:6|max:6',
             'id_warga' => 'required|exists:tb_wargas,id_warga',
+        ], [
+            'password.required' => 'Password baru wajib diisi.',
+            'password.min' => 'Password harus terdiri dari 6 karakter.',
+            'password.max' => 'Password maksimal 6 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak sesuai.',
         ]);
 
         $warga = Wargas::find($request->id_warga);

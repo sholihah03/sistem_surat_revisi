@@ -15,6 +15,8 @@ class Otp extends Model
 
     protected $fillable = [
         'warga_id',
+        'rt_id',
+        'rw_id',
         'kode_otp',
         'expired_at',
         'is_used',
@@ -24,5 +26,13 @@ class Otp extends Model
     public function warga()
     {
         return $this->belongsTo(Wargas::class, 'warga_id', 'id_warga');
+    }
+    public function rt()
+    {
+        return $this->belongsTo(Rt::class, 'rt_id', 'id_rt');
+    }
+    public function rw()
+    {
+        return $this->belongsTo(Rw::class, 'rw_id', 'id_rw');
     }
 }

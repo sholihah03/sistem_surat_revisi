@@ -4,6 +4,6 @@
 
 <p><strong>Kode OTP Anda:</strong></p>
 <h3 style="font-size: 28px;">{{ $otp }}</h3>
-<p>Kode ini akan kedaluwarsa dalam 60 detik.</p>
+<p>Kode ini akan kedaluwarsa dalam 120 detik.</p>
 
 <p>Terima kasih!</p>

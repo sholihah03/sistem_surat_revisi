@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Rt;
+use App\Models\Rw;
 use App\Models\Otp;
 use App\Models\Wargas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use App\Mail\OtpResetPasswordMail;
 use App\Mail\KirimUlangOtpRegister;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\VerifikasiAkunDisetujui;
 
 class OTPController extends Controller
 {
@@ -51,40 +55,139 @@ class OTPController extends Controller
         return back()->with('error', 'Kode OTP tidak valid atau sudah kadaluarsa.');
     }
 
+    public function indexReset(Request $request){
+        return view('auth.otp-lupa-password');
+    }
+
+    public function verifikasiReset(Request $request)
+    {
+        $kodeOtp = implode('', $request->input('otp'));
+
+        $otpData = Otp::where('kode_otp', $kodeOtp)
+            ->where('expired_at', '>=', now())
+            ->where('jenis_otp', 'reset_password')
+            ->where('is_used', false)
+            ->latest()
+            ->first();
+
+        if (!$otpData) {
+            return back()->with('error', 'Kode OTP tidak valid atau sudah kadaluarsa.');
+        }
+
+        // Tandai OTP sudah dipakai
+        $otpData->is_used = true;
+        $otpData->save();
+
+        // Cek role berdasarkan isi kolom ID yang terisi
+        if ($otpData->warga_id) {
+            session([
+                'reset_id' => $otpData->warga_id,
+                'reset_role' => 'warga'
+            ]);
+        } elseif ($otpData->rt_id) {
+            session([
+                'reset_id' => $otpData->rt_id,
+                'reset_role' => 'rt'
+            ]);
+        } elseif ($otpData->rw_id) {
+            session([
+                'reset_id' => $otpData->rw_id,
+                'reset_role' => 'rw'
+            ]);
+        }
+
+        return redirect()->route('buatPasswordBaru');
+    }
+
     public function kirimUlang(Request $request)
     {
-        $email = session('email_warga'); // Ambil email dari session
+        // Ambil email & jenis OTP dari session
+        $email = session('email_warga') ?? session('email_reset');
+        $tipeOtp = session('otp_jenis') ?? 'register'; // Bisa: register / reset_password
 
         if (!$email) {
             return response()->json(['message' => 'Email tidak ditemukan di sesi.'], 400);
         }
 
+        // Deteksi role dari email
+        $user = null;
+        $tipe = null;
+
+        // Cek Warga
         $warga = Wargas::where('email', $email)->first();
-        if (!$warga) {
-            return response()->json(['message' => 'Warga tidak ditemukan.'], 404);
+        if ($warga) {
+            $user = $warga;
+            $tipe = 'warga';
+        }
+
+        // Cek RT
+        if (!$user) {
+            $rt = Rt::where('email_rt', $email)->first();
+            if ($rt) {
+                $user = $rt;
+                $tipe = 'rt';
+            }
+        }
+
+        // Cek RW
+        if (!$user) {
+            $rw = Rw::where('email_rw', $email)->first();
+            if ($rw) {
+                $user = $rw;
+                $tipe = 'rw';
+            }
+        }
+
+        if (!$user) {
+            return response()->json(['message' => 'Akun tidak ditemukan.'], 404);
         }
 
         // Generate OTP baru
         $otpBaru = random_int(100000, 999999);
         $expiredAt = now()->addSeconds(60);
 
-        // Simpan ke database
-        Otp::create([
-            'warga_id' => $warga->id_warga,
+        $otpData = [
             'kode_otp' => $otpBaru,
             'expired_at' => $expiredAt,
-            'jenis_otp' => 'register',
-        ]);
+            'jenis_otp' => $tipeOtp,
+        ];
 
-        // Kirim email OTP
-        Mail::to($warga->email)->send(new \App\Mail\VerifikasiAkunDisetujui(
-            $warga->nama_lengkap,
-            $otpBaru,
-            route('otp', ['email' => $warga->email])
-        ));
+        if ($tipe === 'warga') {
+            $otpData['warga_id'] = $user->id_warga;
+        } elseif ($tipe === 'rt') {
+            $otpData['rt_id'] = $user->id_rt;
+        } elseif ($tipe === 'rw') {
+            $otpData['rw_id'] = $user->id_rw;
+        }
+
+        Otp::create($otpData);
+
+        // Nama dinamis
+        $nama = $user->nama_lengkap ?? $user->nama_lengkap_rt ?? $user->nama_lengkap_rw;
+
+        // Pilih link tujuan verifikasi
+        $urlVerifikasi = $tipeOtp === 'register'
+            ? route('otp', ['email' => $email])
+            : route('otp.indexReset');
+
+        // Kirim email berdasarkan jenis OTP
+        if ($tipeOtp === 'register') {
+            Mail::to($email)->send(new VerifikasiAkunDisetujui(
+                $nama,
+                $otpBaru,
+                $urlVerifikasi
+            ));
+        } else {
+            Mail::to($email)->send(new OtpResetPasswordMail(
+                $nama,
+                $otpBaru,
+                $urlVerifikasi
+            ));
+        }
 
         return response()->json(['message' => 'Kode OTP telah dikirim ulang.']);
     }
+
 
 
 }

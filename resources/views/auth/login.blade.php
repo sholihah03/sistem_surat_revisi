@@ -174,6 +174,13 @@
                         </div>
                     </div>
 
+                    <!-- Lupa Password -->
+                    <div class="text-right">
+                        <a href="{{ route('emailLupaPassword') }}" class="text-sm text-black-600 hover:underline font-medium">
+                            Lupa Password?
+                        </a>
+                    </div>
+
                     <!-- Button -->
                     <button type="submit"
                             class="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 rounded-md transition">

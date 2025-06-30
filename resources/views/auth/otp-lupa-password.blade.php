@@ -13,7 +13,7 @@
         <h2 class="text-2xl font-bold text-center text-gray-800">Verifikasi Kode OTP</h2>
         <p class="text-center text-sm text-gray-600">Kode telah dikirim ke Email Anda.</p>
 
-        <form method="POST" action="{{ route('otp.verifikasi') }}" class="space-y-4">
+        <form method="POST" action="{{ route('otp.verifikasiReset') }}" class="space-y-4">
             @if (session('success'))
                 <div class="bg-green-100 text-green-700 p-2 rounded mb-3 text-sm">
                     {{ session('success') }}

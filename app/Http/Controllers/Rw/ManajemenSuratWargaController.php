@@ -124,13 +124,15 @@ class ManajemenSuratWargaController extends Controller
 
         $token = Str::random(40);
         $verificationUrl = route('verifikasi.surat', ['token' => $token]);
+        $waktuTtdRt = $suratRt->created_at ?? now();
 
         $qrContent = "SURAT|"
             . "NS:" . $nomorSurat . "|"
             . "TUJUAN:" . strtoupper($tujuan) . "|"
             . "NIK:" . $maskedNIK . "|"
             . "NAMA:" . strtoupper($pengajuan->warga->nama_lengkap) . "|"
-            . "TGL:" . Carbon::now()->translatedFormat('d F Y') . "|"
+            . "TTD RT:" . Carbon::parse($waktuTtdRt)->translatedFormat('d F Y') . "|"
+            . "TTD RW:" . Carbon::now()->translatedFormat('d F Y') . "|"
             . "VERIF_URL:" . $verificationUrl;
 
         $qrPng = QrCode::format('png')->size(300)->generate($qrContent);
