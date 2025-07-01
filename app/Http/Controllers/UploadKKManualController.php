@@ -41,6 +41,11 @@ class UploadKKManualController extends Controller
             'rt_alamat' => 'required|string|max:5',
             'rw_alamat' => 'required|string|max:5',
             'kode_pos' => 'required|string|max:5',
+        ],[
+            'required' => ':attribute wajib diisi.',
+            'string' => ':attribute harus berupa teks.',
+            'max' => ':attribute maksimal :max karakter.',
+            'unique' => ':attribute sudah terdaftar.',
         ]);
 
         // Cek jika path tidak ada (misalnya session expired)

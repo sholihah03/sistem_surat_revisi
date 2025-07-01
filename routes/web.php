@@ -123,6 +123,7 @@ Route::prefix('rt')->middleware(AuthenticateRt::class)->group(function () {
     Route::post('/verifikasiSuratProses', [VerifikasiSuratController::class, 'proses'])->name('verifikasiSuratProses');
     Route::get('/riwayatSuratWarga', [RiwayatSuratWargaController::class, 'index'])->name('riwayatSuratWarga');
     Route::get('/surat/{id}/lihat', [RiwayatSuratWargaController::class, 'lihatHasilSurat'])->name('rt.lihatHasilSurat');
+    Route::get('/surat-rw/{id}/lihat', [RiwayatSuratWargaController::class, 'lihatSuratRw'])->name('rw.lihatHasilSurat');
     Route::get('/unduh-surat/{id}', [RiwayatSuratWargaController::class, 'unduhHasilSurat'])->name('rt.unduhHasilSurat');
     Route::get('/bankDataKk', [BankDataController::class, 'index'])->name('bankDataKk');
     Route::get('/scanTtdRt', [TtdDigitalController::class, 'index'])->name('scanTtdRt');

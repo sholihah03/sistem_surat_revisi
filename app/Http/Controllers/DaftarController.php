@@ -87,6 +87,11 @@ class DaftarController extends Controller
             return redirect()->route('otp')->with('success', 'Kode OTP telah dikirim ke email Anda.');
         }
 
+        // ✅ Cek NIK duplikat di tb_pendaftaran
+        if (Pendaftaran::where('nik', $request->nik)->exists()) {
+            return back()->withErrors(['daftar_error' => 'NIK sudah pernah didaftarkan dan sedang menunggu proses verifikasi.'])->withInput();
+        }
+
         // ❌ Jika KK belum discan → simpan ke tb_pendaftaran
         Pendaftaran::create([
             'no_kk' => $request->no_kk,

@@ -105,14 +105,20 @@
                                 </td>
                                 <td class="p-3">
                                     @php $key = 'biasa-'.$item->id_pengajuan_surat; @endphp
-                                    @if($hasilSurat->has($key))
-                                        <button class="btn btn-info lihat-surat px-3 py-1 bg-yellow-500 text-white font-semibold rounded" data-id="{{ $hasilSurat[$key]->id_hasil_surat_ttd_rt }}">
+                                    @if($item->status_rw === 'disetujui' && $hasilSuratRw->has($key))
+                                        <button class="lihat-surat px-3 py-1 bg-green-600 text-white font-semibold rounded"
+                                            data-id="{{ $hasilSuratRw[$key]->id_hasil_surat_ttd_rw }}"
+                                            data-jenis="rw">
+                                            Lihat Surat
+                                        </button>
+                                    @elseif($hasilSuratRt->has($key))
+                                        <button class="lihat-surat px-3 py-1 bg-yellow-500 text-white font-semibold rounded"
+                                            data-id="{{ $hasilSuratRt[$key]->id_hasil_surat_ttd_rt }}"
+                                            data-jenis="rt">
                                             Lihat Surat
                                         </button>
                                     @else
-                                        <p class="font-semibold">
-                                            Tidak Ada
-                                        </p>
+                                        <p class="font-semibold">Tidak Ada</p>
                                     @endif
                                 </td>
                                 {{-- <td class="p-3">
@@ -162,14 +168,20 @@
                                 <td class="p-3">{{ $item->alasan_penolakan_pengajuan_lain ?? 'Tidak Ada' }}</td>
                                 <td class="p-3">
                                     @php $key = 'lain-'.$item->id_pengajuan_surat_lain; @endphp
-                                    @if($hasilSurat->has($key))
-                                        <button class="btn btn-info lihat-surat px-3 py-1 bg-yellow-500 text-white font-semibold rounded" data-id="{{ $hasilSurat[$key]->id_hasil_surat_ttd_rt }}">
+                                    @if($item->status_rw === 'disetujui' && $hasilSuratRw->has($key))
+                                        <button class="lihat-surat px-3 py-1 bg-green-600 text-white font-semibold rounded"
+                                            data-id="{{ $hasilSuratRw[$key]->id_hasil_surat_ttd_rw }}"
+                                            data-jenis="rw">
+                                            Lihat Surat
+                                        </button>
+                                    @elseif($hasilSuratRt->has($key))
+                                        <button class="lihat-surat px-3 py-1 bg-yellow-500 text-white font-semibold rounded"
+                                            data-id="{{ $hasilSuratRt[$key]->id_hasil_surat_ttd_rt }}"
+                                            data-jenis="rt">
                                             Lihat Surat
                                         </button>
                                     @else
-                                        <p class="font-semibold">
-                                            Tidak Ada
-                                        </p>
+                                        <p class="font-semibold">Tidak Ada</p>
                                     @endif
                                 </td>
                                 {{-- <td class="p-3">
@@ -218,10 +230,17 @@ document.querySelectorAll('.lihat-surat').forEach(btn => {
     btn.addEventListener('click', function(e) {
         e.preventDefault();
         const idHasilSurat = this.getAttribute('data-id');
+        const jenisSurat = this.getAttribute('data-jenis');
         const iframe = document.getElementById('iframeHasilSurat');
         const modal = document.getElementById('modalHasilSurat');
 
         iframe.src = `/rt/surat/${idHasilSurat}/lihat`;
+
+        if (jenisSurat === 'rw') {
+            iframe.src = `/rt/surat-rw/${idHasilSurat}/lihat`;
+        } else {
+            iframe.src = `/rt/surat/${idHasilSurat}/lihat`;
+        }
 
         modal.classList.remove('hidden');
         modal.classList.add('flex');

@@ -7,6 +7,7 @@ use App\Models\ScanKK;
 use Illuminate\Http\Request;
 use App\Models\PengajuanSurat;
 use App\Models\HasilSuratTtdRt;
+use App\Models\HasilSuratTtdRw;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\PengajuanSuratLain;
 use App\Http\Controllers\Controller;
@@ -129,7 +130,17 @@ class RiwayatSuratWargaController extends Controller
         $pengajuanLain = $pengajuanLain->get();
 
         // Ambil hasil surat seperti biasa, sesuaikan id pengajuan
-        $hasilSurat = HasilSuratTtdRt::whereIn('jenis', ['biasa', 'lain'])->get()
+        $hasilSuratRt = HasilSuratTtdRt::whereIn('jenis', ['biasa', 'lain'])->get()
+        ->keyBy(function($item) {
+            if ($item->jenis === 'biasa') {
+                return 'biasa-' . $item->pengajuan_surat_id;
+            } elseif ($item->jenis === 'lain') {
+                return 'lain-' . $item->pengajuan_surat_lain_id;
+            }
+            return null;
+        });
+
+        $hasilSuratRw = HasilSuratTtdRw::whereIn('jenis', ['biasa', 'lain'])->get()
         ->keyBy(function($item) {
             if ($item->jenis === 'biasa') {
                 return 'biasa-' . $item->pengajuan_surat_id;
@@ -141,34 +152,50 @@ class RiwayatSuratWargaController extends Controller
 
         $profile_rt = Auth::guard('rt')->user()->profile_rt;
 
-        return view('rt.riwayatSuratWarga', compact('profile_rt', 'pengajuanBiasa', 'pengajuanLain', 'hasilSurat', 'showModalUploadTtd','ttdDigital'));
+        return view('rt.riwayatSuratWarga', compact('profile_rt', 'pengajuanBiasa', 'pengajuanLain', 'hasilSuratRt', 'hasilSuratRw', 'showModalUploadTtd','ttdDigital'));
     }
 
 
     public function lihatHasilSurat($id)
     {
         $profile_rt = Auth::guard('rt')->user()->profile_rt;
-        $hasilSurat = HasilSuratTtdRt::findOrFail($id);
+        $hasilSuratRt = HasilSuratTtdRt::findOrFail($id);
         $rt = Auth::guard('rt')->user();
         $ttdDigital = $rt->ttd_digital;
         $showModalUploadTtd = empty($ttdDigital);
 
         // Pastikan file surat ada dan dapat diakses
-        if (!Storage::exists($hasilSurat->file_surat)) {
+        if (!Storage::exists($hasilSuratRt->file_surat)) {
             abort(404, 'File surat tidak ditemukan');
         }
 
         // Jika file surat PDF, kita bisa tampilkan pakai iframe atau embed
-        $fileUrl = Storage::url($hasilSurat->file_surat);
+        $fileUrl = Storage::url($hasilSuratRt->file_surat);
 
-        return view('rt.hasilSurat', compact('hasilSurat', 'fileUrl', 'profile_rt', 'showModalUploadTtd','ttdDigital'));
+        return view('rt.hasilSurat', compact('hasilSuratRt', 'fileUrl', 'profile_rt', 'showModalUploadTtd','ttdDigital'));
+    }
+
+        public function lihatSuratRw($id)
+    {
+        $rt = Auth::guard('rt')->user();
+        $ttdDigital = $rt->ttd_digital;
+        $showModalUploadTtdRw = empty($ttdDigital);
+        $hasilSuratDisetujui = HasilSuratTtdRw::findOrFail($id);
+
+        if (!Storage::exists($hasilSuratDisetujui->file_surat)) {
+            abort(404, 'File surat tidak ditemukan');
+        }
+
+        $fileUrl = Storage::url($hasilSuratDisetujui->file_surat);
+
+        return view('rw.hasilSuratRW', compact('hasilSuratDisetujui', 'fileUrl', 'ttdDigital', 'showModalUploadTtdRw'));
     }
 
     public function unduhHasilSurat($id)
     {
-        $hasilSurat = HasilSuratTtdRt::findOrFail($id);
+        $hasilSuratRt = HasilSuratTtdRt::findOrFail($id);
 
-        $filePath = $hasilSurat->file_surat; // Simpan path file surat di kolom file_surat
+        $filePath = $hasilSuratRt->file_surat; // Simpan path file surat di kolom file_surat
         if (!Storage::exists($filePath)) {
             abort(404, "File surat tidak ditemukan");
         }

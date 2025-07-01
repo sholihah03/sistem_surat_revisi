@@ -24,7 +24,7 @@
         <!-- Form untuk Edit Data -->
         <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg shadow-sm">
             <h3 class="text-xl font-bold text-blue-700 mb-2">✏️ Edit Data Jika Ada yang Tidak Sesuai</h3>
-            <p class="text-sm text-red-600 mb-4">Silakan perbaiki data Anda sebelum menyimpan. Pastikan data sesuai dengan dokumen KK asli dan tidak ada yang salah.</p>
+            <p class="text-sm text-red-600 mb-4">Silakan perbaiki data Anda sebelum menyimpan. Pastikan data sesuai dengan dokumen KK asli dan tidak ada yang salah serta gunakan <strong class="text-blue-500">huruf kapital</strong> jika ada perubahan</p>
 
             <form action="{{ route('uploadKKsimpan') }}" method="POST" class="space-y-5 max-h-[75vh] overflow-y-auto">
                 @csrf

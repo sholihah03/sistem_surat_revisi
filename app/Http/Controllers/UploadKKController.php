@@ -95,6 +95,11 @@ class UploadKKController extends Controller
             'rt_alamat' => 'nullable|string|max:10',
             'rw_alamat' => 'nullable|string|max:10',
             'kode_pos' => 'nullable|string|max:10',
+        ],[
+            'required' => ':attribute wajib diisi.',
+            'string' => ':attribute harus berupa teks.',
+            'max' => ':attribute maksimal :max karakter.',
+            'unique' => ':attribute sudah terdaftar.',
         ]);
 
         $path_file_kk = $request->input('path'); // Path dari file KK yang sudah diunggah dan di-OCR sebelumnya
