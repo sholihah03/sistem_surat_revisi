@@ -56,9 +56,9 @@ class HistoriSuratController extends Controller
         // Query hasil surat yang terkait dengan pengajuan warga (baik biasa maupun lain)
         $hasilSurat = HasilSuratTtdRw::where(function ($query) use ($idPengajuanBiasa, $idPengajuanLain) {
             $query->where(function ($q) use ($idPengajuanBiasa) {
-                $q->where('jenis', 'biasa')->whereIn('pengajuan_id', $idPengajuanBiasa);
+                $q->where('jenis', 'biasa')->whereIn('pengajuan_surat_id', $idPengajuanBiasa);
             })->orWhere(function ($q) use ($idPengajuanLain) {
-                $q->where('jenis', 'lain')->whereIn('pengajuan_id', $idPengajuanLain);
+                $q->where('jenis', 'lain')->whereIn('pengajuan_surat_lain_id', $idPengajuanLain);
             });
         })->get();
 

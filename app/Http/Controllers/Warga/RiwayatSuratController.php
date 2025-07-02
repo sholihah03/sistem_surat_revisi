@@ -44,7 +44,7 @@ class RiwayatSuratController extends Controller
         ->get()
         ->map(function ($item) {
             $item->disetujui_rw = HasilSuratTtdRw::where('jenis', 'biasa')
-                ->where('pengajuan_id', $item->id_pengajuan_surat)
+                ->where('pengajuan_surat_id', $item->id_pengajuan_surat)
                 ->exists();
             return $item;
         });
@@ -63,7 +63,7 @@ class RiwayatSuratController extends Controller
         ->get()
         ->map(function ($item) {
             $item->disetujui_rw = HasilSuratTtdRw::where('jenis', 'lain')
-                ->where('pengajuan_id', $item->id_pengajuan_surat_lain)
+                ->where('pengajuan_surat_lain_id', $item->id_pengajuan_surat_lain)
                 ->exists();
             return $item;
         });
