@@ -133,11 +133,13 @@ class UploadKKController extends Controller
         // Update tb_pendaftaran dengan scan_id yang baru saja disimpan
         // Asumsi, kamu sudah memiliki data pendaftaran yang ingin diupdate
         // Misalnya, kita ambil pendaftaran berdasarkan no_kk_scan (atau kondisi lain)
-        $pendaftaran = Pendaftaran::where('no_kk', $request->no_kk_scan)->first();
+        // $pendaftaran = Pendaftaran::where('no_kk', $request->no_kk_scan)->first();
+        $pendaftaran = Pendaftaran::find(session('id_pendaftaran'));
 
         if ($pendaftaran) {
             $pendaftaran->scan_id = $scan_id;
             $pendaftaran->save();
+            session()->forget('id_pendaftaran');
 
             if ($pendaftaran->rt && $pendaftaran->rt->email_rt) {
                 Mail::to($pendaftaran->rt->email_rt)->send(new NotifikasiVerifikasiAkun($pendaftaran));

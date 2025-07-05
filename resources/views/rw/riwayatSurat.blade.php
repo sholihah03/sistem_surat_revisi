@@ -118,7 +118,7 @@
                         @if(!empty($item->id_hasil_surat_ttd_rw))
                             <button
                                 onclick="showHasilSuratModal('{{ route('rw.lihatHasilSurat', ['id' => $item->id_hasil_surat_ttd_rw]) }}')"
-                                class="btn btn-info lihat-surat px-3 py-1 bg-yellow-500 text-white font-semibold rounded"
+                                class="btn btn-info lihat-surat px-3 py-1 bg-green-600 text-white font-semibold rounded"
                             >
                                 Lihat Surat
                             </button>

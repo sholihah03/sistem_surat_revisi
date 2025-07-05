@@ -30,7 +30,7 @@ class DaftarController extends Controller
             'no_kk' => 'required|numeric',
             'nik' => 'required|numeric',
             'nama_lengkap' => 'required',
-            'email' => 'required|email|unique:tb_wargas,email',
+            'email' => 'required|email',
             'no_hp' => 'required|numeric',
             'rw' => 'required|numeric',
             'rt' => 'required|numeric',
@@ -39,9 +39,9 @@ class DaftarController extends Controller
         $scanKK = ScanKK::where('no_kk_scan', $request->no_kk)->first();
 
         // Cek data duplikat di Wargas
-        if (Wargas::where('email', $request->email)->exists()) {
-            return back()->withErrors(['daftar_error' => 'Email sudah terdaftar'])->withInput();
-        }
+        // if (Wargas::where('email', $request->email)->exists()) {
+        //     return back()->withErrors(['daftar_error' => 'Email sudah terdaftar'])->withInput();
+        // }
 
         if (Wargas::where('nik', $request->nik)->exists()) {
             return back()->withErrors(['daftar_error' => 'NIK sudah terdaftar'])->withInput();
@@ -89,11 +89,12 @@ class DaftarController extends Controller
 
         // ✅ Cek NIK duplikat di tb_pendaftaran
         if (Pendaftaran::where('nik', $request->nik)->exists()) {
-            return back()->withErrors(['daftar_error' => 'NIK sudah pernah didaftarkan dan sedang menunggu proses verifikasi.'])->withInput();
+            return back()->withErrors(['daftar_error' => 'NIK sudah pernah didaftarkan.'])->withInput();
         }
 
         // ❌ Jika KK belum discan → simpan ke tb_pendaftaran
-        Pendaftaran::create([
+        $pendaftaran = Pendaftaran::create([
+            'scan_id' => $request->scan_id,
             'no_kk' => $request->no_kk,
             'nik' => $request->nik,
             'nama_lengkap' => $request->nama_lengkap,
@@ -102,6 +103,8 @@ class DaftarController extends Controller
             'rw_id' => $rw->id_rw,
             'rt_id' => $rt->id_rt,
         ]);
+
+        session(['id_pendaftaran' => $pendaftaran->id_pendaftaran]);
 
         return redirect()->route('uploadKK')->with('info', 'Data Anda sedang diverifikasi. Silakan upload Kartu Keluarga.');
     }

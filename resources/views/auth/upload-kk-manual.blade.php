@@ -43,6 +43,8 @@
                 @endif
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <input type="hidden" name="scan_id" value="{{ session('scan_kk_id') }}">
+
                     <div>
                         <label for="nama_kepala_keluarga" class="block text-base font-semibold text-gray-800 mb-1">Nama Kepala Keluarga</label>
                         <input type="text" id="nama_kepala_keluarga" name="nama_kepala_keluarga" class="w-full px-4 py-2 border-2 border-blue-400 rounded-md focus:ring-blue-500 shadow-sm" placeholder="Masukkan Nama Kepala Keluarga">
@@ -50,7 +52,7 @@
 
                     <div>
                         <label for="no_kk" class="block text-base font-semibold text-gray-800 mb-1">No KK</label>
-                        <input type="text" id="no_kk" name="no_kk" class="w-full px-4 py-2 border-2 border-blue-400 rounded-md focus:ring-blue-500 shadow-sm" placeholder="Masukkan No KK">
+                        <input type="text" id="no_kk" name="no_kk" class="w-full px-4 py-2 border-2 border-blue-400 rounded-md focus:ring-blue-500 shadow-sm" placeholder="Masukkan No KK" maxlength="16">
                     </div>
 
                     <div>

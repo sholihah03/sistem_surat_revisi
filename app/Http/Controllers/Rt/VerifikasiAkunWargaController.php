@@ -33,20 +33,22 @@ class VerifikasiAkunWargaController extends Controller
     }
 
 
-    public function detailVerifikasiAkunWarga()
+    public function detailVerifikasiAkunWarga($id)
     {
         $profile_rt = Auth::guard('rt')->user()->profile_rt;
-        $pendingData = ScanKK::with(['alamat', 'pendaftaran'])
-        ->where('status_verifikasi', 'pending')
-        ->get();
-
         $rt_id = Auth::guard('rt')->user();
         $ttdDigital = $rt_id->ttd_digital;
         $showModalUploadTtd = empty($ttdDigital);
 
+        // Ambil hanya data yang sesuai dengan id
+        $item = ScanKK::with(['alamat', 'pendaftaran'])
+                    ->where('id_scan', $id)
+                    ->where('status_verifikasi', 'pending')
+                    ->firstOrFail();
 
-        return view('rt.detailVerifikasiAkunWarga', compact('pendingData', 'profile_rt', 'showModalUploadTtd','ttdDigital'));
+        return view('rt.detailVerifikasiAkunWarga', compact('item', 'profile_rt', 'showModalUploadTtd', 'ttdDigital'));
     }
+
 
     public function disetujui($id)
     {

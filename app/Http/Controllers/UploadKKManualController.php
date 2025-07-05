@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Alamat;
 use App\Models\ScanKK;
+use App\Models\Pendaftaran;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NotifikasiVerifikasiAkun;
 use Illuminate\Support\Facades\Storage;
 
 class UploadKKManualController extends Controller
@@ -66,7 +69,7 @@ class UploadKKManualController extends Controller
         ]);
 
         // Simpan data scan KK
-        ScanKK::create([
+        $scanKK = ScanKK::create([
             'alamat_id' => $alamat->id_alamat,
             'nama_kepala_keluarga' => $request->nama_kepala_keluarga,
             'no_kk_scan' => $request->no_kk,
@@ -75,8 +78,21 @@ class UploadKKManualController extends Controller
             'alasan_penolakan' => null, // null jika belum ditolak
         ]);
 
+        session()->put('scan_kk_id', $scanKK->id_scan);
+
         // Hapus path dari session agar tidak digunakan ulang
         session()->forget('failed_kk_path');
+
+        // Tambahan untuk update tb_pendaftaran
+        $pendaftaran = Pendaftaran::where('no_kk', $request->no_kk)->first();
+        if ($pendaftaran) {
+            $pendaftaran->scan_id = $scanKK->id_scan;
+            $pendaftaran->save();
+
+            if ($pendaftaran->rt && $pendaftaran->rt->email_rt) {
+                Mail::to($pendaftaran->rt->email_rt)->send(new NotifikasiVerifikasiAkun($pendaftaran));
+            }
+        }
 
         return redirect()->route('login')->with('success_upload_kk', 'Data berhasil disimpan.');
     }
