@@ -48,7 +48,7 @@
                                     <td class="px-2 md:px-4 py-2 whitespace-nowrap text-center align-middle">{{ $status['total_disetujui'] }}</td>
                                     <td class="px-2 md:px-4 py-2 whitespace-nowrap text-center align-middle">{{ $status['total_ditolak'] }}</td>
                                     <td class="px-2 md:px-4 py-2 text-center align-middle">
-                                        <a href="#" class="text-green-500 hover:underline">Detail</a>
+                                        <a href="{{ route('riwayatSuratRw') }}" class="text-green-500 hover:underline">Detail</a>
                                     </td>
                                 </tr>
                             @empty
