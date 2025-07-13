@@ -5,70 +5,86 @@
     <title>Verifikasi OTP</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 </head>
-<body class="min-h-screen bg-gray-50 flex items-center justify-center px-4" style="background-image: url('{{ asset('images/background login.png') }}')">
+<body class="min-h-screen bg-gray-50 flex items-center justify-center px-4"
+      style="background-image: url('{{ asset('images/background login.png') }}')">
 
-    <div class="bg-white w-full max-w-md rounded-xl shadow-lg p-6 space-y-5">
-        <h2 class="text-2xl font-bold text-center text-gray-800">Verifikasi Kode OTP</h2>
-        <p class="text-center text-sm text-gray-600">Kode telah dikirim ke Email Anda.</p>
+@php
+    $disabledOtp = $otpExpired ?? false ? 'disabled' : '';
+@endphp
 
-        <form method="POST" action="{{ route('otp.verifikasi') }}" class="space-y-4">
-            @if (session('success'))
-                <div class="bg-green-100 text-green-700 p-2 rounded mb-3 text-sm">
-                    {{ session('success') }}
-                </div>
-            @endif
-            @csrf
+<div class="bg-white w-full max-w-md rounded-xl shadow-lg p-6 space-y-5">
+    <h2 class="text-2xl font-bold text-center text-gray-800">Verifikasi Kode OTP</h2>
+    <p class="text-center text-sm text-gray-600">Kode telah dikirim ke Email Anda.</p>
 
-            <!-- OTP Input -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Kode OTP</label>
-                <div class="flex justify-center gap-2">
-                    <input type="text" maxlength="1" inputmode="numeric" pattern="\d*" name="otp[]"
-                            class="w-12 h-12 text-center text-xl border border-blue-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 otp-input">
-                    <input type="text" maxlength="1" inputmode="numeric" pattern="\d*" name="otp[]"
-                            class="w-12 h-12 text-center text-xl border border-blue-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 otp-input">
-                    <input type="text" maxlength="1" inputmode="numeric" pattern="\d*" name="otp[]"
-                            class="w-12 h-12 text-center text-xl border border-blue-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 otp-input">
-                    <input type="text" maxlength="1" inputmode="numeric" pattern="\d*" name="otp[]"
-                            class="w-12 h-12 text-center text-xl border border-blue-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 otp-input">
-                    <input type="text" maxlength="1" inputmode="numeric" pattern="\d*" name="otp[]"
-                            class="w-12 h-12 text-center text-xl border border-blue-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 otp-input">
-                    <input type="text" maxlength="1" inputmode="numeric" pattern="\d*" name="otp[]"
-                            class="w-12 h-12 text-center text-xl border border-blue-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 otp-input">
-                </div>
+    <form method="POST" action="{{ route('otp.verifikasi') }}" class="space-y-4">
+        @csrf
+
+        @if (session('success'))
+            <div class="bg-green-100 text-green-700 p-2 rounded mb-3 text-sm text-center">
+                {{ session('success') }}
             </div>
+        @endif
 
-            <!-- Submit Button -->
-            <button type="submit"
-                class="w-full bg-yellow-400 hover:bg-yellow-500 text-white py-2 rounded-lg font-semibold transition">
-                Verifikasi
+        @if (session('error'))
+            <div class="bg-red-100 text-red-700 p-2 rounded mb-3 text-sm text-center">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        <!-- OTP Input -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Kode OTP</label>
+            <div class="flex justify-center gap-2">
+                @for ($i = 0; $i < 6; $i++)
+                    <input type="text" maxlength="1" inputmode="numeric" pattern="\d*" name="otp[]"
+                           class="w-12 h-12 text-center text-xl border border-blue-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 otp-input"
+                           {{ $disabledOtp }}>
+                @endfor
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit"
+                class="w-full bg-yellow-400 hover:bg-yellow-500 text-white py-2 rounded-lg font-semibold transition"
+                {{ $disabledOtp }}>
+            Verifikasi
+        </button>
+
+        <!-- Kirim Ulang -->
+        <div class="text-center">
+            <p class="text-sm text-gray-600">Belum menerima kode?</p>
+            <button type="button"
+                    id="resendBtn"
+                    class="text-blue-600 hover:underline text-sm font-medium mt-1 {{ $otpExpired ? '' : 'disabled:opacity-50' }}"
+                    {{ $otpExpired ? '' : 'disabled' }}>
+                {{ $otpExpired ? 'Kirim Ulang OTP' : 'Kirim Ulang OTP (' }}
+                <span id="timer" {{ $otpExpired ? 'hidden' : '' }}>120</span>
+                {{ $otpExpired ? '' : ' detik)' }}
             </button>
+            <p id="resend-message" class="text-sm text-green-600 mt-1 hidden">Kode OTP telah dikirim ulang.</p>
+        </div>
+    </form>
+</div>
 
-            <!-- Kirim Ulang -->
-            <div class="text-center">
-                <p class="text-sm text-gray-600">Belum menerima kode?</p>
-                <button type="button" id="resendBtn" class="text-blue-600 hover:underline text-sm font-medium mt-1 disabled:opacity-50" disabled>
-                    Kirim Ulang OTP (<span id="timer">120</span> detik)
-                </button>
-                <p id="resend-message" class="text-sm text-green-600 mt-1 hidden">Kode OTP telah dikirim ulang.</p>
-            </div>
-        </form>
-    </div>
-
-    @include('components.modal-timeout')
-
-    <script>
-            let countdown = 120;
-    let interval; // Ubah dari const ke let
+<script>
+    const otpExpired = {{ $otpExpired ? 'true' : 'false' }};
+    let countdown = 120;
+    let interval;
 
     const timerEl = document.getElementById('timer');
     const resendBtn = document.getElementById('resendBtn');
     const message = document.getElementById('resend-message');
 
     function startCountdown() {
-        clearInterval(interval); // hentikan interval sebelumnya jika ada
+        if (otpExpired) {
+            clearInterval(interval);
+            resendBtn.disabled = false;
+            resendBtn.textContent = 'Kirim Ulang OTP';
+            return;
+        }
+
+        clearInterval(interval);
         countdown = 120;
         timerEl.textContent = countdown;
         resendBtn.disabled = true;
@@ -86,7 +102,7 @@
         }, 1000);
     }
 
-    // Jalankan countdown saat halaman pertama kali dimuat
+    // Jalankan countdown jika belum expired
     startCountdown();
 
     resendBtn.addEventListener('click', () => {
@@ -116,14 +132,12 @@
         });
     });
 
-            // Ambil semua input dengan class 'otp-input'
+    // Handle OTP input logic (pindah fokus otomatis)
     const inputs = document.querySelectorAll('.otp-input');
 
     inputs.forEach((input, index) => {
         input.addEventListener('input', (e) => {
             const value = e.target.value;
-
-            // Jika paste 6 digit sekaligus
             if (value.length === 6) {
                 for (let i = 0; i < 6; i++) {
                     inputs[i].value = value[i];
@@ -132,7 +146,6 @@
                 return;
             }
 
-            // Jika hanya satu digit, langsung pindah ke kolom berikutnya
             if (value.length === 1 && index < inputs.length - 1) {
                 inputs[index + 1].focus();
             }
@@ -144,13 +157,12 @@
             }
         });
 
-        // Optional: Select input saat fokus
         input.addEventListener('focus', () => {
             input.select();
         });
     });
 
-    // Deteksi paste dari clipboard
+    // Paste 6-digit OTP
     document.querySelector('.flex').addEventListener('paste', function (e) {
         const paste = (e.clipboardData || window.clipboardData).getData('text');
         if (paste.length === 6 && /^\d+$/.test(paste)) {
@@ -161,8 +173,7 @@
         }
         e.preventDefault();
     });
-    </script>
-
+</script>
 
 </body>
 </html>

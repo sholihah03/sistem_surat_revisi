@@ -19,80 +19,117 @@ class LupaPasswordController extends Controller
         return view('auth.email-lupa-password');
     }
 
-    public function kirimOtp(Request $request)
-    {
-        $request->validate(['email' => 'required|email']);
+public function kirimOtp(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'role' => 'required|in:warga,rt,rw',
+    ]);
 
-        $email = $request->email;
-        $user = null;
-        $tipe = null;
+    $email = $request->email;
+    $role = $request->role;
+    $user = null;
 
-        // Cek di warga
-        $warga = Wargas::where('email', $email)->first();
-        if ($warga) {
-            $user = $warga;
-            $tipe = 'warga';
+    $errors = [];
+
+    if ($role === 'warga') {
+        $request->validate(['nik' => 'required']);
+        $emailAda = Wargas::where('email', $email)->first();
+        $nikAda = Wargas::where('nik', $request->nik)->first();
+
+        if (!$emailAda) {
+            $errors[] = 'Email tidak terdaftar di data warga.';
         }
 
-        // Cek di RT
-        if (!$user) {
-            $rt = Rt::where('email_rt', $email)->first();
-            if ($rt) {
-                $user = $rt;
-                $tipe = 'rt';
+        if (!$nikAda) {
+            $errors[] = 'NIK tidak ditemukan di data warga.';
+        }
+
+        if ($emailAda && $nikAda) {
+            $user = Wargas::where('email', $email)->where('nik', $request->nik)->first();
+            if (!$user) {
+                $errors[] = 'Email dan NIK tidak cocok.';
             }
         }
 
-        // Cek di RW
-        if (!$user) {
-            $rw = Rw::where('email_rw', $email)->first();
-            if ($rw) {
-                $user = $rw;
-                $tipe = 'rw';
+    } elseif ($role === 'rt') {
+        $request->validate(['no_rt' => 'required']);
+        $emailAda = Rt::where('email_rt', $email)->first();
+        $rtAda = Rt::where('no_rt', $request->no_rt)->first();
+
+        if (!$emailAda) {
+            $errors[] = 'Email tidak terdaftar di data RT.';
+        }
+
+        if (!$rtAda) {
+            $errors[] = 'No RT tidak ditemukan di data RT.';
+        }
+
+        if ($emailAda && $rtAda) {
+            $user = Rt::where('email_rt', $email)->where('no_rt', $request->no_rt)->first();
+            if (!$user) {
+                $errors[] = 'Email dan No RT tidak cocok.';
             }
         }
 
-        // Jika tidak ditemukan
-        if (!$user) {
-            return back()->with('error', 'Email tidak ditemukan di sistem.');
+    } elseif ($role === 'rw') {
+        $request->validate(['no_rw' => 'required']);
+        $emailAda = Rw::where('email_rw', $email)->first();
+        $rwAda = Rw::where('no_rw', $request->no_rw)->first();
+
+        if (!$emailAda) {
+            $errors[] = 'Email tidak terdaftar di data RW.';
         }
 
-        // Buat OTP
-        $kodeOtp = random_int(100000, 999999);
-        $expiredAt = Carbon::now()->addMinutes(5);
-
-        $otpData = [
-            'kode_otp' => $kodeOtp,
-            'expired_at' => $expiredAt,
-            'jenis_otp' => 'reset_password',
-        ];
-
-        // Simpan berdasarkan role
-        if ($tipe === 'warga') {
-            $otpData['warga_id'] = $user->id_warga;
-        } elseif ($tipe === 'rt') {
-            $otpData['rt_id'] = $user->id_rt;
-        } elseif ($tipe === 'rw') {
-            $otpData['rw_id'] = $user->id_rw;
+        if (!$rwAda) {
+            $errors[] = 'No RW tidak ditemukan di data RW.';
         }
 
-        Otp::create($otpData);
-
-        // Kirim OTP via email\
-        Mail::to($email)->send(new OtpResetPasswordMail(
-            $user->nama_lengkap ?? $user->nama_lengkap_rt ?? $user->nama_lengkap_rw,
-            $kodeOtp,
-            route('otp.indexReset')
-        ));
-
-        // Simpan session role & email
-        session([
-            'email_reset' => $email,
-            'tipe_user' => $tipe,
-        ]);
-
-        return view('auth.otp-lupa-password'); // silakan copy view otp-verifikasi dan rename
+        if ($emailAda && $rwAda) {
+            $user = Rw::where('email_rw', $email)->where('no_rw', $request->no_rw)->first();
+            if (!$user) {
+                $errors[] = 'Email dan No RW tidak cocok.';
+            }
+        }
     }
+
+    if (!empty($errors)) {
+        return back()->with('error', implode(' ', $errors));
+    }
+
+    // Buat dan simpan OTP
+    $kodeOtp = random_int(100000, 999999);
+    $expiredAt = now()->addMinutes(5);
+
+    $otpData = [
+        'kode_otp' => $kodeOtp,
+        'expired_at' => $expiredAt,
+        'jenis_otp' => 'reset_password',
+    ];
+
+    if ($role === 'warga') {
+        $otpData['warga_id'] = $user->id_warga;
+    } elseif ($role === 'rt') {
+        $otpData['rt_id'] = $user->id_rt;
+    } elseif ($role === 'rw') {
+        $otpData['rw_id'] = $user->id_rw;
+    }
+
+    Otp::create($otpData);
+
+    Mail::to($email)->send(new OtpResetPasswordMail(
+        $user->nama_lengkap ?? $user->nama_lengkap_rt ?? $user->nama_lengkap_rw,
+        $kodeOtp,
+        route('otp.indexReset')
+    ));
+
+    session([
+        'email_reset' => $email,
+        'tipe_user' => $role,
+    ]);
+
+    return view('auth.otp-lupa-password');
+}
 
     public function formPasswordBaru()
     {

@@ -19,12 +19,23 @@ class HistoriAkunWargaController extends Controller
 
         $search = $request->input('search');
 
+        // $historiData = ScanKK::with(['alamat', 'wargas', 'pendaftaran'])
+        //     ->whereIn('status_verifikasi', ['disetujui', 'ditolak'])
+        //     ->whereHas('wargas', function ($q) use ($rt) {
+        //         $q->where('rt_id', $rt->id_rt);
+        //     })
+        //     ->orderBy('updated_at', 'desc');
         $historiData = ScanKK::with(['alamat', 'wargas', 'pendaftaran'])
             ->whereIn('status_verifikasi', ['disetujui', 'ditolak'])
-            ->whereHas('wargas', function ($q) use ($rt) {
-                $q->where('rt_id', $rt->id_rt);
+            ->where(function ($query) use ($rt) {
+                $query->whereHas('wargas', function ($q) use ($rt) {
+                    $q->where('rt_id', $rt->id_rt);
+                })->orWhereHas('pendaftaran', function ($q) use ($rt) {
+                    $q->where('rt_id', $rt->id_rt);
+                });
             })
             ->orderBy('updated_at', 'desc');
+
 
         if ($search) {
             $historiData->where(function ($query) use ($search) {
@@ -44,7 +55,10 @@ class HistoriAkunWargaController extends Controller
     public function historiKadaluwarsa(Request $request)
     {
         $search = $request->input('search');
-        $query = Kadaluwarsa::query()->orderBy('created_at', 'desc');
+        $rt = Auth::guard('rt')->user(); // Ambil data RT yang sedang login
+
+        $query = Kadaluwarsa::where('rt_id', $rt->id_rt) // Filter sesuai RT login
+            ->orderBy('created_at', 'desc');
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -54,12 +68,13 @@ class HistoriAkunWargaController extends Controller
         }
 
         $dataKadaluwarsa = $query->get();
-        $profile_rt = Auth::guard('rt')->user()->profile_rt;
-        $rt = Auth::guard('rt')->user();
+        $profile_rt = $rt->profile_rt;
         $ttdDigital = $rt->ttd_digital;
         $showModalUploadTtd = empty($ttdDigital);
 
-        return view('rt.historiAkunKadaluwarsa', compact('dataKadaluwarsa', 'profile_rt', 'rt', 'showModalUploadTtd','ttdDigital'));
+        return view('rt.historiAkunKadaluwarsa', compact(
+            'dataKadaluwarsa', 'profile_rt', 'rt', 'showModalUploadTtd', 'ttdDigital'
+        ));
     }
 
 }

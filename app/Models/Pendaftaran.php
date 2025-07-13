@@ -21,6 +21,8 @@ class Pendaftaran extends Model
         'nik',
         'no_hp',
         'email',
+        'status',
+        'alasan_penolakan',
     ];
 
     public function scanKk()

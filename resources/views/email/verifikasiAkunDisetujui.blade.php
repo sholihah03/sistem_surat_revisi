@@ -6,6 +6,6 @@
 <p>Kode ini akan kedaluwarsa dalam 120 detik.</p>
 
 <p>Silakan klik tombol di bawah ini untuk memverifikasi OTP:</p>
-<a href="{{ $link }}" style="background: #3490dc; padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px;">Verifikasi Sekarang</a>
+<a href="{{ $link }}" style="background: #3490dc; padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px;">Kirim Sekarang</a>
 
 <p>Terima kasih!</p>

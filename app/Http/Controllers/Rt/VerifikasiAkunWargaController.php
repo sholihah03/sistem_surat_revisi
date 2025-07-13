@@ -107,32 +107,71 @@ class VerifikasiAkunWargaController extends Controller
     }
 
 
-        public function ditolak(Request $request, $id)
-        {
-            $scan = ScanKK::findOrFail($id);
+    // public function ditolak(Request $request, $id)
+    // {
+    //     $scan = ScanKK::findOrFail($id);
 
-            // Validasi alasan penolakan
-            $request->validate([
-                'alasan_penolakan' => 'required|string|max:255',
-            ]);
+    //     // Validasi alasan penolakan
+    //     $request->validate([
+    //         'alasan_penolakan' => 'required|string|max:255',
+    //     ]);
 
-            $pendaftaran = $scan->pendaftaran->first(); // Ambil 1 orang untuk notifikasi
-            if ($pendaftaran) {
-                Mail::to($pendaftaran->email)->send(
-                    new VerifikasiAkunDitolak(
-                        $pendaftaran->nama_lengkap,
-                        $request->alasan_penolakan,
-                        route('login')
-                    )
-                );
-            }
+    //     $pendaftaran = $scan->pendaftaran->first(); // Ambil 1 orang untuk notifikasi
+    //     if ($pendaftaran) {
+    //         Mail::to($pendaftaran->email)->send(
+    //             new VerifikasiAkunDitolak(
+    //                 $pendaftaran->nama_lengkap,
+    //                 $request->alasan_penolakan,
+    //                 route('login')
+    //             )
+    //         );
+    //     }
 
-            $scan->status_verifikasi = 'ditolak';
-            $scan->alasan_penolakan = $request->alasan_penolakan; // Ambil alasan dari form
-            $scan->save();
+    //     $scan->status_verifikasi = 'ditolak';
+    //     $scan->alasan_penolakan = $request->alasan_penolakan; // Ambil alasan dari form
+    //     $scan->save();
 
-            return redirect()->route('verifikasiAkunWarga')->with('error', 'Akun telah ditolak.');
-        }
+    //     return redirect()->route('verifikasiAkunWarga')->with('error', 'Akun telah ditolak.');
+    // }
 
+
+
+    public function ditolak(Request $request, $id)
+{
+    $scan = ScanKK::findOrFail($id);
+
+    $request->validate([
+        'alasan_penolakan' => 'required|string|max:255',
+    ]);
+
+    // Kirim notifikasi ke salah satu akun pendaftaran
+    $pendaftaranList = $scan->pendaftaran;
+    $firstPendaftaran = $pendaftaranList->first();
+    if ($firstPendaftaran) {
+        Mail::to($firstPendaftaran->email)->send(
+            new VerifikasiAkunDitolak(
+                $firstPendaftaran->nama_lengkap,
+                $request->alasan_penolakan,
+                route('login')
+            )
+        );
+    }
+
+    // Update ScanKK
+    $scan->update([
+        'status_verifikasi' => 'ditolak',
+        'alasan_penolakan' => $request->alasan_penolakan,
+    ]);
+
+    // Update semua pendaftaran yg terkait
+    foreach ($pendaftaranList as $pendaftaran) {
+        $pendaftaran->update([
+            'status' => 'ditolak',
+            'alasan_penolakan' => $request->alasan_penolakan,
+        ]);
+    }
+
+    return redirect()->route('verifikasiAkunWarga')->with('error', 'Akun telah ditolak.');
+}
 
 }

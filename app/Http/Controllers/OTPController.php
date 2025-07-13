@@ -18,12 +18,25 @@ class OTPController extends Controller
 {
     public function index(Request $request)
     {
-        $email = $request->query('email');  // Pastikan email dikirim sebagai query parameter
+        $email = $request->query('email');
         session(['email_warga' => $email]);
 
-        return view('auth.otp-verifikasi');
-    }
+        // Ambil OTP terbaru dari user
+        $otp = Otp::where('jenis_otp', 'register')
+            ->whereHas('warga', function ($query) use ($email) {
+                $query->where('email', $email);
+            })
+            ->latest()
+            ->first();
 
+        $otpExpired = false;
+        if ($otp && $otp->expired_at < now()) {
+            session()->flash('error', 'Kode OTP Anda sudah expired. Silakan klik "Kirim Ulang OTP".');
+            $otpExpired = true;
+        }
+
+        return view('auth.otp-verifikasi', compact('otp', 'otpExpired'));
+    }
 
     public function verifikasi(Request $request)
     {
@@ -99,94 +112,59 @@ class OTPController extends Controller
         return redirect()->route('buatPasswordBaru');
     }
 
-    public function kirimUlang(Request $request)
-    {
-        // Ambil email & jenis OTP dari session
-        $email = session('email_warga') ?? session('email_reset');
-        $tipeOtp = session('otp_jenis') ?? 'register'; // Bisa: register / reset_password
+public function kirimUlang(Request $request)
+{
+    // 1. Ambil email dari session
+    $email = session('email_warga');
 
-        if (!$email) {
-            return response()->json(['message' => 'Email tidak ditemukan di sesi.'], 400);
-        }
+    // 2. Jika email di session kosong, cari dari OTP terakhir jenis "register"
+    if (!$email) {
+        $otpTerakhir = Otp::where('jenis_otp', 'register')
+            ->orderByDesc('created_at')
+            ->first();
 
-        // Deteksi role dari email
-        $user = null;
-        $tipe = null;
-
-        // Cek Warga
-        $warga = Wargas::where('email', $email)->first();
-        if ($warga) {
-            $user = $warga;
-            $tipe = 'warga';
-        }
-
-        // Cek RT
-        if (!$user) {
-            $rt = Rt::where('email_rt', $email)->first();
-            if ($rt) {
-                $user = $rt;
-                $tipe = 'rt';
+        if ($otpTerakhir && $otpTerakhir->warga_id) {
+            $wargaFromOtp = Wargas::find($otpTerakhir->warga_id);
+            if ($wargaFromOtp) {
+                $email = $wargaFromOtp->email;
             }
         }
-
-        // Cek RW
-        if (!$user) {
-            $rw = Rw::where('email_rw', $email)->first();
-            if ($rw) {
-                $user = $rw;
-                $tipe = 'rw';
-            }
-        }
-
-        if (!$user) {
-            return response()->json(['message' => 'Akun tidak ditemukan.'], 404);
-        }
-
-        // Generate OTP baru
-        $otpBaru = random_int(100000, 999999);
-        $expiredAt = now()->addSeconds(60);
-
-        $otpData = [
-            'kode_otp' => $otpBaru,
-            'expired_at' => $expiredAt,
-            'jenis_otp' => $tipeOtp,
-        ];
-
-        if ($tipe === 'warga') {
-            $otpData['warga_id'] = $user->id_warga;
-        } elseif ($tipe === 'rt') {
-            $otpData['rt_id'] = $user->id_rt;
-        } elseif ($tipe === 'rw') {
-            $otpData['rw_id'] = $user->id_rw;
-        }
-
-        Otp::create($otpData);
-
-        // Nama dinamis
-        $nama = $user->nama_lengkap ?? $user->nama_lengkap_rt ?? $user->nama_lengkap_rw;
-
-        // Pilih link tujuan verifikasi
-        $urlVerifikasi = $tipeOtp === 'register'
-            ? route('otp', ['email' => $email])
-            : route('otp.indexReset');
-
-        // Kirim email berdasarkan jenis OTP
-        if ($tipeOtp === 'register') {
-            Mail::to($email)->send(new VerifikasiAkunDisetujui(
-                $nama,
-                $otpBaru,
-                $urlVerifikasi
-            ));
-        } else {
-            Mail::to($email)->send(new OtpResetPasswordMail(
-                $nama,
-                $otpBaru,
-                $urlVerifikasi
-            ));
-        }
-
-        return response()->json(['message' => 'Kode OTP telah dikirim ulang.']);
     }
+
+    // 3. Jika masih tidak ketemu email
+    if (!$email) {
+        return response()->json(['message' => 'Email tidak ditemukan di session maupun dari OTP.'], 400);
+    }
+
+    // 4. Ambil warga berdasarkan email
+    $warga = Wargas::where('email', $email)->first();
+    if (!$warga) {
+        return response()->json(['message' => 'Data warga tidak ditemukan.'], 404);
+    }
+
+    // 5. Buat OTP baru
+    $otpBaru = random_int(100000, 999999);
+    $expiredAt = now()->addSeconds(120);
+
+    Otp::create([
+        'warga_id' => $warga->id_warga,
+        'kode_otp' => $otpBaru,
+        'expired_at' => $expiredAt,
+        'jenis_otp' => 'register',
+        'is_used' => false,
+    ]);
+
+    $urlVerifikasi = route('otp', ['email' => $email]);
+
+    // 6. Kirim email OTP
+    Mail::to($email)->send(new VerifikasiAkunDisetujui(
+        $warga->nama_lengkap,
+        $otpBaru,
+        $urlVerifikasi
+    ));
+
+    return response()->json(['message' => 'Kode OTP telah dikirim ulang.']);
+}
 
 
 
