@@ -66,7 +66,6 @@ class ManajemenSuratWargaController extends Controller
         return view('rw.manajemenSuratWarga', compact('profile_rw', 'surats', 'ttdDigital', 'showModalUploadTtdRw'));
     }
 
-
     public function setujui(Request $request)
     {
         Carbon::setLocale('id');
@@ -249,7 +248,6 @@ class ManajemenSuratWargaController extends Controller
 
         return back()->with('success', 'Pengajuan surat berhasil ditolak.');
     }
-
 
     public function verifikasiSurat($token)
     {

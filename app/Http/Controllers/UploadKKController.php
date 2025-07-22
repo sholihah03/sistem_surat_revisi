@@ -18,15 +18,14 @@ class UploadKKController extends Controller
     }
 
     public function konfirm(Request $request)
-{
-    return view('auth.upload-kkKonfir', [
-        'no_kk' => $request->query('no_kk'),
-        'nama_kepala_keluarga' => $request->query('nama_kepala_keluarga'),
-        'path' => $request->query('path'),
-        'alamatData' => $request->query('alamatData'),
-    ]);
-}
-
+    {
+        return view('auth.upload-kkKonfir', [
+            'no_kk' => $request->query('no_kk'),
+            'nama_kepala_keluarga' => $request->query('nama_kepala_keluarga'),
+            'path' => $request->query('path'),
+            'alamatData' => $request->query('alamatData'),
+        ]);
+    }
 
     public function proses(Request $request)
     {
