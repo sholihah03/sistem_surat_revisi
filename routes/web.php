@@ -76,6 +76,10 @@ Route::get('/suratPengantar', [TemplateSuratController::class, 'index'])->name('
 
 Route::get('/verifikasi-surat/{token}', [ManajemenSuratWargaController::class, 'verifikasiSurat'])->name('verifikasi.surat');
 
+// Route publik untuk verifikasi surat
+Route::get('/verifikasi/surat/{token}', [ManajemenSuratWargaController::class, 'verifikasiSuratPublik'])->name('verifikasi.surat.publik');
+
+
 
 Route::prefix('warga')->middleware(AuthenticateWarga::class)->group(function () {
     Route::get('/dashboardWarga', [DashboardController::class, 'index'])->name('dashboardWarga');

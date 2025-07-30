@@ -122,17 +122,18 @@ class ManajemenSuratWargaController extends Controller
         $maskedNIK = substr($nik, 0, 6) . '******' . substr($nik, -4);
 
         $token = Str::random(40);
-        $verificationUrl = route('verifikasi.surat', ['token' => $token]);
+        $verificationUrl = route('verifikasi.surat.publik', ['token' => $token]);
         $waktuTtdRt = $suratRt->created_at ?? now();
 
         $qrContent = "SURAT|"
-            . "NS:" . $nomorSurat . "|"
-            . "TUJUAN:" . strtoupper($tujuan) . "|"
-            . "NIK:" . $maskedNIK . "|"
-            . "NAMA:" . strtoupper($pengajuan->warga->nama_lengkap) . "|"
-            . "TTD RT:" . Carbon::parse($waktuTtdRt)->translatedFormat('d F Y') . "|"
-            . "TTD RW:" . Carbon::now()->translatedFormat('d F Y') . "|"
-            . "VERIF_URL:" . $verificationUrl;
+        . "NS:" . $nomorSurat . "|"
+        . "TUJUAN:" . strtoupper($tujuan) . "|"
+        . "NIK:" . $maskedNIK . "|"
+        . "NAMA:" . strtoupper($pengajuan->warga->nama_lengkap) . "|"
+        . "TTD RT:" . Carbon::parse($waktuTtdRt)->translatedFormat('d F Y') . " (" . $rt->nama_rt . ")" . "|"
+        . "TTD RW:" . Carbon::now()->translatedFormat('d F Y') . " (" . $rw->nama_rw . ")" . "|"
+        . "VERIF_URL:" . $verificationUrl;
+
 
         $qrPng = QrCode::format('png')->size(300)->generate($qrContent);
         $qrBase64 = 'data:image/png;base64,' . base64_encode($qrPng);
@@ -292,4 +293,47 @@ class ManajemenSuratWargaController extends Controller
         // Tampilkan view verifikasi dengan data surat
         return view('rw.verifikasiSurat', compact('hasilSurat', 'pengajuan', 'rt', 'rw', 'ttd_rt', 'ttd_rw', 'tanggal_disetujui_rw', 'showModalUploadTtdRw'));
     }
+
+// App\Http\Controllers\Rw\ManajemenSuratWargaController.php
+
+public function verifikasiSuratPublik($token)
+{
+    $hasilSurat = HasilSuratTtdRw::where('token', $token)->first();
+
+    if (!$hasilSurat) {
+        return view('verifikasiSurat.hasilQrCode', [
+            'status' => 'invalid',
+            'pesan' => 'QR Code tidak valid atau dokumen tidak ditemukan.',
+        ]);
+    }
+
+    // Ambil data pengajuan dan include hasilSuratTtdRt
+    $pengajuan = ($hasilSurat->jenis === 'biasa')
+        ? PengajuanSurat::with([
+            'warga.rt.rw',
+            'warga.scan_KK.alamat',
+            'tujuanSurat',
+            'hasilSuratTtdRt' // tambahkan relasi ini
+        ])->find($hasilSurat->pengajuan_surat_id)
+        : PengajuanSuratLain::with([
+            'warga.rt.rw',
+            'warga.scan_KK.alamat',
+            'hasilSuratTtdRt'
+        ])->find($hasilSurat->pengajuan_surat_lain_id);
+
+    if (!$pengajuan) {
+        return view('verifikasiSurat.hasilQrCode', [
+            'status' => 'invalid',
+            'pesan' => 'Data pengajuan surat tidak ditemukan.',
+        ]);
+    }
+
+    return view('verifikasiSurat.hasilQrCode', [
+        'status' => 'valid',
+        'pengajuan' => $pengajuan,
+        'hasilSurat' => $hasilSurat,
+    ]);
+}
+
+
 }
