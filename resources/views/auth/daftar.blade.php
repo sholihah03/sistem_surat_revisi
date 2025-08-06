@@ -104,34 +104,6 @@
                         </div>
                     </div>
 
-                    <!-- RW dan RT -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- RW -->
-                        <div>
-                            <label for="rw" class="block text-sm font-semibold text-gray-700">RW</label>
-                            <div class="flex items-center border border-blue-400 rounded-md px-3 py-2 mt-1">
-                                <select name="rw" id="rw" required class="w-full focus:outline-none bg-transparent text-gray-700">
-                                    <option value="">Pilih RW</option>
-                                    @foreach ($dataRW as $rw)
-                                        <option value="{{ $rw->id_rw }}">RW {{ $rw->no_rw }} - {{ $rw->nama_lengkap_rw ?? 'Tanpa Ketua' }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <!-- RT -->
-                        <div>
-                            <label for="rt" class="block text-sm font-semibold text-gray-700">RT</label>
-                            <div class="flex items-center border border-blue-400 rounded-md px-3 py-2 mt-1">
-                                <select name="rt" id="rt" required class="w-full focus:outline-none bg-transparent text-gray-700">
-                                    <option value="">Pilih RT</option>
-                                    @foreach ($dataRT as $rt)
-                                    <option value="{{ $rt->id_rt }}">RT {{ $rt->no_rt }} - {{ $rt->nama_lengkap_rt ?? 'Tanpa Ketua' }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Button -->
                     <button type="submit"
                         class="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 rounded-md transition">

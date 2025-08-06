@@ -13,16 +13,11 @@ class Pendaftaran extends Model
     protected $primaryKey = 'id_pendaftaran';
 
     protected $fillable = [
-        'scan_id',
-        'rt_id',
-        'rw_id',
         'nama_lengkap',
         'no_kk',
         'nik',
         'no_hp',
         'email',
-        'status',
-        'alasan_penolakan',
     ];
 
     public function scanKk()

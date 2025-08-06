@@ -6,10 +6,12 @@ use App\Models\Rt;
 use App\Models\Rw;
 use App\Models\Otp;
 use App\Models\Wargas;
+use App\Models\Pendaftaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Mail\OtpResetPasswordMail;
 use App\Mail\KirimUlangOtpRegister;
+use App\Mail\OTPAkun;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\VerifikasiAkunDisetujui;
@@ -23,7 +25,7 @@ class OTPController extends Controller
 
         // Ambil OTP terbaru dari user
         $otp = Otp::where('jenis_otp', 'register')
-            ->whereHas('warga', function ($query) use ($email) {
+            ->whereHas('pendaftaran', function ($query) use ($email) {
                 $query->where('email', $email);
             })
             ->latest()
@@ -38,35 +40,48 @@ class OTPController extends Controller
         return view('auth.otp-verifikasi', compact('otp', 'otpExpired'));
     }
 
-    public function verifikasi(Request $request)
-    {
-        $kodeOtp = implode('', $request->input('otp')); // Gabungkan 6 digit input
+public function verifikasi(Request $request)
+{
+    $kodeOtp = implode('', $request->input('otp'));
 
-        $otpData = Otp::where('kode_otp', $kodeOtp)
-            ->where('expired_at', '>=', now())
-            ->where('jenis_otp', 'register')
-            ->where('is_used', false) // hanya yang belum dipakai
-            ->latest()
-            ->first();
+    $otpData = Otp::where('kode_otp', $kodeOtp)
+        ->where('expired_at', '>=', now())
+        ->where('jenis_otp', 'register')
+        ->where('is_used', false)
+        ->latest()
+        ->first();
 
-        if ($otpData) {
-            // Tandai OTP sebagai sudah dipakai
-            $otpData->is_used = true;
-            $otpData->save();
+    if ($otpData) {
+        $otpData->is_used = true;
+        $otpData->save();
 
-            // Simpan kode OTP ke tb_wargas (opsional, sesuai kebutuhan)
-            $warga = Wargas::find($otpData->warga_id);
-            if ($warga) {
-                $warga->otp_code = $otpData->kode_otp;
-                $warga->save();
-            }
+        $pendaftaran = Pendaftaran::find($otpData->pendaftaran_id);
 
-            // Arahkan ke form buat password
-            return redirect()->route('buatPassword', ['id_warga' => $otpData->warga_id]);
+        if (!$pendaftaran) {
+            return back()->with('error', 'Data pendaftaran tidak ditemukan.');
         }
 
-        return back()->with('error', 'Kode OTP tidak valid atau sudah kadaluarsa.');
+        // Pindahkan ke tb_wargas
+        $warga = Wargas::create([
+            'nama_lengkap' => $pendaftaran->nama_lengkap,
+            'email' => $pendaftaran->email,
+            'no_hp' => $pendaftaran->no_hp,
+            'nik' => $pendaftaran->nik,
+            'no_kk' => $pendaftaran->no_kk,
+            'otp_code' => $otpData->kode_otp,
+            'status_verifikasi' => false,
+        ]);
+
+        // Hapus dari tb_pendaftaran
+        $pendaftaran->delete();
+
+        return redirect()->route('buatPassword', ['id_warga' => $warga->id_warga])
+            ->with('success', 'OTP berhasil diverifikasi. Silakan buat password.');
     }
+
+    return back()->with('error', 'Kode OTP tidak valid atau sudah kadaluarsa.');
+}
+
 
     public function indexReset(Request $request){
         return view('auth.otp-lupa-password');
@@ -123,10 +138,10 @@ public function kirimUlang(Request $request)
             ->orderByDesc('created_at')
             ->first();
 
-        if ($otpTerakhir && $otpTerakhir->warga_id) {
-            $wargaFromOtp = Wargas::find($otpTerakhir->warga_id);
-            if ($wargaFromOtp) {
-                $email = $wargaFromOtp->email;
+        if ($otpTerakhir && $otpTerakhir->pendaftaran_id) {
+            $pendaftaranFromOtp = Pendaftaran::find($otpTerakhir->pendaftaran_id);
+            if ($pendaftaranFromOtp) {
+                $email = $pendaftaranFromOtp->email;
             }
         }
     }
@@ -137,8 +152,8 @@ public function kirimUlang(Request $request)
     }
 
     // 4. Ambil warga berdasarkan email
-    $warga = Wargas::where('email', $email)->first();
-    if (!$warga) {
+    $pendaftaran = Pendaftaran::where('email', $email)->first();
+    if (!$pendaftaran) {
         return response()->json(['message' => 'Data warga tidak ditemukan.'], 404);
     }
 
@@ -147,7 +162,7 @@ public function kirimUlang(Request $request)
     $expiredAt = now()->addSeconds(120);
 
     Otp::create([
-        'warga_id' => $warga->id_warga,
+        'pendaftaran_id' => $pendaftaran->id_pendaftaran,
         'kode_otp' => $otpBaru,
         'expired_at' => $expiredAt,
         'jenis_otp' => 'register',
@@ -157,8 +172,8 @@ public function kirimUlang(Request $request)
     $urlVerifikasi = route('otp', ['email' => $email]);
 
     // 6. Kirim email OTP
-    Mail::to($email)->send(new VerifikasiAkunDisetujui(
-        $warga->nama_lengkap,
+    Mail::to($email)->send(new OTPAkun(
+        $pendaftaran->nama_lengkap,
         $otpBaru,
         $urlVerifikasi
     ));

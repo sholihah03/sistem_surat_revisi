@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tb_otp', function (Blueprint $table) {
             $table->id('id_otp');
-            $table->foreignId('warga_id')->constrained('tb_wargas', 'id_warga')->onDelete('cascade');
+            $table->foreignId('pendaftaran_id')->constrained('tb_pendaftaran', 'id_pendaftaran')->onDelete('cascade');
             $table->string('kode_otp', 6);
             $table->dateTime('expired_at');
             $table->boolean('is_used')->default(false); // Menandai apakah OTP sudah dipakai
@@ -22,6 +22,9 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('tb_otp');
