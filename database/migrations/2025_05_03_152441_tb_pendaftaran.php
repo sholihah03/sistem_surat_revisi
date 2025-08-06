@@ -14,8 +14,6 @@ return new class extends Migration
         Schema::create('tb_pendaftaran', function (Blueprint $table) {
             $table->id('id_pendaftaran');
             $table->string('nama_lengkap');
-            $table->string('no_kk', 16);
-            $table->string('nik', 16)->unique();
             $table->string('no_hp', 13);
             $table->string('email')->unique();
 

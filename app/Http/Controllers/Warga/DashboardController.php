@@ -18,6 +18,12 @@ class DashboardController extends Controller
         $rt = $warga->rt;
         $rw = $warga->rw;
 
+        $dataBelumLengkap =
+        empty($warga->scan_Kk?->no_kk_scan) ||
+        empty($warga->rt_id) ||
+        empty($warga->rw_id);
+
+
         // Ambil pengajuan surat untuk warga tersebut, sekaligus eager load tujuanSurat
         $pengajuanSurat = PengajuanSurat::with('tujuanSurat')
             ->where('warga_id', $warga->id_warga)
@@ -46,13 +52,18 @@ class DashboardController extends Controller
         // Urutkan berdasarkan created_at descending
         $pengajuanSuratGabungan = $pengajuanSuratGabungan->sortByDesc('created_at');
 
-        return view('warga.dashboard', compact('warga', 'rt', 'rw', 'pengajuanSuratGabungan'));
+        return view('warga.dashboard', compact('warga', 'rt', 'rw', 'pengajuanSuratGabungan', 'dataBelumLengkap'));
     }
 
     public function panduan()
     {
         $warga = Auth::guard('warga')->user();
-        return view('warga.panduan', compact('warga'));
+        $dataBelumLengkap =
+        empty($warga->scan_Kk?->path_file_kk) ||
+        empty($warga->rt_id) ||
+        empty($warga->rw_id);
+
+        return view('warga.panduan', compact('warga', 'dataBelumLengkap'));
     }
 
 

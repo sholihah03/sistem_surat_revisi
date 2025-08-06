@@ -57,8 +57,81 @@
 
 </head>
 <body class="min-h-screen bg-yellow-50">
+
     <!-- Navbar -->
     @include('komponen.nav')
+
+    @if ($dataBelumLengkap)
+        <div class="fixed left-0 right-0 z-30 px-4">
+            <div class="max-w-5xl mx-auto bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative shadow-md">
+                <strong class="font-bold">Data Belum Lengkap!</strong>
+                <span class="block sm:inline">
+                    Silakan lengkapi data diri Anda terlebih dahulu dengan mengunggah foto KK dan memilih RT/RW di menu profil.
+                </span>
+
+                {{-- Tombol upload KK --}}
+                <div class="mt-3">
+                    <a href="{{ route('uploadKK') }}"
+                    class="inline-block bg-red-500 hover:bg-red-600 text-white font-semibold py-1.5 px-4 rounded transition duration-200">
+                        Upload KK Sekarang
+                    </a>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Modal Upload KK-->
+        @if(session('success_upload_kk'))
+        <div id="successModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div class="bg-white rounded-lg shadow-lg p-8 relative w-[520px] text-center animate-scale">
+                <!-- Tombol Close -->
+                <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+
+                <!-- Ikon Ceklis -->
+                <div class="flex justify-center mb-6">
+                    <img src="https://img.icons8.com/color/96/000000/ok--v1.png" alt="Success Icon" class="w-20 h-20">
+                </div>
+
+                <!-- Judul -->
+                <h2 class="text-2xl font-bold mb-4 text-gray-800 whitespace-nowrap">
+                    Terima kasih Sudah Melengkapi<br>Data Diri Anda.
+                </h2>
+
+                <!-- Deskripsi -->
+                <p class="text-gray-600 mb-8 text-base leading-relaxed">
+                    Data Anda saat ini sedang divalidasi oleh pihak RT.<br>
+                    Mohon menunggu hingga 24 jam untuk informasi berikutnya lewat Email.
+                </p>
+
+                <!-- Tombol Tutup -->
+                <button onclick="closeModal()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg">
+                    Tutup
+                </button>
+            </div>
+        </div>
+
+        <script>
+        function closeModal() {
+            document.getElementById('successModal').style.display = 'none';
+        }
+        </script>
+
+        <style>
+        @keyframes scaleUp {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .animate-scale {
+            animation: scaleUp 0.3s ease-out;
+        }
+        </style>
+        @endif
 
     <!-- Carousel + Teks Selamat Datang -->
     <div class="max-w-5xl mx-auto px-4 mt-6 rounded-xl overflow-hidden shadow">
@@ -103,36 +176,6 @@
 
     <!-- Fitur Card dan Histori Tabel dalam Kotak dengan Opacity -->
     <div class="max-w-7xl mx-auto mt-6 px-4 py-6 bg-white bg-opacity-18 rounded-lg">
-        <!-- Fitur Card -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <!-- Card Ajukan Surat -->
-            <div class="feature-card bg-blue-100 p-6 rounded-xl shadow border-l-4 border-blue-500">
-                <h2 class="text-lg font-semibold mb-2">📝 Ajukan Surat Pengantar</h2>
-                <p class="text-sm text-gray-600 mb-3">Mulai proses pengajuan surat Anda untuk berbagai keperluan.</p>
-                <a href="{{ route('pengajuanSuratWarga') }}" class="inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors duration-300 transform transition-transform duration-300 hover:scale-105">
-                    Ajukan Sekarang
-                </a>
-            </div>
-
-            <!-- Card Riwayat Surat -->
-            <div class="feature-card bg-teal-100 p-6 rounded-xl shadow border-l-4 border-teal-500">
-                <h2 class="text-lg font-semibold mb-2">📄 Riwayat Surat</h2>
-                <p class="text-sm text-gray-600 mb-3">Lihat status surat yang telah diajukan.</p>
-                <a href="{{ route('riwayatSurat') }}" class="inline-block bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600 transition-colors duration-300 transform transition-transform duration-300 hover:scale-105">
-                    Lihat Sekarang
-                </a>
-            </div>
-
-            <!-- Card Histori Surat -->
-            <div class="feature-card bg-pink-100 p-6 rounded-xl shadow border-l-4 border-pink-500">
-                <h2 class="text-lg font-semibold mb-2">📜 Histori Surat</h2>
-                <p class="text-sm text-gray-600 mb-3">Cek riwayat dan status pengajuan surat yang sudah disetujui atau ditolak.</p>
-                <a href="{{ route('historiSuratWarga') }}" class="inline-block bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600 transition-colors duration-300 transform transition-transform duration-300 hover:scale-105">
-                    Lihat Histori
-                </a>
-            </div>
-        </div>
-
         <!-- Status Tabel -->
         <div>
             <h3 class="text-xl font-bold text-gray-800 mb-4">

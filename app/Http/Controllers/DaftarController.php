@@ -29,8 +29,6 @@ class DaftarController extends Controller
 public function store(Request $request)
 {
     $request->validate([
-        'no_kk' => 'required|numeric',
-        'nik' => 'required|numeric',
         'nama_lengkap' => 'required',
         'email' => 'required|email',
         'no_hp' => 'required|numeric',
@@ -50,10 +48,6 @@ public function store(Request $request)
     }
 
     // Cek jika sudah ada di tb_pendaftaran
-    if (Pendaftaran::where('nik', $request->nik)->exists()) {
-        return back()->withErrors(['daftar_error' => 'NIK sudah terdaftar'])->withInput();
-    }
-
     if (Pendaftaran::where('nama_lengkap', $request->nama_lengkap)->exists()) {
         return back()->withErrors(['daftar_error' => 'Nama Lengkap sudah digunakan'])->withInput();
     }
@@ -63,9 +57,7 @@ public function store(Request $request)
     }
 
     // Cek jika sudah ada di tb_pendaftaran
-    $pendaftaranLama = Pendaftaran::where('email', $request->email)
-        ->orWhere('nik', $request->nik)
-        ->first();
+    $pendaftaranLama = Pendaftaran::where('email', $request->email)->first();
 
     if ($pendaftaranLama) {
         // Cari OTP terkait pendaftaran lama
@@ -85,8 +77,6 @@ public function store(Request $request)
 
     // Simpan ke tb_pendaftaran
     $pendaftaran = Pendaftaran::create([
-        'no_kk' => $request->no_kk,
-        'nik' => $request->nik,
         'nama_lengkap' => $request->nama_lengkap,
         'email' => $request->email,
         'no_hp' => $request->no_hp,

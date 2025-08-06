@@ -15,8 +15,8 @@ return new class extends Migration
             $table->foreignId('rw_id')->nullable()->constrained('tb_rw', 'id_rw')->onDelete('cascade');
             $table->string('nama_lengkap', 225);
             $table->string('email', 225);
-            $table->string('no_kk', 16);
-            $table->string('nik', 16);
+            $table->string('no_kk', 16)->nullable();
+            $table->string('nik', 16)->nullable();
             $table->string('no_hp', 225);
             $table->string('otp_code', 225)->nullable();
             $table->boolean('status_verifikasi')->default(false);

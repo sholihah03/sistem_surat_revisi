@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Warga;
 
+use App\Http\Controllers\Controller;
 use App\Models\Alamat;
 use App\Models\ScanKK;
 use App\Models\Pendaftaran;
@@ -83,18 +84,19 @@ class UploadKKManualController extends Controller
         // Hapus path dari session agar tidak digunakan ulang
         session()->forget('failed_kk_path');
 
-        // Tambahan untuk update tb_pendaftaran
-        $pendaftaran = Pendaftaran::where('no_kk', $request->no_kk)->first();
-        if ($pendaftaran) {
-            $pendaftaran->scan_id = $scanKK->id_scan;
-            $pendaftaran->save();
+        // // Tambahan untuk update tb_pendaftaran
+        // $pendaftaran = Pendaftaran::where('no_kk', $request->no_kk)->first();
+        // if ($pendaftaran) {
+        //     $pendaftaran->scan_id = $scanKK->id_scan;
+        //     $pendaftaran->save();
 
-            if ($pendaftaran->rt && $pendaftaran->rt->email_rt) {
-                Mail::to($pendaftaran->rt->email_rt)->send(new NotifikasiVerifikasiAkun($pendaftaran));
-            }
-        }
+        //     if ($pendaftaran->rt && $pendaftaran->rt->email_rt) {
+        //         Mail::to($pendaftaran->rt->email_rt)->send(new NotifikasiVerifikasiAkun($pendaftaran));
+        //     }
+        // }
 
         return redirect()->route('login')->with('success_upload_kk', 'Data berhasil disimpan.');
     }
 
 }
+

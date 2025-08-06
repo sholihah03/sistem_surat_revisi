@@ -15,6 +15,8 @@ class ScanKK extends Model
 
     protected $fillable = [
         'alamat_id',
+        // 'rt_id',
+        // 'rw_id',
         'nama_kepala_keluarga',
         'no_kk_scan',
         'path_file_kk',
@@ -36,4 +38,13 @@ class ScanKK extends Model
         return $this->hasMany(Wargas::class, 'scan_kk_id', 'id_scan');
     }
 
+    public function rt()
+    {
+        return $this->belongsTo(Rt::class, 'rt_id', 'id_rt');
+    }
+
+    public function rw()
+    {
+        return $this->belongsTo(Rw::class, 'rw_id', 'id_rw');
+    }
 }

@@ -15,8 +15,12 @@ class ProfileWargaController extends Controller
     {
         $warga = Auth::guard('warga')->user();
         $alamat = $warga->scan_Kk?->alamat;
+        $dataBelumLengkap =
+        empty($warga->scan_Kk?->path_file_kk) ||
+        empty($warga->rt_id) ||
+        empty($warga->rw_id);
 
-        return view('warga.profileWarga', compact('warga', 'alamat'));
+        return view('warga.profileWarga', compact('warga', 'alamat', 'dataBelumLengkap'));
     }
 
     public function uploadFoto(Request $request)

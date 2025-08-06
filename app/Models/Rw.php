@@ -34,17 +34,17 @@ class Rw extends Model implements Authenticatable
 
     public function wargas()
     {
-        return $this->hasMany(Wargas::class, 'rt_id', 'id_rt');
+        return $this->hasMany(Wargas::class, 'rw_id', 'id_rw');
     }
 
-    public function pendaftarans()
+    public function scanKK()
     {
-        return $this->hasMany(Pendaftaran::class, 'rt_id', 'id_rt');
+        return $this->hasMany(ScanKK::class, 'rw_id', 'id_rw');
     }
 
     public function kadaluwarsa()
     {
-        return $this->hasMany(Kadaluwarsa::class, 'rt_id', 'id_rt');
+        return $this->hasMany(Kadaluwarsa::class, 'rw_id', 'id_rw');
     }
 
     // Metode untuk autentikasi

@@ -16,59 +16,6 @@
     <div class="min-h-screen flex items-center justify-center px-4">
         <div class="flex flex-col md:flex-row items-center bg-transparent w-full max-w-6xl">
 
-        <!-- Modal Upload KK-->
-        @if(session('success_upload_kk'))
-        <div id="successModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div class="bg-white rounded-lg shadow-lg p-8 relative w-[520px] text-center animate-scale">
-                <!-- Tombol Close -->
-                <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
-
-                <!-- Ikon Ceklis -->
-                <div class="flex justify-center mb-6">
-                    <img src="https://img.icons8.com/color/96/000000/ok--v1.png" alt="Success Icon" class="w-20 h-20">
-                </div>
-
-                <!-- Judul -->
-                <h2 class="text-2xl font-bold mb-4 text-gray-800 whitespace-nowrap">
-                    Terima kasih atas pendaftaran Anda.
-                </h2>
-
-                <!-- Deskripsi -->
-                <p class="text-gray-600 mb-8 text-base leading-relaxed">
-                    Data Anda saat ini sedang divalidasi oleh pihak RT.<br>
-                    Mohon menunggu hingga 24 jam untuk informasi berikutnya lewat Email.
-                </p>
-
-                <!-- Tombol Tutup -->
-                <button onclick="closeModal()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg">
-                    Tutup
-                </button>
-            </div>
-        </div>
-
-        <script>
-        function closeModal() {
-            document.getElementById('successModal').style.display = 'none';
-        }
-        </script>
-
-        <style>
-        @keyframes scaleUp {
-            from {
-                transform: scale(0.8);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-        .animate-scale {
-            animation: scaleUp 0.3s ease-out;
-        }
-        </style>
-        @endif
-
         @if(session('success_buat_password'))
         <div id="passwordSuccessModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div class="bg-white rounded-lg shadow-lg p-8 relative w-[520px] text-center animate-scale">

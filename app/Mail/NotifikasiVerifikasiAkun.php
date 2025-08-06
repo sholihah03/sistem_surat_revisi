@@ -11,16 +11,26 @@ class NotifikasiVerifikasiAkun extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $pendaftaran;
+    public $scan;
+    public $alamat;
+    public $scan_id;
 
-    public function __construct(Pendaftaran $pendaftaran)
+    /**
+     * Create a new message instance.
+     */
+    public function __construct($scan, $alamat, $scan_id)
     {
-        $this->pendaftaran = $pendaftaran;
+        $this->scan = $scan;
+        $this->alamat = $alamat;
+        $this->scan_id = $scan_id;
     }
 
+    /**
+     * Build the message.
+     */
     public function build()
     {
-        return $this->subject('Verifikasi Pendaftaran Warga Baru')
-                    ->view('email.notifikasiVerifikasiAkunWarga');
+        return $this->subject('Permintaan Verifikasi KK Baru')
+            ->view('email.notifikasiVerifikasiDataWarga');
     }
 }

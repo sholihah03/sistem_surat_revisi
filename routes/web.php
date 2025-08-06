@@ -7,7 +7,7 @@ use App\Http\Middleware\AuthenticateRw;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\DaftarController;
 use App\Http\Middleware\AuthenticateWarga;
-use App\Http\Controllers\UploadKKController;
+use App\Http\Controllers\Warga\UploadKKController;
 use App\Http\Controllers\Rt\BankDataController;
 use App\Http\Controllers\BuatPasswordController;
 use App\Http\Controllers\LupaPasswordController;
@@ -17,7 +17,7 @@ use App\Http\Controllers\Rw\ProfileRwController;
 use App\Http\Controllers\Rt\TtdDigitalController;
 use App\Http\Controllers\Rw\DashboardRwController;
 use App\Http\Controllers\Rw\TujuanSuratController;
-use App\Http\Controllers\UploadKKManualController;
+use App\Http\Controllers\Warga\UploadKKManualController;
 use App\Http\Controllers\Rw\TtdDigitalRwController;
 use App\Http\Controllers\Warga\DashboardController;
 use App\Http\Controllers\Warga\FormSuratController;
@@ -64,14 +64,6 @@ Route::post('/otp/kirim-ulang', [OTPController::class, 'kirimUlang'])->name('otp
 Route::get('/buatPassword', [BuatPasswordController::class, 'index'])->name('buatPassword');
 Route::post('/buatPassword', [BuatPasswordController::class, 'store'])->name('buatPassword.store');
 
-Route::get('/uploadKK', [UploadKKController::class, 'index'])->name('uploadKK');
-Route::get('/uploadKKKonfirm', [UploadKKController::class, 'konfirm'])->name('uploadKKKonfirm');
-Route::post('/uploadKKproses', [UploadKKController::class, 'proses'])->name('uploadKKproses');
-Route::post('/uploadKKsimpan', [UploadKKController::class, 'simpan'])->name('uploadKKsimpan');
-
-Route::get('/uploadKKManual', [UploadKKManualController::class, 'index'])->name('uploadKKManual');
-Route::post('/uploadKKManualSimpan', [UploadKKManualController::class, 'uploadKKSimpan'])->name('uploadKKManualSimpan');
-
 Route::get('/suratPengantar', [TemplateSuratController::class, 'index'])->name('suratPengantar');
 
 Route::get('/verifikasi-surat/{token}', [ManajemenSuratWargaController::class, 'verifikasiSurat'])->name('verifikasi.surat');
@@ -82,6 +74,14 @@ Route::get('/verifikasi/surat/{token}', [ManajemenSuratWargaController::class, '
 
 
 Route::prefix('warga')->middleware(AuthenticateWarga::class)->group(function () {
+    Route::get('/uploadKK', [UploadKKController::class, 'index'])->name('uploadKK');
+    Route::get('/uploadKKKonfirm', [UploadKKController::class, 'konfirm'])->name('uploadKKKonfirm');
+    Route::post('/uploadKKproses', [UploadKKController::class, 'proses'])->name('uploadKKproses');
+    Route::post('/uploadKKsimpan', [UploadKKController::class, 'simpan'])->name('uploadKKsimpan');
+
+    Route::get('/uploadKKManual', [UploadKKManualController::class, 'index'])->name('uploadKKManual');
+    Route::post('/uploadKKManualSimpan', [UploadKKManualController::class, 'uploadKKSimpan'])->name('uploadKKManualSimpan');
+
     Route::get('/dashboardWarga', [DashboardController::class, 'index'])->name('dashboardWarga');
     Route::get('/panduan', [DashboardController::class, 'panduan'])->name('panduan');
     Route::post('/notifikasi/mark-as-read', [NotificationWargaController::class, 'markAsRead'])->name('notifikasi.markAsRead');

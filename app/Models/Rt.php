@@ -39,9 +39,9 @@ class Rt extends Model implements Authenticatable
         return $this->hasMany(Wargas::class, 'rt_id', 'id_rt');
     }
 
-    public function pendaftarans()
+    public function scanKK()
     {
-        return $this->hasMany(Pendaftaran::class, 'rt_id', 'id_rt');
+        return $this->hasMany(ScanKK::class, 'rt_id', 'id_rt');
     }
 
     public function kadaluwarsa()

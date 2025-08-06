@@ -60,47 +60,21 @@
                         </div>
                     </div>
 
-                    <!-- Grid untuk KK dan NIK -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- No KK -->
-                        <div>
-                            <label for="no_kk" class="block text-sm font-semibold text-gray-700">Nomor Kartu Keluarga</label>
-                            <div class="flex items-center border border-blue-400 rounded-md px-3 py-2 mt-1">
-                                <input type="number" name="no_kk" id="no_kk" required placeholder="Nomor Kartu Keluarga"
-                                    class="w-full focus:outline-none bg-transparent text-gray-700" maxlength="16" oninput="validateLength(this)" />
-                            </div>
-                        </div>
-
-                        <!-- No NIK -->
-                        <div>
-                            <label for="nik" class="block text-sm font-semibold text-gray-700">Nomor NIK</label>
-                            <div class="flex items-center border border-blue-400 rounded-md px-3 py-2 mt-1">
-                                <input type="number" name="nik" id="nik" required placeholder="Nomor NIK"
-                                    class="w-full focus:outline-none bg-transparent text-gray-700" maxlength="16" oninput="validateLength(this)" />
-                            </div>
+                    <!-- No WhatsApp -->
+                    <div>
+                        <label for="no_hp" class="block text-sm font-semibold text-gray-700">Nomor WhatsApp</label>
+                        <div class="flex items-center border border-blue-400 rounded-md px-3 py-2 mt-1">
+                            <input type="number" name="no_hp" id="no_hp" required placeholder="Nomor WhatsApp"
+                                class="w-full focus:outline-none bg-transparent text-gray-700" maxlength="13" oninput="validateLengthWa(this)"/>
                         </div>
                     </div>
 
-                    <small class="text-xs text-red-500 mt-1">Data pribadi Anda akan dijaga kerahasiaannya dan hanya digunakan untuk keperluan sistem administrasi RT/RW. Nomor NIK yang Anda masukkan tidak akan dibagikan ke pihak lain.</small>
-
-                    <!-- Grid untuk No WhatsApp dan Email -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- No WhatsApp -->
-                        <div>
-                            <label for="no_hp" class="block text-sm font-semibold text-gray-700">Nomor WhatsApp</label>
-                            <div class="flex items-center border border-blue-400 rounded-md px-3 py-2 mt-1">
-                                <input type="number" name="no_hp" id="no_hp" required placeholder="Nomor WhatsApp"
-                                    class="w-full focus:outline-none bg-transparent text-gray-700" maxlength="13" oninput="validateLengthWa(this)"/>
-                            </div>
-                        </div>
-
-                        <!-- Email -->
-                        <div>
-                            <label for="email" class="block text-sm font-semibold text-gray-700">Email</label>
-                            <div class="flex items-center border border-blue-400 rounded-md px-3 py-2 mt-1">
-                                <input type="email" name="email" id="email" required placeholder="Email"
-                                    class="w-full focus:outline-none bg-transparent text-gray-700" />
-                            </div>
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-sm font-semibold text-gray-700">Email</label>
+                        <div class="flex items-center border border-blue-400 rounded-md px-3 py-2 mt-1">
+                            <input type="email" name="email" id="email" required placeholder="Email"
+                                class="w-full focus:outline-none bg-transparent text-gray-700" />
                         </div>
                     </div>
 

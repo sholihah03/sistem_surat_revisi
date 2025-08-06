@@ -1,25 +1,31 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Warga;
 
-use App\Mail\NotifikasiVerifikasiAkun;
 use App\Models\ScanKK;
 use App\Models\Pendaftaran;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\NotifikasiVerifikasiAkun;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Alamat; // Tambahkan model Alamat
+
 
 class UploadKKController extends Controller
 {
     public function index()
     {
-        return view('auth.upload-kk');
+        // Mengambil data RT dari tabel tb_rt (misalnya hanya mengambil kolom no_rt)
+        $dataRT = DB::table('tb_rt')->select('id_rt', 'no_rt', 'nama_lengkap_rt')->get();
+        $dataRW = DB::table('tb_rw')->select('id_rw', 'no_rw', 'nama_lengkap_rw')->get();
+        return view('warga.upload-kk', compact('dataRT','dataRW'));
     }
 
     public function konfirm(Request $request)
     {
-        return view('auth.upload-kkKonfir', [
+        return view('warga.upload-kkKonfir', [
             'no_kk' => $request->query('no_kk'),
             'nama_kepala_keluarga' => $request->query('nama_kepala_keluarga'),
             'path' => $request->query('path'),
@@ -129,23 +135,17 @@ class UploadKKController extends Controller
         // Setelah data berhasil disimpan di tb_scan_kk, ambil id_scan yang baru disimpan
         $scan_id = $scan->id_scan;
 
-        // Update tb_pendaftaran dengan scan_id yang baru saja disimpan
-        // Asumsi, kamu sudah memiliki data pendaftaran yang ingin diupdate
-        // Misalnya, kita ambil pendaftaran berdasarkan no_kk_scan (atau kondisi lain)
-        // $pendaftaran = Pendaftaran::where('no_kk', $request->no_kk_scan)->first();
-        $pendaftaran = Pendaftaran::find(session('id_pendaftaran'));
+        // Cari RT berdasarkan nomor RT dari input
+        $rt = DB::table('tb_rt')->where('no_rt', $request->rt_alamat)->first();
 
-        if ($pendaftaran) {
-            $pendaftaran->scan_id = $scan_id;
-            $pendaftaran->save();
-            session()->forget('id_pendaftaran');
+if ($rt && $rt->email_rt) {
+    // Kirim email notifikasi ke email RT
+Mail::to($rt->email_rt)->send(new NotifikasiVerifikasiAkun($scan, $alamat, $scan_id));
 
-            if ($pendaftaran->rt && $pendaftaran->rt->email_rt) {
-                Mail::to($pendaftaran->rt->email_rt)->send(new NotifikasiVerifikasiAkun($pendaftaran));
-            }
-        }
+}
 
-        return redirect()->route('login')->with('success_upload_kk', 'Data berhasil disimpan.');
+
+        return redirect()->route('dashboardWarga')->with('success_upload_kk', 'Data berhasil disimpan.');
     }
 
     private function extractNoKK($text)

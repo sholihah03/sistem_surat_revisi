@@ -5,6 +5,20 @@
         </a>
 
         <div class="hidden md:flex items-center gap-4 relative">
+            {{-- <a href="{{ route('pengajuanSuratWarga') }}" class="text-white hover:underline font-semibold">Ajukan Surat</a>
+            <a href="{{ route('riwayatSurat') }}" class="text-white hover:underline font-semibold">Riwayat Surat</a>
+            <a href="{{ route('historiSuratWarga') }}" class="text-white hover:underline font-semibold">Histori Surat</a> --}}
+
+            @if ($dataBelumLengkap)
+                <span class="text-gray-400 cursor-not-allowed font-semibold" title="Lengkapi data diri terlebih dahulu">Ajukan Surat</span>
+                <span class="text-gray-400 cursor-not-allowed font-semibold" title="Lengkapi data diri terlebih dahulu">Riwayat Surat</span>
+                <span class="text-gray-400 cursor-not-allowed font-semibold" title="Lengkapi data diri terlebih dahulu">Histori Surat</span>
+            @else
+                <a href="{{ route('pengajuanSuratWarga') }}" class="text-white hover:underline font-semibold">Ajukan Surat</a>
+                <a href="{{ route('riwayatSurat') }}" class="text-white hover:underline font-semibold">Riwayat Surat</a>
+                <a href="{{ route('historiSuratWarga') }}" class="text-white hover:underline font-semibold">Histori Surat</a>
+            @endif
+
             <div class="relative">
                 <button id="notifButton" onclick="toggleNotif()" class="relative hover:opacity-80 hover:scale-110 transition-all duration-200">
                     <img src="{{ asset('images/notification2.png') }}" class="w-6 h-6" alt="Notif" />
@@ -77,12 +91,20 @@
                 </div>
             </div>
 
-            <a href="{{ route('profileWarga') }}" class="hover:opacity-80 hover:scale-110 transition-all duration-200 inline-block">
-                <img src="{{ $warga->profile_warga ? asset('storage/profile_warga/' . $warga->profile_warga) : asset('images/profile2.png') }}" class="w-8 h-8 rounded-full object-cover" alt="Profile" />
-            </a>
-            <a href="{{ route('logout') }}" class="text-base no-underline font-semibold hover:scale-105 hover:text-gray-200 transition-all duration-200">
-                Logout
-            </a>
+            <!-- Profil Dropdown -->
+            <div class="relative">
+                <button onclick="toggleProfile()" class="flex items-center gap-2 hover:opacity-80 transition-all duration-200">
+                    <img src="{{ $warga->profile_warga ? asset('storage/profile_warga/' . $warga->profile_warga) : asset('images/profile2.png') }}" class="w-8 h-8 rounded-full object-cover" alt="Profile" />
+                    <svg id="arrowIcon" class="w-4 h-4 transition-transform duration-300 transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <div id="profileDropdown" class="hidden absolute right-0 mt-2 bg-white text-gray-800 rounded shadow-md w-40 z-50">
+                    <a href="{{ route('profileWarga') }}" class="block px-4 py-2 hover:bg-yellow-100">Profil</a>
+                    <a href="{{ route('logout') }}" class="block px-4 py-2 hover:bg-yellow-100">Logout</a>
+                </div>
+            </div>
+
         </div>
 
         <!-- Mobile Hamburger -->
@@ -262,5 +284,30 @@ document.addEventListener('click', function(event) {
             notifDropdownMobile.classList.add('hidden');
         }
     });
+
+    function toggleProfile() {
+    const dropdown = document.getElementById('profileDropdown');
+    const arrowIcon = document.getElementById('arrowIcon');
+
+    dropdown.classList.toggle('hidden');
+
+    if (dropdown.classList.contains('hidden')) {
+        arrowIcon.classList.remove('rotate-180');
+    } else {
+        arrowIcon.classList.add('rotate-180');
+    }
+}
+
+// Tutup dropdown saat klik di luar
+document.addEventListener('click', function (event) {
+    const profileDropdown = document.getElementById('profileDropdown');
+    const profileButton = document.querySelector('button[onclick="toggleProfile()"]');
+
+    if (profileDropdown && !profileDropdown.contains(event.target) && !profileButton.contains(event.target)) {
+        profileDropdown.classList.add('hidden');
+        document.getElementById('arrowIcon').classList.remove('rotate-180');
+    }
+});
+
 </script>
 
