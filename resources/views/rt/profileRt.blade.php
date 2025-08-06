@@ -173,15 +173,12 @@
                 </div>
             @endif
 
-            {{-- @if ($errors->any())
+            @if ($errors->has('ttd_digital'))
                 <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
-                    <ul class="list-disc pl-5">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+                    {{ $errors->first('ttd_digital') }}
                 </div>
-            @endif --}}
+            @endif
+            
             <!-- Jika tanda tangan belum ada -->
             @if (empty($rt->ttd_digital) && empty($rt->ttd_digital_bersih))
                 <form action="{{ route('scanTtdRtUpload') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
@@ -190,6 +187,7 @@
                         <label for="scan_ttd" class="block text-sm font-semibold text-gray-800 mb-1">Pilih Gambar Scan Tanda Tangan</label>
                         <input type="file" name="ttd_digital" accept="image/*" required
                             class="block w-full text-sm text-gray-700 bg-gray-100 border border-gray-300 rounded-lg cursor-pointer p-2">
+                        <p id="file-error" class="text-red-600 text-sm mt-1 hidden">Ukuran file melebihi 2 MB.</p>
                     </div>
 
                     <div class="flex justify-center">
@@ -200,31 +198,37 @@
                 </form>
             @else
             <!-- Jika tanda tangan sudah ada, tampilkan gambar dan tombol Edit -->
-            <div class="mt-4">
-                <table class="min-w-full table-auto border border-gray-300 border-collapse">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th class="px-4 py-2 border border-gray-300">Tanda Tangan Scan</th>
-                            <th class="px-4 py-2 border border-gray-300">Tanda Tangan Bersih</th>
-                            <th class="px-4 py-2 border border-gray-300">Aksi</th>
+            <div class="mt-4 w-full">
+                <table class="w-full table-fixed border border-gray-300 border-collapse rounded-md shadow-md">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-2 py-2 border border-gray-300 text-sm w-1/3">Tanda Tangan Scan</th>
+                            <th class="px-2 py-2 border border-gray-300 text-sm w-1/3">Tanda Tangan Bersih</th>
+                            <th class="px-2 py-2 border border-gray-300 text-sm w-1/3">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="px-4 py-2 border border-gray-300 text-center">
+                            <td class="px-2 py-2 border border-gray-300 text-center">
                                 <img src="{{ Storage::url($rt->ttd_digital) }}"
-                                    alt="Tanda Tangan Scan"
-                                    class="w-20 h-20 object-cover mx-auto cursor-pointer transition-transform duration-200 hover:scale-105"
+                                    alt="Tanda Tangan Scan" width="768"
+                                    height="951"
+                                    class="object-contain mx-auto cursor-pointer hover:scale-105 transition-transform duration-200"
                                     onclick="showImageModal('{{ Storage::url($rt->ttd_digital) }}')">
                             </td>
-                            <td class="px-4 py-2 border border-gray-300 text-center">
+                            <td class="px-2 py-2 border border-gray-300 text-center">
                                 <img src="{{ Storage::url($rt->ttd_digital_bersih) }}"
                                     alt="Tanda Tangan Bersih"
-                                    class="w-20 h-20 object-cover mx-auto cursor-pointer transition-transform duration-200 hover:scale-105"
+                                    width="768"
+                                    height="951"
+                                    class="mx-auto object-contain cursor-pointer hover:scale-105 transition-transform duration-200"
                                     onclick="showImageModal('{{ Storage::url($rt->ttd_digital_bersih) }}')">
+
                             </td>
-                            <td class="px-4 py-2 border border-gray-300 text-center">
-                                <button type="button" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600" onclick="openModalTtd()">
+                            <td class="px-2 py-2 border border-gray-300 text-center">
+                                <button type="button"
+                                    class="px-3 py-1 bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600"
+                                    onclick="openModalTtd()">
                                     Edit
                                 </button>
                             </td>

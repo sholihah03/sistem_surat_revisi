@@ -201,31 +201,33 @@
                 </form>
             @else
             <!-- Jika tanda tangan sudah ada, tampilkan gambar dan tombol Edit -->
-            <div class="mt-4">
-                <table class="min-w-full table-auto border border-gray-300 border-collapse">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th class="px-4 py-2 border border-gray-300">Tanda Tangan Scan</th>
-                            <th class="px-4 py-2 border border-gray-300">Tanda Tangan Bersih</th>
-                            <th class="px-4 py-2 border border-gray-300">Aksi</th>
+            <div class="mt-4 w-full">
+                <table class="w-full table-fixed border border-gray-300 border-collapse rounded-md shadow-md">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-2 py-2 border border-gray-300 text-sm w-1/3">Tanda Tangan Scan</th>
+                            <th class="px-2 py-2 border border-gray-300 text-sm w-1/3">Tanda Tangan Bersih</th>
+                            <th class="px-2 py-2 border border-gray-300 text-sm w-1/3">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="px-4 py-2 border border-gray-300 text-center">
+                            <td class="px-2 py-2 border border-gray-300 text-center">
                                 <img src="{{ Storage::url($rw->ttd_digital) }}"
                                     alt="Tanda Tangan Scan"
-                                    class="w-20 h-20 object-cover mx-auto cursor-pointer transition-transform duration-200 hover:scale-105"
+                                    class="w-16 h-16 object-contain mx-auto cursor-pointer transition-transform duration-200 hover:scale-105"
                                     onclick="showImageModal('{{ Storage::url($rw->ttd_digital) }}')">
                             </td>
-                            <td class="px-4 py-2 border border-gray-300 text-center">
+                            <td class="px-2 py-2 border border-gray-300 text-center">
                                 <img src="{{ Storage::url($rw->ttd_digital_bersih) }}"
                                     alt="Tanda Tangan Bersih"
-                                    class="w-20 h-20 object-cover mx-auto cursor-pointer transition-transform duration-200 hover:scale-105"
+                                    class="w-16 h-16 object-contain mx-auto cursor-pointer transition-transform duration-200 hover:scale-105"
                                     onclick="showImageModal('{{ Storage::url($rw->ttd_digital_bersih) }}')">
                             </td>
-                            <td class="px-4 py-2 border border-gray-300 text-center">
-                                <button type="button" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600" onclick="openModalTtd()">
+                            <td class="px-2 py-2 border border-gray-300 text-center">
+                                <button type="button"
+                                    class="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
+                                    onclick="openModalTtd()">
                                     Edit
                                 </button>
                             </td>

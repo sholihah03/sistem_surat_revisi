@@ -55,50 +55,128 @@ class TtdDigitalRwController extends Controller
     /**
      * Mengubah gambar ke PNG dan latar belakang jadi transparan
      */
+    // private function makeTransparentBackground($sourcePath, $outputPath)
+    // {
+    //     $ext = strtolower(pathinfo($sourcePath, PATHINFO_EXTENSION));
+
+    //     switch ($ext) {
+    //         case 'png':
+    //             $image = imagecreatefrompng($sourcePath);
+    //             break;
+    //         case 'jpg':
+    //         case 'jpeg':
+    //             $image = imagecreatefromjpeg($sourcePath);
+    //             break;
+    //         default:
+    //             throw new \Exception("Format tidak didukung: $ext");
+    //     }
+
+    //     $width = imagesx($image);
+    //     $height = imagesy($image);
+
+    //     // Buat gambar baru dengan alpha channel
+    //     $transparent = imagecreatetruecolor($width, $height);
+    //     imagesavealpha($transparent, true);
+    //     $alpha = imagecolorallocatealpha($transparent, 0, 0, 0, 127);
+    //     imagefill($transparent, 0, 0, $alpha);
+
+    //     for ($x = 0; $x < $width; $x++) {
+    //         for ($y = 0; $y < $height; $y++) {
+    //             $rgb = imagecolorat($image, $x, $y);
+    //             $r = ($rgb >> 16) & 0xFF;
+    //             $g = ($rgb >> 8) & 0xFF;
+    //             $b = $rgb & 0xFF;
+
+    //             // Jika warnanya cukup terang (putih atau abu muda), buat transparan
+    //             if ($r > 230 && $g > 230 && $b > 230) {
+    //                 imagesetpixel($transparent, $x, $y, $alpha); // transparan
+    //             } else {
+    //                 $color = imagecolorallocate($transparent, $r, $g, $b);
+    //                 imagesetpixel($transparent, $x, $y, $color);
+    //             }
+    //         }
+    //     }
+
+    //     imagepng($transparent, $outputPath);
+    //     imagedestroy($image);
+    //     imagedestroy($transparent);
+    // }
+
     private function makeTransparentBackground($sourcePath, $outputPath)
-    {
-        $ext = strtolower(pathinfo($sourcePath, PATHINFO_EXTENSION));
+{
+    $ext = strtolower(pathinfo($sourcePath, PATHINFO_EXTENSION));
 
-        switch ($ext) {
-            case 'png':
-                $image = imagecreatefrompng($sourcePath);
-                break;
-            case 'jpg':
-            case 'jpeg':
-                $image = imagecreatefromjpeg($sourcePath);
-                break;
-            default:
-                throw new \Exception("Format tidak didukung: $ext");
-        }
+    switch ($ext) {
+        case 'png':
+            $image = imagecreatefrompng($sourcePath);
+            break;
+        case 'jpg':
+        case 'jpeg':
+            $image = imagecreatefromjpeg($sourcePath);
+            break;
+        default:
+            throw new \Exception("Format tidak didukung: $ext");
+    }
 
-        $width = imagesx($image);
-        $height = imagesy($image);
+    $width = imagesx($image);
+    $height = imagesy($image);
 
-        // Buat gambar baru dengan alpha channel
-        $transparent = imagecreatetruecolor($width, $height);
-        imagesavealpha($transparent, true);
-        $alpha = imagecolorallocatealpha($transparent, 0, 0, 0, 127);
-        imagefill($transparent, 0, 0, $alpha);
+    // Buat transparansi
+    $transparent = imagecreatetruecolor($width, $height);
+    imagesavealpha($transparent, true);
+    $alpha = imagecolorallocatealpha($transparent, 0, 0, 0, 127);
+    imagefill($transparent, 0, 0, $alpha);
 
-        for ($x = 0; $x < $width; $x++) {
-            for ($y = 0; $y < $height; $y++) {
-                $rgb = imagecolorat($image, $x, $y);
-                $r = ($rgb >> 16) & 0xFF;
-                $g = ($rgb >> 8) & 0xFF;
-                $b = $rgb & 0xFF;
+    for ($x = 0; $x < $width; $x++) {
+        for ($y = 0; $y < $height; $y++) {
+            $rgb = imagecolorat($image, $x, $y);
+            $r = ($rgb >> 16) & 0xFF;
+            $g = ($rgb >> 8) & 0xFF;
+            $b = $rgb & 0xFF;
 
-                // Jika warnanya cukup terang (putih atau abu muda), buat transparan
-                if ($r > 230 && $g > 230 && $b > 230) {
-                    imagesetpixel($transparent, $x, $y, $alpha); // transparan
-                } else {
-                    $color = imagecolorallocate($transparent, $r, $g, $b);
-                    imagesetpixel($transparent, $x, $y, $color);
-                }
+            if ($r > 230 && $g > 230 && $b > 230) {
+                imagesetpixel($transparent, $x, $y, $alpha);
+            } else {
+                $color = imagecolorallocate($transparent, $r, $g, $b);
+                imagesetpixel($transparent, $x, $y, $color);
             }
         }
-
-        imagepng($transparent, $outputPath);
-        imagedestroy($image);
-        imagedestroy($transparent);
     }
+
+    // ✅ Target ukuran tetap
+    $targetWidth = 2048;
+    $targetHeight = 1653;
+
+    // Hitung proporsional scaling
+    $scale = min($targetWidth / $width, $targetHeight / $height);
+    $resizedWidth = (int)($width * $scale);
+    $resizedHeight = (int)($height * $scale);
+
+    // Buat canvas final
+    $finalImage = imagecreatetruecolor($targetWidth, $targetHeight);
+    imagesavealpha($finalImage, true);
+    $bg = imagecolorallocatealpha($finalImage, 0, 0, 0, 127);
+    imagefill($finalImage, 0, 0, $bg);
+
+    // Posisikan di tengah
+    $x = (int)(($targetWidth - $resizedWidth) / 2);
+    $y = (int)(($targetHeight - $resizedHeight) / 2);
+
+    imagecopyresampled(
+        $finalImage,
+        $transparent,
+        $x, $y,
+        0, 0,
+        $resizedWidth, $resizedHeight,
+        $width, $height
+    );
+
+    imagepng($finalImage, $outputPath);
+
+    imagedestroy($image);
+    imagedestroy($transparent);
+    imagedestroy($finalImage);
+}
+
+
 }
