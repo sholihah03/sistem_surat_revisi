@@ -140,7 +140,6 @@ public function kirimOtp(Request $request)
         return view('auth.buat-password-baru');
     }
 
-
     public function simpanPasswordBaru(Request $request)
 {
     $request->validate([
@@ -159,7 +158,7 @@ public function kirimOtp(Request $request)
         return redirect()->route('login')->with('error', 'Session tidak ditemukan.');
     }
 
-    // Cek pengguna berdasarkan role
+    // Ambil user sesuai role
     if ($role === 'warga') {
         $user = Wargas::find($id);
     } elseif ($role === 'rt') {
@@ -174,13 +173,78 @@ public function kirimOtp(Request $request)
         return redirect()->route('login')->with('error', 'Pengguna tidak ditemukan.');
     }
 
-    // Simpan password baru (hash)
-    $user->password = Hash::make($request->password);
+    $newPassword = $request->password;
+
+    // Cek apakah password sudah digunakan di tb_wargas
+    $usedInWarga = Wargas::all()->contains(function ($w) use ($newPassword) {
+        return $w->password && Hash::check($newPassword, $w->password);
+    });
+
+    // Cek apakah password sudah digunakan di tb_rt
+    $usedInRt = Rt::all()->contains(function ($r) use ($newPassword) {
+        return $r->password && Hash::check($newPassword, $r->password);
+    });
+
+    // Cek apakah password sudah digunakan di tb_rw
+    $usedInRw = Rw::all()->contains(function ($rw) use ($newPassword) {
+        return $rw->password && Hash::check($newPassword, $rw->password);
+    });
+
+    if ($usedInWarga || $usedInRt || $usedInRw) {
+        return back()->withInput()->with('error', 'Password ini sudah pernah digunakan. Silakan gunakan password lain.');
+    }
+
+    // Simpan password baru
+    $user->password = Hash::make($newPassword);
     $user->save();
 
-    // Hapus session
+    // Hapus session setelah reset
     session()->forget(['reset_id', 'reset_role', 'email_reset', 'otp_jenis']);
 
     return redirect()->route('login')->with('success_buat_password', 'Password berhasil diubah. Silakan login.');
 }
+
+
+    // public function simpanPasswordBaru(Request $request)
+    // {
+    //     $request->validate([
+    //         'password' => 'required|min:6|max:6|confirmed',
+    //     ], [
+    //         'password.required' => 'Password baru wajib diisi.',
+    //         'password.min' => 'Password harus terdiri dari 6 karakter.',
+    //         'password.max' => 'Password maksimal 6 karakter.',
+    //         'password.confirmed' => 'Konfirmasi password tidak sesuai.',
+    //     ]);
+
+    //     $id = session('reset_id');
+    //     $role = session('reset_role');
+
+    //     if (!$id || !$role) {
+    //         return redirect()->route('login')->with('error', 'Session tidak ditemukan.');
+    //     }
+
+    //     // Cek pengguna berdasarkan role
+    //     if ($role === 'warga') {
+    //         $user = Wargas::find($id);
+    //     } elseif ($role === 'rt') {
+    //         $user = Rt::find($id);
+    //     } elseif ($role === 'rw') {
+    //         $user = Rw::find($id);
+    //     } else {
+    //         return redirect()->route('login')->with('error', 'Role tidak valid.');
+    //     }
+
+    //     if (!$user) {
+    //         return redirect()->route('login')->with('error', 'Pengguna tidak ditemukan.');
+    //     }
+
+    //     // Simpan password baru (hash)
+    //     $user->password = Hash::make($request->password);
+    //     $user->save();
+
+    //     // Hapus session
+    //     session()->forget(['reset_id', 'reset_role', 'email_reset', 'otp_jenis']);
+
+    //     return redirect()->route('login')->with('success_buat_password', 'Password berhasil diubah. Silakan login.');
+    // }
 }

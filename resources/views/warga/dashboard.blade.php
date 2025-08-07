@@ -66,19 +66,70 @@
             <div class="max-w-5xl mx-auto bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative shadow-md">
                 <strong class="font-bold">Data Belum Lengkap!</strong>
                 <span class="block sm:inline">
-                    Silakan lengkapi data diri Anda terlebih dahulu dengan mengunggah foto KK dan memilih RT/RW di menu profil.
+                    Silakan lengkapi data diri Anda terlebih dahulu dengan menginputkan no kk dan nik Anda
                 </span>
 
-                {{-- Tombol upload KK --}}
                 <div class="mt-3">
-                    <a href="{{ route('uploadKK') }}"
+                    <a href="{{ route('cekKKForm') }}"
                     class="inline-block bg-red-500 hover:bg-red-600 text-white font-semibold py-1.5 px-4 rounded transition duration-200">
-                        Upload KK Sekarang
+                        Cek Sekarang
                     </a>
                 </div>
             </div>
         </div>
     @endif
+
+    <!-- Modal pesan data berhasil lengkap-->
+      @if(session('statusLengkap'))
+        <div id="successDataModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div class="bg-white rounded-lg shadow-lg p-8 relative w-[520px] text-center animate-scale">
+                <!-- Tombol Close -->
+                <button onclick="closeDataModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+
+                <!-- Ikon Ceklis -->
+                <div class="flex justify-center mb-6">
+                    <img src="https://img.icons8.com/color/96/000000/ok--v1.png" alt="Success Icon" class="w-20 h-20">
+                </div>
+
+                <!-- Judul -->
+                <h2 class="text-2xl font-bold mb-4 text-gray-800 whitespace-nowrap">
+                    No KK Anda sudah terdaftar.
+                </h2>
+
+                <!-- Deskripsi -->
+                <p class="text-gray-600 mb-8 text-base leading-relaxed">
+                    Selamat sekarang data diri Anda sudah lengkap.
+                </p>
+
+                <!-- Tombol Tutup -->
+                <button onclick="closeDataModal()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg">
+                    Tutup
+                </button>
+            </div>
+        </div>
+
+        <script>
+        function closeDataModal() {
+            document.getElementById('successDataModal').style.display = 'none';
+        }
+        </script>
+
+        <style>
+        @keyframes scaleUp {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .animate-scale {
+            animation: scaleUp 0.3s ease-out;
+        }
+        </style>
+        @endif
 
     <!-- Modal Upload KK-->
         @if(session('success_upload_kk'))
@@ -94,7 +145,7 @@
 
                 <!-- Judul -->
                 <h2 class="text-2xl font-bold mb-4 text-gray-800 whitespace-nowrap">
-                    Terima kasih Sudah Melengkapi<br>Data Diri Anda.
+                    Terima Kasih Sudah Melengkapi<br>Data Diri Anda.
                 </h2>
 
                 <!-- Deskripsi -->

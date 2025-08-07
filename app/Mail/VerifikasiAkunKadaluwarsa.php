@@ -22,7 +22,7 @@ class VerifikasiAkunKadaluwarsa extends Mailable
 
     public function build()
     {
-        return $this->subject('Pendaftaran Anda Kadaluwarsa')
+        return $this->subject('Pengajuan Data Diri Anda Kadaluwarsa')
                     ->view('email.verifikasiAkunKadaluwarsa');
     }
 }

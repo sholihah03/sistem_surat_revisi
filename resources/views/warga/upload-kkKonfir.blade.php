@@ -17,8 +17,8 @@
         <div class="bg-gray-50 p-4 rounded-md shadow-sm">
             <h3 class="text-lg font-semibold mb-2 text-gray-700">Data Hasil Upload KK:</h3>
             <p><strong>No KK:</strong> <span id="no_kk_text">{{ $no_kk }}</span></p>
+            <p><strong>No NIK Pengupload:</strong> <span id="nik_pendaftar">{{ $nik_pendaftar }}</span></p>
             <p><strong>Nama Kepala Keluarga:</strong> <span id="nama_kepala_keluarga_text">{{ $nama_kepala_keluarga }}</span></p>
-            {{-- <p><strong>Alamat:</strong> <span id="alamat_text">{{ $alamatData['provinsi'] ?? '' }}, {{ $alamatData['kabupaten_kota'] ?? '' }}, {{ $alamatData['kecamatan'] ?? '' }}, {{ $alamatData['kelurahan'] ?? '' }}, {{ $alamatData['rt'] ?? '' }}/{{ $alamatData['rw'] ?? '' }}, {{ $alamatData['kode_pos'] ?? '' }}</span></p> --}}
         </div>
 
         <!-- Form untuk Edit Data -->
@@ -29,12 +29,21 @@
             <form id="formData" action="{{ route('uploadKKsimpan') }}" method="POST" class="space-y-5 max-h-[75vh] overflow-y-auto">
                 @csrf
 
+                <input type="hidden" name="nik_pendaftar" value="{{ $nik_pendaftar }}">
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label for="no_kk" class="block text-base font-semibold text-gray-800 mb-1">No KK</label>
                         <input type="text" id="no_kk_scan" name="no_kk_scan" value="{{ old('no_kk_scan', $no_kk) }}"
                             class="w-full px-4 py-2 border-2 border-blue-400 rounded-md focus:ring-blue-500 shadow-sm"
                             placeholder="Masukkan No KK">
+                    </div>
+
+                    <div>
+                        <label for="no_kk" class="block text-base font-semibold text-gray-800 mb-1">NIK Anda</label>
+                        <input type="text" id="nik_pendaftar" name="nik_pendaftar" value="{{ $nik_pendaftar }}"
+                            class="w-full px-4 py-2 border-2 border-blue-400 rounded-md focus:ring-blue-500 shadow-sm"
+                            placeholder="Masukkan No NIK">
                     </div>
 
                     <div>
@@ -89,11 +98,11 @@
                 <input type="hidden" name="path" value="{{ $path }}">
 
                 <!-- Tombol untuk membuka modal -->
-<button type="button"
-    onclick="document.getElementById('modalKonfirmasi').classList.remove('hidden')"
-    class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-md transition shadow-md mt-4">
-    Simpan Data
-</button>
+                <button type="button"
+                    onclick="document.getElementById('modalKonfirmasi').classList.remove('hidden')"
+                    class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-md transition shadow-md mt-4">
+                    Simpan Data
+                </button>
 
 
             </form>

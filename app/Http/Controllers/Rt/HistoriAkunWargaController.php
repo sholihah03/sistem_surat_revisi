@@ -47,7 +47,7 @@ class HistoriAkunWargaController extends Controller
         $search = $request->input('search');
         $rt = Auth::guard('rt')->user(); // Ambil data RT yang sedang login
 
-        $query = Kadaluwarsa::where('rt_id', $rt->id_rt) // Filter sesuai RT login
+        $query = Kadaluwarsa::where('rt_alamat', $rt->no_rt)// Filter sesuai RT login
             ->orderBy('created_at', 'desc');
 
         if ($search) {

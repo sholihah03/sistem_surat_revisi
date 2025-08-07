@@ -7,7 +7,6 @@ use App\Http\Middleware\AuthenticateRw;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\DaftarController;
 use App\Http\Middleware\AuthenticateWarga;
-use App\Http\Controllers\Warga\UploadKKController;
 use App\Http\Controllers\Rt\BankDataController;
 use App\Http\Controllers\BuatPasswordController;
 use App\Http\Controllers\LupaPasswordController;
@@ -17,7 +16,7 @@ use App\Http\Controllers\Rw\ProfileRwController;
 use App\Http\Controllers\Rt\TtdDigitalController;
 use App\Http\Controllers\Rw\DashboardRwController;
 use App\Http\Controllers\Rw\TujuanSuratController;
-use App\Http\Controllers\Warga\UploadKKManualController;
+use App\Http\Controllers\Warga\UploadKKController;
 use App\Http\Controllers\Rw\TtdDigitalRwController;
 use App\Http\Controllers\Warga\DashboardController;
 use App\Http\Controllers\Warga\FormSuratController;
@@ -31,6 +30,8 @@ use App\Http\Controllers\Rt\HistoriAkunWargaController;
 use App\Http\Controllers\Surat\TemplateSuratController;
 use App\Http\Controllers\Rt\RiwayatSuratWargaController;
 use App\Http\Controllers\Warga\PengajuanSuratController;
+use App\Http\Controllers\Warga\PengecekanNoKKController;
+use App\Http\Controllers\Warga\UploadKKManualController;
 use App\Http\Controllers\Rt\VerifikasiAkunWargaController;
 use App\Http\Controllers\Rw\ManajemenSuratWargaController;
 use App\Http\Controllers\Warga\NotificationWargaController;
@@ -81,6 +82,12 @@ Route::prefix('warga')->middleware(AuthenticateWarga::class)->group(function () 
 
     Route::get('/uploadKKManual', [UploadKKManualController::class, 'index'])->name('uploadKKManual');
     Route::post('/uploadKKManualSimpan', [UploadKKManualController::class, 'uploadKKSimpan'])->name('uploadKKManualSimpan');
+
+    // Tampilkan form pengecekan
+    Route::get('/cek-kk-nik', [PengecekanNoKKController::class, 'index'])->name('cekKKForm');
+    // Proses pengecekan
+    Route::post('/cek-kk-nik', [PengecekanNoKKController::class, 'cek'])->name('cekKKProcess');
+
 
     Route::get('/dashboardWarga', [DashboardController::class, 'index'])->name('dashboardWarga');
     Route::get('/panduan', [DashboardController::class, 'panduan'])->name('panduan');

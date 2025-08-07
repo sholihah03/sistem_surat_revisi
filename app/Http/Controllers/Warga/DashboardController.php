@@ -18,11 +18,13 @@ class DashboardController extends Controller
         $rt = $warga->rt;
         $rw = $warga->rw;
 
-        $dataBelumLengkap =
-        empty($warga->scan_Kk?->no_kk_scan) ||
-        empty($warga->rt_id) ||
-        empty($warga->rw_id);
+        // $dataBelumLengkap =
+        // empty($warga->scan_Kk?->no_kk_scan) ||
+        // empty($warga->rt_id) ||
+        // empty($warga->rw_id);
 
+        // Cek apakah warga sudah input KK atau NIK
+        $dataBelumLengkap = empty($warga->no_kk) && empty($warga->nik);
 
         // Ambil pengajuan surat untuk warga tersebut, sekaligus eager load tujuanSurat
         $pengajuanSurat = PengajuanSurat::with('tujuanSurat')

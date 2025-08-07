@@ -22,9 +22,13 @@ class VerifikasiAkunWargaController extends Controller
     public function index()
     {
         $profile_rt = Auth::guard('rt')->user()->profile_rt;
-        $pendingData = ScanKK::with(['alamat'])
-        ->where('status_verifikasi', 'pending')
-        ->get();
+        // $pendingData = ScanKK::with(['alamat'])
+        // ->where('status_verifikasi', 'pending')
+        // ->get();
+                $pendingData = ScanKK::with(['alamat'])
+    ->where('status_verifikasi', 'pending')
+    ->where('created_at', '>=', now()->subHours(24))
+    ->get();
 
         $rt = Auth::guard('rt')->user();
         $ttdDigital = $rt->ttd_digital;
@@ -82,6 +86,7 @@ public function disetujui($id)
         // Update data warga yang sudah ada
         $warga->update([
             'scan_kk_id' => $scan->id_scan,
+            'nik'        => $scan->nik_pendaftar,
             'no_kk'      => $scan->no_kk_scan,
             'email'      => $scan->email_pendaftar ?? $warga->email,
             'no_hp'      => $scan->no_hp_pendaftar ?? $warga->no_hp,

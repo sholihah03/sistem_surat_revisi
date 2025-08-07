@@ -15,7 +15,7 @@
                 <thead class="bg-gray-100 sticky top-0 z-10">
                     <tr>
                         <th class="px-2 md:px-4 py-2 text-left w-8">No</th>
-                        <th class="px-2 md:px-4 py-2 text-left w-40">Nama Warga</th>
+                        <th class="px-2 md:px-4 py-2 text-left w-40">Nama Warga Pendaftar</th>
                         <th class="px-2 md:px-4 py-2 text-left w-40">Nama Kepala Keluarga</th>
                         <th class="px-2 md:px-4 py-2 text-left w-24">No KK</th>
                         <th class="px-2 md:px-4 py-2 text-left w-56">Alamat</th>

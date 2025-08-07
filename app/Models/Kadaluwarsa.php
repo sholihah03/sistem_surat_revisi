@@ -13,8 +13,8 @@ class Kadaluwarsa extends Model
     protected $primaryKey = 'id_kadaluwarsa';
 
     protected $fillable = [
-        'rt_id',
-        'rw_id',
+        'rt_alamat',
+        'rw_alamat',
         'nama_kepala_keluarga',
         'path_file_kk',
         'nama_lengkap',

@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('tb_kadaluwarsa', function (Blueprint $table) {
             $table->id('id_kadaluwarsa');
-            $table->foreignId('rt_id')->constrained('tb_rt', 'id_rt')->onDelete('cascade');
-            $table->foreignId('rw_id')->constrained('tb_rw', 'id_rw')->onDelete('cascade');
+            $table->string('rt_alamat')->nullable();
+            $table->string('rw_alamat')->nullable();
             $table->string('nama_kepala_keluarga', 225);
             $table->string('path_file_kk', 225);
             $table->string('nama_lengkap');

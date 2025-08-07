@@ -30,6 +30,7 @@ class UploadKKController extends Controller
             'nama_kepala_keluarga' => $request->query('nama_kepala_keluarga'),
             'path' => $request->query('path'),
             'alamatData' => $request->query('alamatData'),
+            'nik_pendaftar' => $request->query('nik_pendaftar'),
         ]);
     }
 
@@ -82,7 +83,15 @@ class UploadKKController extends Controller
         // Reset hitungan jika berhasil
         session()->forget('upload_kk_fail');
 
-        return redirect()->route('uploadKKKonfirm', compact('no_kk', 'nama_kepala_keluarga', 'path', 'alamatData'));
+        // return redirect()->route('uploadKKKonfirm', compact('no_kk', 'nama_kepala_keluarga', 'path', 'alamatData'));
+        return redirect()->route('uploadKKKonfirm', [
+    'no_kk' => $no_kk,
+    'nama_kepala_keluarga' => $nama_kepala_keluarga,
+    'path' => $path,
+    'alamatData' => $alamatData,
+    'nik_pendaftar' => $request->nik_pengupload, // <- tambah ini
+]);
+
     }
 
     public function simpan(Request $request)
@@ -130,6 +139,7 @@ class UploadKKController extends Controller
         // Simpan data ke tb_scan_kk
         $scan = new ScanKK();
         $scan->no_kk_scan = $request->no_kk_scan;
+        $scan->nik_pendaftar = $request->nik_pendaftar;
         $scan->nama_pendaftar = $warga->nama_lengkap ?? null;
         $scan->no_hp_pendaftar = $warga->no_hp ?? null;
         $scan->email_pendaftar = $warga->email ?? null;
