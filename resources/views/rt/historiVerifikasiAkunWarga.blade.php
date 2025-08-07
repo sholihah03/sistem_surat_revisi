@@ -47,7 +47,7 @@
                             {{
                                 $item->status_verifikasi === 'disetujui'
                                     ? ($item->wargas->first()->nama_lengkap ?? '-')
-                                    : ($item->pendaftaran->first()->nama_lengkap ?? '-')
+                                    : ($item->nama_pendaftar ?? '-')
                             }}
                         </td>
                         <td class="px-2 md:px-4 py-2 whitespace-nowrap w-40">{{ $item->nama_kepala_keluarga }}</td>

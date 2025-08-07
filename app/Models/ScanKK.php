@@ -15,8 +15,9 @@ class ScanKK extends Model
 
     protected $fillable = [
         'alamat_id',
-        // 'rt_id',
-        // 'rw_id',
+        'nama_pendaftar',
+        'no_hp_pendaftar',
+        'email_pendaftar',
         'nama_kepala_keluarga',
         'no_kk_scan',
         'path_file_kk',

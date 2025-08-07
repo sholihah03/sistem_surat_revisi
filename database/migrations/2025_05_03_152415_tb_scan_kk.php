@@ -16,6 +16,9 @@ return new class extends Migration
             $table->foreignId('alamat_id')->nullable()->constrained('tb_alamat', 'id_alamat')->onDelete('cascade');
             // $table->foreignId('rw_id')->nullable()->constrained('tb_rw', 'id_rw')->onDelete('cascade');
             // $table->foreignId('rt_id')->nullable()->constrained('tb_rt', 'id_rt')->onDelete('cascade');
+            $table->string('nama_pendaftar', 225)->nullable();
+            $table->string('no_hp_pendaftar', 225)->nullable();
+            $table->string('email_pendaftar', 225)->nullable();
             $table->string('nama_kepala_keluarga', 225);
             $table->string('no_kk_scan', 225);
             $table->string('path_file_kk', 225);

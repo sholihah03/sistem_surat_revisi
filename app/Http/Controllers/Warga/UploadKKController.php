@@ -87,6 +87,9 @@ class UploadKKController extends Controller
 
     public function simpan(Request $request)
     {
+
+        // Ambil data warga yang sedang login
+        $warga = auth()->guard('warga')->user();
         // Validasi
         $request->validate([
             'no_kk_scan' => 'required|string|max:50',
@@ -127,6 +130,9 @@ class UploadKKController extends Controller
         // Simpan data ke tb_scan_kk
         $scan = new ScanKK();
         $scan->no_kk_scan = $request->no_kk_scan;
+        $scan->nama_pendaftar = $warga->nama_lengkap ?? null;
+        $scan->no_hp_pendaftar = $warga->no_hp ?? null;
+        $scan->email_pendaftar = $warga->email ?? null;
         $scan->nama_kepala_keluarga = $request->nama_kepala_keluarga;
         $scan->path_file_kk = $path_file_kk; // Menyimpan path file KK yang sudah di-upload
         $scan->alamat_id = $alamat_id;  // Menyimpan alamat_id ke tb_scan_kk

@@ -19,22 +19,12 @@ class HistoriAkunWargaController extends Controller
 
         $search = $request->input('search');
 
-        // $historiData = ScanKK::with(['alamat', 'wargas', 'pendaftaran'])
-        //     ->whereIn('status_verifikasi', ['disetujui', 'ditolak'])
-        //     ->whereHas('wargas', function ($q) use ($rt) {
-        //         $q->where('rt_id', $rt->id_rt);
-        //     })
-        //     ->orderBy('updated_at', 'desc');
-        $historiData = ScanKK::with(['alamat', 'wargas', 'pendaftaran'])
-            ->whereIn('status_verifikasi', ['disetujui', 'ditolak'])
-            ->where(function ($query) use ($rt) {
-                $query->whereHas('wargas', function ($q) use ($rt) {
-                    $q->where('rt_id', $rt->id_rt);
-                })->orWhereHas('pendaftaran', function ($q) use ($rt) {
-                    $q->where('rt_id', $rt->id_rt);
-                });
-            })
-            ->orderBy('updated_at', 'desc');
+        $historiData = ScanKK::with(['alamat', 'wargas'])
+    ->whereIn('status_verifikasi', ['disetujui', 'ditolak'])
+    ->whereHas('wargas', function ($q) use ($rt) {
+        $q->where('rt_id', $rt->id_rt);
+    })
+    ->orderBy('updated_at', 'desc');
 
 
         if ($search) {

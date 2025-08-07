@@ -29,7 +29,7 @@
                     <tr class="hover:bg-gray-50">
                         <td class="px-2 md:px-4 py-2 whitespace-nowrap w-8">{{ $index + 1 }}</td>
                         <td class="px-2 md:px-4 py-2 whitespace-nowrap w-40">
-                            {{ $item->pendaftaran->first()->nama_lengkap ?? '-' }}
+                            {{ $item->nama_pendaftar ?? '-' }}
                         </td>
                         <td class="px-2 md:px-4 py-2 whitespace-nowrap w-40">{{ $item->nama_kepala_keluarga }}</td>
                         <td class="px-2 md:px-4 py-2 whitespace-nowrap w-24">{{ $item->no_kk_scan }}</td>

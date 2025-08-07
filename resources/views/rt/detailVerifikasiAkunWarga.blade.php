@@ -8,7 +8,7 @@
     <div class="bg-white shadow-md rounded-lg p-4 mb-6 border border-gray-200">
         <div class="flex flex-col md:flex-row gap-4">
             <div class="md:w-1/2">
-                <p><strong>Nama Warga:</strong> {{ $item->pendaftaran->first()->nama_lengkap ?? '-' }}</p>
+                <p><strong>Nama Warga:</strong> {{ $item->nama_pendaftar ?? '-' }}</p>
                 <p><strong>Nama Kepala Keluarga:</strong> {{ $item->nama_kepala_keluarga }}</p>
                 <p><strong>No KK:</strong> {{ $item->no_kk_scan }}</p>
                 <p><strong>Alamat:</strong></p>

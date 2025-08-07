@@ -9,6 +9,7 @@ use App\Models\Kadaluwarsa;
 use App\Models\Pendaftaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use App\Mail\VerifikasiAkunDitolak;
 use App\Http\Controllers\Controller;
 use App\Service\NotificationService;
@@ -21,7 +22,7 @@ class VerifikasiAkunWargaController extends Controller
     public function index()
     {
         $profile_rt = Auth::guard('rt')->user()->profile_rt;
-        $pendingData = ScanKK::with(['alamat', 'pendaftaran'])
+        $pendingData = ScanKK::with(['alamat'])
         ->where('status_verifikasi', 'pending')
         ->get();
 
@@ -41,106 +42,90 @@ class VerifikasiAkunWargaController extends Controller
         $showModalUploadTtd = empty($ttdDigital);
 
         // Ambil hanya data yang sesuai dengan id
-        $item = ScanKK::with(['alamat', 'pendaftaran'])
-                    ->where('id_scan', $id)
+        $item = ScanKK::with(['alamat'])
                     ->where('status_verifikasi', 'pending')
                     ->firstOrFail();
 
         return view('rt.detailVerifikasiAkunWarga', compact('item', 'profile_rt', 'showModalUploadTtd', 'ttdDigital'));
     }
+public function disetujui($id)
+{
+    $scan = ScanKK::with('alamat')->findOrFail($id); // Load data KK & alamat
 
-    public function disetujui($id)
-    {
-        $scan = ScanKK::findOrFail($id);
-        $scan->status_verifikasi = 'disetujui';
-        $scan->save();
+    // Ubah status verifikasi menjadi disetujui
+    $scan->status_verifikasi = 'disetujui';
+    $scan->save();
 
-        // Ambil semua pendaftaran yang sesuai
-        $pendaftaranList = Pendaftaran::where('scan_id', $scan->id_scan)->get();
+    // Coba cari warga berdasarkan nama yang cocok
+    $namaPendaftar = $scan->nama_pendaftar ?? $scan->nama_kepala_keluarga;
+    $warga = Wargas::where('nama_lengkap', $namaPendaftar)->first();
 
+    if ($warga) {
+        $rt_id = null;
+        $rw_id = null;
 
-        foreach ($pendaftaranList as $pendaftaran) {
-            // Cek duplikat ke tb_wargas agar tidak double insert
-            $sudahAda = Wargas::where('nik', $pendaftaran->nik)->orWhere('email', $pendaftaran->email)->first();
-            if (!$sudahAda) {
-                // Buat data warga
-                $warga = Wargas::create([
-                    'no_kk' => $pendaftaran->no_kk,
-                    'nik' => $pendaftaran->nik,
-                    'nama_lengkap' => $pendaftaran->nama_lengkap,
-                    'email' => $pendaftaran->email,
-                    'no_hp' => $pendaftaran->no_hp,
-                    'rw_id' => $pendaftaran->rw_id,
-                    'rt_id' => $pendaftaran->rt_id,
-                    'scan_kk_id' => $scan->id_scan,
-                ]);
+        if ($scan->alamat) {
+            $nomor_rt = $scan->alamat->rt_alamat;
+            $nomor_rw = $scan->alamat->rw_alamat;
 
-                // ✅ Generate OTP
-                $otp = random_int(100000, 999999);
-                $expiredAt = Carbon::now()->addSeconds(60);
-
-                Otp::create([
-                    'warga_id' => $warga->id_warga,
-                    'kode_otp' => $otp,
-                    'expired_at' => $expiredAt,
-                    'jenis_otp' => 'register',
-                ]);
-
-                Mail::to($warga->email)->send(new VerifikasiAkunDisetujui($warga->nama_lengkap,
-                    $otp,
-                    route('otp', ['email' => $warga->email])
-                ));
-
-                 // Simpan email ke session
-                session(['email_warga' => $warga->email]);
-            } else {
-                // Jika sudah ada, ambil data warga untuk disimpan ke session
-                session(['email_warga' => $sudahAda->email]);
+            $rt = DB::table('tb_rt')->where('no_rt', $nomor_rt)->first();
+            if ($rt) {
+                $rt_id = $rt->id_rt;
             }
 
-            // Hapus data pendaftaran setelah dipindah
-            $pendaftaran->delete();
+            $rw = DB::table('tb_rw')->where('no_rw', $nomor_rw)->first();
+            if ($rw) {
+                $rw_id = $rw->id_rw;
+            }
         }
 
-        return redirect()->route('verifikasiAkunWarga')->with('success', 'Akun berhasil disetujui.');
+        // Update data warga yang sudah ada
+        $warga->update([
+            'scan_kk_id' => $scan->id_scan,
+            'no_kk'      => $scan->no_kk_scan,
+            'email'      => $scan->email_pendaftar ?? $warga->email,
+            'no_hp'      => $scan->no_hp_pendaftar ?? $warga->no_hp,
+            'rt_id'      => $rt_id,
+            'rw_id'      => $rw_id,
+        ]);
+    } else {
+        // Jika tidak ditemukan, kamu bisa log error atau abaikan
+        return redirect()->route('verifikasiAkunWarga')
+            ->with('error', 'Data warga dengan nama tersebut tidak ditemukan.');
     }
+
+    return redirect()->route('verifikasiAkunWarga')->with('success', 'Akun berhasil disetujui.');
+}
+
+
+
 
     public function ditolak(Request $request, $id)
     {
         $scan = ScanKK::findOrFail($id);
 
-        $request->validate([
-            'alasan_penolakan' => 'required|string|max:255',
-        ]);
+    $request->validate([
+        'alasan_penolakan' => 'required|string|max:255',
+    ]);
 
-        // Kirim notifikasi ke salah satu akun pendaftaran
-        $pendaftaranList = $scan->pendaftaran;
-        $firstPendaftaran = $pendaftaranList->first();
-        if ($firstPendaftaran) {
-            Mail::to($firstPendaftaran->email)->send(
-                new VerifikasiAkunDitolak(
-                    $firstPendaftaran->nama_lengkap,
-                    $request->alasan_penolakan,
-                    route('login')
-                )
-            );
-        }
-
-        // Update ScanKK
-        $scan->update([
-            'status_verifikasi' => 'ditolak',
-            'alasan_penolakan' => $request->alasan_penolakan,
-        ]);
-
-        // Update semua pendaftaran yg terkait
-        foreach ($pendaftaranList as $pendaftaran) {
-            $pendaftaran->update([
-                'status' => 'ditolak',
-                'alasan_penolakan' => $request->alasan_penolakan,
-            ]);
-        }
-
-        return redirect()->route('verifikasiAkunWarga')->with('error', 'Akun telah ditolak.');
+    // Jika perlu, bisa kirim email notifikasi ke pendaftar jika ada
+    if ($scan->email_pendaftar) {
+        Mail::to($scan->email_pendaftar)->send(
+            new VerifikasiAkunDitolak(
+                $scan->nama_pendaftar ?? $scan->nama_kepala_keluarga,
+                $request->alasan_penolakan,
+                route('login')
+            )
+        );
     }
+
+    // Update status verifikasi dan alasan
+    $scan->update([
+        'status_verifikasi' => 'ditolak',
+        'alasan_penolakan' => $request->alasan_penolakan,
+    ]);
+
+    return redirect()->route('verifikasiAkunWarga')->with('error', 'Akun telah ditolak.');
+}
 
 }
