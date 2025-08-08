@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Warga;
 
+use Carbon\Carbon;
+use App\Models\ScanKK;
 use App\Models\TujuanSurat;
 use Illuminate\Http\Request;
 use App\Models\PersyaratanSurat;
@@ -16,6 +18,31 @@ class PengajuanSuratController extends Controller
     public function index(Request $request)
     {
         $warga = Auth::guard('warga')->user();
+
+        $scanKK = ScanKK::where('nama_pendaftar', $warga->nama_lengkap)->first();
+
+        $statusKK = null;
+        $alasanPenolakan = null;
+
+        if ($scanKK) {
+            $statusKK = $scanKK->status_verifikasi;
+            $alasanPenolakan = $scanKK->alasan_penolakan;
+        }
+
+        $dataBelumLengkap = (empty($warga->no_kk) && empty($warga->nik) && !$scanKK);
+
+        // Hitung notifikasi baru
+        $notifikasi = collect(); // ambil dari model notifikasi kamu
+
+        $totalNotifBaru = $notifikasi->where('is_read', false)->count();
+
+        // Tambahkan notifikasi "status disetujui" ke total jika kurang dari 1 hari
+        $showStatusDisetujui = false;
+        if ($statusKK === 'disetujui' && $scanKK && $scanKK->updated_at->gt(Carbon::now()->subDay())) {
+            $showStatusDisetujui = true;
+            $totalNotifBaru++;
+        }
+
         $query = TujuanSurat::query();
 
         if ($request->has('search') && $request->search != '') {
@@ -27,7 +54,7 @@ class PengajuanSuratController extends Controller
 
         $tujuanSurat = $query->get();
 
-        return view('warga.pengajuanSurat', compact('tujuanSurat', 'warga'));
+        return view('warga.pengajuanSurat', compact('tujuanSurat', 'warga', 'dataBelumLengkap', 'statusKK', 'alasanPenolakan', 'totalNotifBaru', 'showStatusDisetujui'));
     }
 
     public function formPengajuanSurat(Request $request)
@@ -35,6 +62,31 @@ class PengajuanSuratController extends Controller
         $tujuan = $request->query('tujuan');
         $id = $request->query('id');
         $nomor = $request->query('nomor');
+        $warga = Auth::guard('warga')->user();
+
+        $scanKK = ScanKK::where('nama_pendaftar', $warga->nama_lengkap)->first();
+
+        $statusKK = null;
+        $alasanPenolakan = null;
+
+        if ($scanKK) {
+            $statusKK = $scanKK->status_verifikasi;
+            $alasanPenolakan = $scanKK->alasan_penolakan;
+        }
+
+        $dataBelumLengkap = (empty($warga->no_kk) && empty($warga->nik) && !$scanKK);
+
+        // Hitung notifikasi baru
+        $notifikasi = collect(); // ambil dari model notifikasi kamu
+
+        $totalNotifBaru = $notifikasi->where('is_read', false)->count();
+
+        // Tambahkan notifikasi "status disetujui" ke total jika kurang dari 1 hari
+        $showStatusDisetujui = false;
+        if ($statusKK === 'disetujui' && $scanKK && $scanKK->updated_at->gt(Carbon::now()->subDay())) {
+            $showStatusDisetujui = true;
+            $totalNotifBaru++;
+        }
 
         $persyaratanList = PersyaratanSurat::where('tujuan_surat_id', $id)
         ->get()
@@ -49,7 +101,7 @@ class PengajuanSuratController extends Controller
         $warga = Auth::guard('warga')->user();
         $alamat = $warga->scan_Kk?->alamat;
 
-        return view('warga.formSuratTujuanPopuler', compact('persyaratanList', 'tujuan', 'nomor', 'warga', 'alamat'));
+        return view('warga.formSuratTujuanPopuler', compact('persyaratanList', 'tujuan', 'nomor', 'warga', 'alamat', 'dataBelumLengkap', 'statusKK', 'alasanPenolakan', 'totalNotifBaru', 'showStatusDisetujui', 'scanKK'));
     }
 
     public function formPengajuanSuratStore(Request $request)

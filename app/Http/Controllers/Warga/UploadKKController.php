@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\NotifikasiVerifikasiAkun;
+use App\Mail\NotifikasiVerifikasiDataWarga;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Alamat; // Tambahkan model Alamat
 
@@ -156,7 +156,7 @@ class UploadKKController extends Controller
 
 if ($rt && $rt->email_rt) {
     // Kirim email notifikasi ke email RT
-Mail::to($rt->email_rt)->send(new NotifikasiVerifikasiAkun($scan, $alamat, $scan_id));
+Mail::to($rt->email_rt)->send(new NotifikasiVerifikasiDataWarga($scan, $alamat, $scan_id, $rt->rt_nomor));
 
 }
 

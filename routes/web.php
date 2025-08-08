@@ -32,7 +32,7 @@ use App\Http\Controllers\Rt\RiwayatSuratWargaController;
 use App\Http\Controllers\Warga\PengajuanSuratController;
 use App\Http\Controllers\Warga\PengecekanNoKKController;
 use App\Http\Controllers\Warga\UploadKKManualController;
-use App\Http\Controllers\Rt\VerifikasiAkunWargaController;
+use App\Http\Controllers\Rt\VerifikasiDataWargaController;
 use App\Http\Controllers\Rw\ManajemenSuratWargaController;
 use App\Http\Controllers\Warga\NotificationWargaController;
 use App\Http\Controllers\Rt\DashboardController as RtDashboardController;
@@ -123,10 +123,10 @@ Route::prefix('warga')->middleware(AuthenticateWarga::class)->group(function () 
 
 Route::prefix('rt')->middleware(AuthenticateRt::class)->group(function () {
     Route::get('/dashboardRt', [RtDashboardController::class, 'indexMain'])->name('dashboardRt');
-    Route::get('/verifikasiAkunWarga', [VerifikasiAkunWargaController::class, 'index'])->name('verifikasiAkunWarga');
-    Route::get('/detailVerifikasiAkunWarga/{id}', [VerifikasiAkunWargaController::class, 'detailVerifikasiAkunWarga'])->name('detailVerifikasiAkunWarga');
-    Route::post('/verifikasiAkunWarga/{id}/disetujui', [VerifikasiAkunWargaController::class, 'disetujui'])->name('verifikasiAkunWarga.disetujui');
-    Route::post('/verifikasiAkunWarga/{id}/ditolak', [VerifikasiAkunWargaController::class, 'ditolak'])->name('verifikasiAkunWarga.ditolak');
+    Route::get('/verifikasiAkunWarga', [VerifikasiDataWargaController::class, 'index'])->name('verifikasiAkunWarga');
+    Route::get('/detailVerifikasiAkunWarga/{id}', [VerifikasiDataWargaController::class, 'detailVerifikasiAkunWarga'])->name('detailVerifikasiAkunWarga');
+    Route::post('/verifikasiAkunWarga/{id}/disetujui', [VerifikasiDataWargaController::class, 'disetujui'])->name('verifikasiAkunWarga.disetujui');
+    Route::post('/verifikasiAkunWarga/{id}/ditolak', [VerifikasiDataWargaController::class, 'ditolak'])->name('verifikasiAkunWarga.ditolak');
     Route::get('/historiVerifikasiAkunWarga', [HistoriAkunWargaController::class, 'historiVerifikasiAkunWarga'])->name('historiVerifikasiAkunWarga');
     Route::get('/historiAkunExpired', [HistoriAkunWargaController::class, 'historiKadaluwarsa'])->name('historiAkunKadaluwarsa');
     Route::get('/dataWarga', [DataWargaController::class, 'index'])->name('dataWarga');

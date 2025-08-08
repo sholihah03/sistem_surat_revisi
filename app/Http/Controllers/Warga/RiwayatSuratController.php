@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Warga;
 
 use Carbon\Carbon;
+use App\Models\ScanKK;
 use Illuminate\Http\Request;
 use App\Models\PengajuanSurat;
 use App\Models\HasilSuratTtdRw;
@@ -18,6 +19,30 @@ class RiwayatSuratController extends Controller
         $warga = Auth::guard('warga')->user();
         $user = $request->user('warga');
 
+        $scanKK = ScanKK::where('nama_pendaftar', $warga->nama_lengkap)->first();
+
+        $statusKK = null;
+        $alasanPenolakan = null;
+
+        if ($scanKK) {
+            $statusKK = $scanKK->status_verifikasi;
+            $alasanPenolakan = $scanKK->alasan_penolakan;
+        }
+
+        $dataBelumLengkap = (empty($warga->no_kk) && empty($warga->nik) && !$scanKK);
+
+        // Hitung notifikasi baru
+        $notifikasi = collect(); // ambil dari model notifikasi kamu
+
+        $totalNotifBaru = $notifikasi->where('is_read', false)->count();
+
+        // Tambahkan notifikasi "status disetujui" ke total jika kurang dari 1 hari
+        $showStatusDisetujui = false;
+        if ($statusKK === 'disetujui' && $scanKK && $scanKK->updated_at->gt(Carbon::now()->subDay())) {
+            $showStatusDisetujui = true;
+            $totalNotifBaru++;
+        }
+
         // Ambil semua surat hasil tanda tangan RW milik user
         $suratSelesai = HasilSuratTtdRw::where(function($query) use ($user) {
             $query->whereHas('pengajuanSurat', function($q) use ($user) {
@@ -28,6 +53,7 @@ class RiwayatSuratController extends Controller
             });
         })
         ->where('created_at', '>=', Carbon::now()->subMonth()) // hanya yang disetujui dalam 1 bulan terakhir
+        ->orderBy('created_at', 'desc')
         ->get();
 
         // Pengajuan dari tb_pengajuan_surat (biasa)
@@ -41,6 +67,7 @@ class RiwayatSuratController extends Controller
                             ->where('updated_at', '>=', now()->subDays(30));
                 });
         })
+        ->orderBy('created_at', 'desc')
         ->get()
         ->map(function ($item) {
             $item->disetujui_rw = HasilSuratTtdRw::where('jenis', 'biasa')
@@ -48,7 +75,6 @@ class RiwayatSuratController extends Controller
                 ->exists();
             return $item;
         });
-
 
         // Pengajuan dari tb_pengajuan_surat_lain (manual)
         $pengajuanLain = PengajuanSuratLain::where('warga_id', $user->id_warga)
@@ -60,6 +86,7 @@ class RiwayatSuratController extends Controller
                             ->where('updated_at', '>=', now()->subDays(30));
                 });
         })
+        ->orderBy('created_at', 'desc')
         ->get()
         ->map(function ($item) {
             $item->disetujui_rw = HasilSuratTtdRw::where('jenis', 'lain')
@@ -69,7 +96,7 @@ class RiwayatSuratController extends Controller
         });
 
 
-        return view('warga.riwayatSurat', compact('pengajuanBiasa', 'pengajuanLain', 'suratSelesai', 'warga'));
+        return view('warga.riwayatSurat', compact('pengajuanBiasa', 'pengajuanLain', 'suratSelesai', 'warga', 'dataBelumLengkap', 'statusKK', 'alasanPenolakan', 'totalNotifBaru', 'showStatusDisetujui'));
     }
 
     public function showPdf($id)

@@ -61,14 +61,15 @@
     <!-- Navbar -->
     @include('komponen.nav')
 
+    {{-- Notifikasi kondisi KK --}}
     @if ($dataBelumLengkap)
+        {{-- KK belum diupload --}}
         <div class="fixed left-0 right-0 z-30 px-4">
             <div class="max-w-5xl mx-auto bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative shadow-md">
                 <strong class="font-bold">Data Belum Lengkap!</strong>
                 <span class="block sm:inline">
-                    Silakan lengkapi data diri Anda terlebih dahulu dengan menginputkan no kk dan nik Anda
+                    Silakan lengkapi data diri Anda terlebih dahulu dengan menginputkan no KK dan NIK Anda
                 </span>
-
                 <div class="mt-3">
                     <a href="{{ route('cekKKForm') }}"
                     class="inline-block bg-red-500 hover:bg-red-600 text-white font-semibold py-1.5 px-4 rounded transition duration-200">
@@ -77,7 +78,36 @@
                 </div>
             </div>
         </div>
+    @elseif ($statusKK === 'pending')
+        {{-- KK sudah diupload tapi belum diverifikasi --}}
+        <div class="fixed left-0 right-0 z-30 px-4">
+            <div class="max-w-5xl mx-auto bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded relative shadow-md">
+                <strong class="font-bold">Tunggu Verifikasi!</strong>
+                <span class="block sm:inline">
+                    Data diri Anda sedang diverifikasi oleh RT. Proses ini memakan waktu hingga 24 jam.
+                    Anda akan mendapatkan informasi melalui email setelah proses selesai.
+                </span>
+            </div>
+        </div>
+    @elseif ($statusKK === 'ditolak')
+        {{-- KK ditolak --}}
+        <div class="fixed left-0 right-0 z-30 px-4">
+            <div class="max-w-5xl mx-auto bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative shadow-md">
+                <strong class="font-bold">Data Ditolak!</strong>
+                <span class="block sm:inline">
+                    Data diri Anda ditolak oleh RT.
+                    Alasan: <em>{{ $alasanPenolakan ?? 'Tidak ada alasan yang diberikan.' }}</em>
+                </span>
+                <div class="mt-3">
+                    <a href="{{ route('cekKKForm') }}"
+                    class="inline-block bg-red-500 hover:bg-red-600 text-white font-semibold py-1.5 px-4 rounded transition duration-200">
+                        Upload Ulang
+                    </a>
+                </div>
+            </div>
+        </div>
     @endif
+
 
     <!-- Modal pesan data berhasil lengkap-->
       @if(session('statusLengkap'))
@@ -264,14 +294,26 @@
                                             @endif
                                         </td>
                                         <td class="px-4 py-2 border border-gray-300">
-                                            @if($surat->status_rw_universal === 'disetujui')
-                                                <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Disetujui</span>
+                                            @if($surat->status_rt_universal === 'ditolak')
+                                                <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                                                    Ditolak oleh RT
+                                                </span>
+                                            @elseif($surat->status_rw_universal === 'disetujui')
+                                                <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                                                    Disetujui
+                                                </span>
                                             @elseif($surat->status_rw_universal === 'menunggu')
-                                                <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">Menunggu</span>
+                                                <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                                                    Menunggu
+                                                </span>
                                             @elseif($surat->status_rw_universal === 'ditolak')
-                                                <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">Ditolak</span>
+                                                <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                                                    Ditolak
+                                                </span>
                                             @else
-                                                <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded">-</span>
+                                                <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                                                    -
+                                                </span>
                                             @endif
                                         </td>
                                         <td class="px-4 py-2 border border-gray-300">
@@ -316,6 +358,7 @@
 
     {{-- Bantuan --}}
 @php
+if (! function_exists('formatNomorIndo')) {
     function formatNomorIndo($nomor)
     {
         // Bersihkan karakter selain angka
@@ -324,13 +367,20 @@
         // Jika kosong, tampilkan placeholder
         if (!$nomor) return 'Belum tersedia';
 
-        // Tambahkan tanda +
-        $nomor = '+'.$nomor;
+        // Normalisasi: jika mulai dengan 0 ganti jadi 62
+        if (substr($nomor, 0, 1) === '0') {
+            $nomor = '62' . ltrim($nomor, '0');
+        }
 
-        // Format: +62 877-7981-9104
-        return preg_replace('/(\+62)(\d{3})(\d{4})(\d{4})/', '$1 $2-$3-$4', $nomor);
+        // Tambahkan tanda +
+        $nomor = '+' . $nomor;
+
+        // Format: +62 877-7981-9104 (regex sederhana)
+        return preg_replace('/(\+62)(\d{2,4})(\d{3,4})(\d{3,4})/', '$1 $2-$3-$4', $nomor);
     }
+}
 @endphp
+
 
 <div class="max-w-7xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-md">
     <h2 class="text-2xl font-bold mb-4 text-gray-800">🆘 Bantuan</h2>

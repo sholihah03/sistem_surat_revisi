@@ -46,14 +46,21 @@
             <div class="mb-8 bg-white p-4 rounded shadow">
                 <h2 class="text-lg sm:text-xl font-semibold text-black-600 mb-4">🕘 Histori Pengajuan Surat</h2>
 
-                @if($disetujuiBiasa->isEmpty() && $disetujuiLain->isEmpty())
-                    <p class="text-gray-500 italic">Belum ada surat yang disetujui.</p>
+                @if(
+                    $disetujuiBiasa->isEmpty() &&
+                    $ditolakBiasa->isEmpty() &&
+                    $disetujuiLain->isEmpty() &&
+                    $ditolakLain->isEmpty()
+                )
+                    <p class="text-gray-500 italic">Belum ada surat yang disetujui atau ditolak.</p>
                 @else
-                <div class="{{ count($disetujuiBiasa) + count($disetujuiLain) > 3 ? 'max-h-96 overflow-y-auto pr-2' : '' }}">
+                <div class="{{ count($disetujuiBiasa) + count($ditolakBiasa) + count($disetujuiLain) + count($ditolakLain) > 3 ? 'max-h-96 overflow-y-auto pr-2' : '' }}">
                     <ul class="space-y-4">
-                        @foreach ($disetujuiBiasa as $item)
+
+                        {{-- Biasa --}}
+                        @foreach ($disetujuiBiasa->merge($ditolakBiasa) as $item)
                         <li class="border p-4 rounded-md">
-                            <h3 class="font-semibold text-gray-800">{{ $item->tujuanSurat ? $item->tujuanSurat->nama_tujuan : 'Tidak ada tujuan surat' }}</h3>
+                            <h3 class="font-semibold text-gray-800">{{ $item->tujuanSurat->nama_tujuan ?? 'Tidak ada tujuan surat' }}</h3>
                             <p class="text-sm text-gray-600">Tanggal Pengajuan: {{ $item->created_at->translatedFormat('d F Y') }}</p>
 
                             {{-- Status RT --}}
@@ -67,20 +74,23 @@
                                 <p class="text-sm text-red-600 italic">Alasan RT: {{ $item->alasan_penolakan_pengajuan }}</p>
                             @endif
 
-                            {{-- Status RW --}}
-                            <p class="text-sm {{ $item->status_rw === 'ditolak' ? 'text-red-600' : ($item->status_rw === 'disetujui' ? 'text-green-600' : 'text-gray-600') }}">
-                                Status RW {{ $item->status_rw ? strtolower($item->status_rw) : '-' }}
-                                @if($item->waktu_persetujuan_rw)
-                                    pada {{ \Carbon\Carbon::parse($item->waktu_persetujuan_rw)->translatedFormat('d F Y') }}
+                            {{-- Status RW (hanya tampil jika RT bukan "ditolak") --}}
+                            @if($item->status_rt !== 'ditolak')
+                                <p class="text-sm {{ $item->status_rw === 'ditolak' ? 'text-red-600' : ($item->status_rw === 'disetujui' ? 'text-green-600' : 'text-gray-600') }}">
+                                    Status RW {{ $item->status_rw ? strtolower($item->status_rw) : '-' }}
+                                    @if($item->waktu_persetujuan_rw)
+                                        pada {{ \Carbon\Carbon::parse($item->waktu_persetujuan_rw)->translatedFormat('d F Y') }}
+                                    @endif
+                                </p>
+                                @if($item->status_rw === 'ditolak' && $item->alasan_penolakan_pengajuan)
+                                    <p class="text-sm text-red-600 italic">Alasan RW: {{ $item->alasan_penolakan_pengajuan }}</p>
                                 @endif
-                            </p>
-                            @if($item->status_rw === 'ditolak' && $item->alasan_penolakan_pengajuan)
-                                <p class="text-sm text-red-600 italic">Alasan RW: {{ $item->alasan_penolakan_pengajuan }}</p>
                             @endif
                         </li>
                         @endforeach
 
-                        @foreach ($disetujuiLain as $item)
+                        {{-- Lain --}}
+                        @foreach ($disetujuiLain->merge($ditolakLain) as $item)
                         <li class="border p-4 rounded-md">
                             <h3 class="font-semibold text-gray-800">{{ $item->tujuan_manual }}</h3>
                             <p class="text-sm text-gray-600">Tanggal Pengajuan: {{ $item->created_at->translatedFormat('d F Y') }}</p>
@@ -96,15 +106,17 @@
                                 <p class="text-sm text-red-600 italic">Alasan RT: {{ $item->alasan_penolakan_pengajuan_lain }}</p>
                             @endif
 
-                            {{-- Status RW --}}
-                            <p class="text-sm {{ $item->status_rw_pengajuan_lain === 'ditolak' ? 'text-red-600' : ($item->status_rw_pengajuan_lain === 'disetujui' ? 'text-green-600' : 'text-gray-600') }}">
-                                Status RW {{ $item->status_rw_pengajuan_lain ? strtolower($item->status_rw_pengajuan_lain) : '-' }}
-                                @if($item->waktu_persetujuan_rw_lain)
-                                    pada {{ \Carbon\Carbon::parse($item->waktu_persetujuan_rw_lain)->translatedFormat('d F Y') }}
+                            {{-- Status RW (hanya tampil jika RT bukan "ditolak") --}}
+                            @if($item->status_rt_pengajuan_lain !== 'ditolak')
+                                <p class="text-sm {{ $item->status_rw_pengajuan_lain === 'ditolak' ? 'text-red-600' : ($item->status_rw_pengajuan_lain === 'disetujui' ? 'text-green-600' : 'text-gray-600') }}">
+                                    Status RW {{ $item->status_rw_pengajuan_lain ? strtolower($item->status_rw_pengajuan_lain) : '-' }}
+                                    @if($item->waktu_persetujuan_rw_lain)
+                                        pada {{ \Carbon\Carbon::parse($item->waktu_persetujuan_rw_lain)->translatedFormat('d F Y') }}
+                                    @endif
+                                </p>
+                                @if($item->status_rw_pengajuan_lain === 'ditolak' && $item->alasan_penolakan_pengajuan_lain)
+                                    <p class="text-sm text-red-600 italic">Alasan RW: {{ $item->alasan_penolakan_pengajuan_lain }}</p>
                                 @endif
-                            </p>
-                            @if($item->status_rw_pengajuan_lain === 'ditolak' && $item->alasan_penolakan_pengajuan_lain)
-                                <p class="text-sm text-red-600 italic">Alasan RW: {{ $item->alasan_penolakan_pengajuan_lain }}</p>
                             @endif
                         </li>
                         @endforeach

@@ -11,7 +11,7 @@ use App\Models\Pendaftaran;
 use App\Models\Kadaluwarsa;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\VerifikasiAkunKadaluwarsa;
+use App\Mail\VerifikasiDataKadaluwarsa;
 
 class CekKadaluarsa
 {
@@ -63,7 +63,7 @@ public function handle($request, Closure $next)
 
                     if ($scan->email_pendaftar) {
                         Mail::to($scan->email_pendaftar)->send(
-                            new VerifikasiAkunKadaluwarsa($scan->nama_pendaftar)
+                            new VerifikasiDataKadaluwarsa($scan->nama_pendaftar)
                         );
                         Log::info('Email kadaluwarsa terkirim ke ' . $scan->email_pendaftar);
                     }
@@ -128,7 +128,7 @@ public function handle($request, Closure $next)
 
     //                 if ($pendaftaran && $pendaftaran->email) {
     //                     Mail::to($pendaftaran->email)->send(
-    //                         new VerifikasiAkunKadaluwarsa($pendaftaran->nama_lengkap)
+    //                         new VerifikasiDataKadaluwarsa($pendaftaran->nama_lengkap)
     //                     );
     //                 }
 

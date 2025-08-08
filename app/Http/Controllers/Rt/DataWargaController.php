@@ -19,7 +19,8 @@ class DataWargaController extends Controller
         $search = $request->input('search');
 
         $query = Wargas::with('scan_Kk.alamat')
-            ->where('rt_id', $rt->id_rt);
+            ->where('rt_id', $rt->id_rt)
+            ->orderBy('updated_at', 'desc');
 
         if ($search) {
             $query->where('nama_lengkap', 'like', '%' . $search . '%');

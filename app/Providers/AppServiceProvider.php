@@ -88,7 +88,7 @@ class AppServiceProvider extends ServiceProvider
                     ->take(5)
                     ->get();
 
-                $notifikasiBaru = $notifikasiBiasa->concat($notifikasiLain)->concat($notifikasiSelesai)->sortByDesc('updated_at')->take(5);
+                $notifikasiBaru = $notifikasiBiasa->concat($notifikasiLain)->concat($notifikasiSelesai)->sortByDesc('updated_at')->values()->take(5);
 
                 // Semua notifikasi terbaru (untuk isi dropdown)
                 $notifikasiBiasaAll = PengajuanSurat::with('warga')
@@ -124,7 +124,7 @@ class AppServiceProvider extends ServiceProvider
                     ->take(5)
                     ->get();
 
-                $notifikasi = $notifikasiBiasaAll->concat($notifikasiLainAll)->concat($notifikasiSelesaiAll)->sortByDesc('updated_at')->take(5);
+                $notifikasi = $notifikasiBiasaAll->concat($notifikasiLainAll)->concat($notifikasiSelesaiAll)->sortByDesc('updated_at')->values()->take(5);
 
                 // Total notifikasi belum dibaca (untuk badge merah di icon)
                 $totalNotifBaru =

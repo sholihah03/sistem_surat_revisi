@@ -157,6 +157,11 @@ class DashboardRwController extends Controller
         })
         ->count();
 
+        // Urutkan $statusPengajuanPerRt berdasarkan no_rt secara ascending
+        usort($statusPengajuanPerRt, function ($a, $b) {
+            return intval($a['no_rt']) <=> intval($b['no_rt']);
+        });
+
 
         return view('rw.mainRw', [
             'totalSuratMasuk' => $totalSuratMasuk,

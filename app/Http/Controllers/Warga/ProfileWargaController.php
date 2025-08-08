@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Warga;
 
+use Carbon\Carbon;
+use App\Models\ScanKK;
 use App\Models\Wargas;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -15,12 +17,31 @@ class ProfileWargaController extends Controller
     {
         $warga = Auth::guard('warga')->user();
         $alamat = $warga->scan_Kk?->alamat;
-        $dataBelumLengkap =
-        empty($warga->scan_Kk?->path_file_kk) ||
-        empty($warga->rt_id) ||
-        empty($warga->rw_id);
+        $scanKK = ScanKK::where('nama_pendaftar', $warga->nama_lengkap)->first();
 
-        return view('warga.profileWarga', compact('warga', 'alamat', 'dataBelumLengkap'));
+        $statusKK = null;
+        $alasanPenolakan = null;
+
+        if ($scanKK) {
+            $statusKK = $scanKK->status_verifikasi;
+            $alasanPenolakan = $scanKK->alasan_penolakan;
+        }
+
+        $dataBelumLengkap = (empty($warga->no_kk) && empty($warga->nik) && !$scanKK);
+
+        // Hitung notifikasi baru
+        $notifikasi = collect(); // ambil dari model notifikasi kamu
+
+        $totalNotifBaru = $notifikasi->where('is_read', false)->count();
+
+        // Tambahkan notifikasi "status disetujui" ke total jika kurang dari 1 hari
+        $showStatusDisetujui = false;
+        if ($statusKK === 'disetujui' && $scanKK && $scanKK->updated_at->gt(Carbon::now()->subDay())) {
+            $showStatusDisetujui = true;
+            $totalNotifBaru++;
+        }
+
+        return view('warga.profileWarga', compact('warga', 'alamat', 'dataBelumLengkap', 'notifikasi', 'totalNotifBaru', 'showStatusDisetujui', 'scanKK', 'statusKK', 'alasanPenolakan'));
     }
 
     public function uploadFoto(Request $request)

@@ -5,66 +5,72 @@
     <h1 class="text-2xl font-bold mb-2">Bank Data Kartu Keluarga Warga</h1>
     <p class="mb-6 text-lg text-gray-600">Daftar lengkap data Kartu Keluarga warga yang sudah terdaftar beserta alamat dan foto Kartu Keluarga. Klik gambar KK untuk melihat dan mengunduh dalam format PDF.</p>
 
-    <div class="overflow-x-auto bg-white rounded-lg shadow-md">
-        <div class="overflow-x-auto">
-            <table class="table-auto w-full border table-fixed">
-                <thead>
-                    <tr class="bg-gray-200">
-                        <th class="p-2 border">No</th>
-                        <th class="p-2 border">Nama Lengkap Warga</th>
-                        <th class="p-2 border">No KK</th>
-                        <th class="p-2 border">Alamat</th>
-                        <th class="p-2 border">Gambar KK</th>
-                    </tr>
-                </thead>
-            </table>
-            <div class="max-h-[220px] overflow-y-auto">
-                <table class="table-auto w-full border table-fixed">
-                    <tbody>
-                        @forelse ($wargas as $index => $warga)
-                            <tr class="border">
-                                <td class="p-2 border text-center">{{ $index + 1 }}</td>
-                                <td class="p-2 border">{{ $warga->nama_lengkap }}</td>
-                                <td class="p-2 border">{{ $warga->no_kk }}</td>
-                                <td class="p-2 border">
-                                    @if ($warga->scan_Kk && $warga->scan_Kk->alamat)
-                                        {{ $warga->scan_Kk->alamat->nama_jalan }},
-                                        RT {{ $warga->scan_Kk->alamat->rt_alamat }},
-                                        RW {{ $warga->scan_Kk->alamat->rw_alamat }},<br>
-                                        Kel {{ $warga->scan_Kk->alamat->kelurahan }},
-                                        Kec {{ $warga->scan_Kk->alamat->kecamatan }},
-                                        Kab/Kota {{ $warga->scan_Kk->alamat->kabupaten_kota }},<br>
-                                        Provinsi {{ $warga->scan_Kk->alamat->provinsi }},
-                                        Kode Pos {{ $warga->scan_Kk->alamat->kode_pos }}
-                                    @else
-                                        <span class="text-gray-500 italic">Belum tersedia</span>
-                                    @endif
-                                </td>
-                                <td class="p-2 border">
-                                    @if ($warga->scan_Kk && $warga->scan_Kk->path_file_kk)
-                                    <img
-                                        src="{{ asset('storage/' . str_replace('public/', '', $warga->scan_Kk->path_file_kk)) }}"
-                                        alt="KK"
-                                        class="w-32 cursor-pointer"
-                                        onclick="showImageModal('{{ asset('storage/' . str_replace('public/', '', $warga->scan_Kk->path_file_kk)) }}', '{{ $warga->nama_lengkap }}')"
-                                    />
-                                    @else
-                                        <span class="text-gray-500 italic">Belum tersedia</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="px-2 md:px-4 py-3 text-center text-gray-500">
-                                    <p>Belum ada Bank Data Kartu Keluarga Warga.</p>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+<div class="overflow-x-auto bg-white rounded-lg shadow-md">
+<table class="table-auto w-full border-collapse border border-gray-300">
+    <thead class="bg-gray-200 sticky top-0 block">
+        <tr class="table w-full table-fixed">
+            <th class="p-2 border w-12">No</th>
+            <th class="p-2 border w-36">Nama Warga</th>
+            <th class="p-2 border w-40">No KK</th>
+            <th class="p-2 border">Alamat</th>
+            <th class="p-2 border w-32">Gambar KK</th>
+        </tr>
+    </thead>
+        <tbody class="max-h-[350px] overflow-y-auto block w-full">
+            @forelse ($scanKKs as $index => $scanKK)
+    <tr class="border flex w-full">
+        <td class="p-2 border text-center w-12">{{ $index + 1 }}</td>
+
+        <!-- Nama lengkap warga yang punya scan_kk ini (semua ditampilkan) -->
+        <td class="p-2 border w-36">
+            @foreach ($scanKK->wargas as $warga)
+                * {{ $warga->nama_lengkap }}<br>
+            @endforeach
+        </td>
+
+        <!-- No KK tampil sekali -->
+        <td class="p-2 border w-40">{{ $scanKK->no_kk_scan ?? '-' }}</td>
+
+        <!-- Alamat tampil sekali -->
+        <td class="p-2 border flex-1 whitespace-normal break-words">
+            @if ($scanKK->alamat)
+                {{ $scanKK->alamat->nama_jalan }},
+                RT {{ $scanKK->alamat->rt_alamat }},
+                RW {{ $scanKK->alamat->rw_alamat }},<br>
+                Kel {{ $scanKK->alamat->kelurahan }},
+                Kec {{ $scanKK->alamat->kecamatan }},
+                Kab/Kota {{ $scanKK->alamat->kabupaten_kota }},<br>
+                Provinsi {{ $scanKK->alamat->provinsi }},
+                Kode Pos {{ $scanKK->alamat->kode_pos }}
+            @else
+                <span class="text-gray-500 italic">Belum tersedia</span>
+            @endif
+        </td>
+
+        <!-- Gambar KK tampil sekali -->
+        <td class="p-2 border w-32">
+            @if ($scanKK->path_file_kk)
+                <img
+                    src="{{ asset('storage/' . str_replace('public/', '', $scanKK->path_file_kk)) }}"
+                    alt="KK"
+                    class="max-w-full max-h-20 cursor-pointer mx-auto"
+                    onclick="showImageModal('{{ asset('storage/' . str_replace('public/', '', $scanKK->path_file_kk)) }}', 'Kartu Keluarga')"
+                />
+            @else
+                <span class="text-gray-500 italic">Belum tersedia</span>
+            @endif
+        </td>
+    </tr>
+@empty
+    <tr>
+        <td colspan="5" class="p-4 text-center text-gray-500">Belum ada Bank Data Kartu Keluarga Warga.</td>
+    </tr>
+@endforelse
+
+        </tbody>
+    </table>
+</div>
+
 </div>
 
 <!-- Modal untuk menampilkan gambar dan tombol download -->

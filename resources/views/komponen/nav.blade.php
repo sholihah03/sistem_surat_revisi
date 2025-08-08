@@ -5,14 +5,16 @@
         </a>
 
         <div class="hidden md:flex items-center gap-4 relative">
-            {{-- <a href="{{ route('pengajuanSuratWarga') }}" class="text-white hover:underline font-semibold">Ajukan Surat</a>
-            <a href="{{ route('riwayatSurat') }}" class="text-white hover:underline font-semibold">Riwayat Surat</a>
-            <a href="{{ route('historiSuratWarga') }}" class="text-white hover:underline font-semibold">Histori Surat</a> --}}
 
-            @if ($dataBelumLengkap)
-                <span class="text-gray-400 cursor-not-allowed font-semibold" title="Lengkapi data diri terlebih dahulu">Ajukan Surat</span>
-                <span class="text-gray-400 cursor-not-allowed font-semibold" title="Lengkapi data diri terlebih dahulu">Riwayat Surat</span>
-                <span class="text-gray-400 cursor-not-allowed font-semibold" title="Lengkapi data diri terlebih dahulu">Histori Surat</span>
+            @php
+                // Status bisa akses menu kalau sudah disetujui
+                $tidakBisaAkses = $dataBelumLengkap || $statusKK === 'pending' || $statusKK === 'ditolak';
+            @endphp
+
+            @if ($tidakBisaAkses)
+                <span class="text-gray-400 cursor-not-allowed font-semibold" title="Belum bisa mengakses menu ini">Ajukan Surat</span>
+                <span class="text-gray-400 cursor-not-allowed font-semibold" title="Belum bisa mengakses menu ini">Riwayat Surat</span>
+                <span class="text-gray-400 cursor-not-allowed font-semibold" title="Belum bisa mengakses menu ini">Histori Surat</span>
             @else
                 <a href="{{ route('pengajuanSuratWarga') }}" class="text-white hover:underline font-semibold">Ajukan Surat</a>
                 <a href="{{ route('riwayatSurat') }}" class="text-white hover:underline font-semibold">Riwayat Surat</a>
@@ -29,7 +31,25 @@
                         </span>
                     @endif
                 </button>
-                <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white text-black rounded shadow-lg z-50 max-h-96 overflow-auto">
+
+                <div id="notifDropdown"
+                    class="{{ $showStatusDisetujui ? 'block' : 'hidden' }} absolute right-0 mt-2 w-80 bg-white text-black rounded shadow-lg z-50 max-h-96 overflow-auto">
+
+                    @if($showStatusDisetujui)
+                        <div class="border-b border-green-400 bg-green-100 p-2">
+                            <p class="text-sm">
+                                ✅ <strong>Status pengajuan data</strong> Anda telah
+                                <span class="text-green-600 font-bold">disetujui</span>.
+                            </p>
+                            <p class="text-xs text-gray-500 mb-1">
+                                {{ $scanKK->updated_at->diffForHumans() }}
+                            </p>
+                            <a href="{{ route('profileWarga') }}" class="text-blue-600 text-sm hover:underline">
+                                Lihat detail
+                            </a>
+                        </div>
+                    @endif
+
                     @if($notifikasi->count() > 0)
                         @foreach($notifikasi as $notif)
                             @php
@@ -83,7 +103,7 @@
                                 @endif
                             </div>
                         @endforeach
-                    @else
+                    @elseif(!$showStatusDisetujui)
                         <div class="p-2 text-center text-gray-600">
                             Tidak ada notifikasi
                         </div>
@@ -128,6 +148,21 @@
                         @endif
                     </button>
                     <div id="notifDropdownMobile" class="hidden mt-2 max-h-60 overflow-auto">
+                        @if($showStatusDisetujui)
+                            <div class="border-b border-green-400 bg-green-100 p-2">
+                                <p class="text-sm">
+                                    ✅ <strong>Status pengajuan data</strong> Anda telah
+                                    <span class="text-green-600 font-bold">disetujui</span>.
+                                </p>
+                                <p class="text-xs text-gray-500 mb-1">
+                                    {{ $scanKK->updated_at->diffForHumans() }}
+                                </p>
+                                <a href="{{ route('profileWarga') }}" class="text-blue-600 text-sm hover:underline">
+                                    Lihat detail
+                                </a>
+                            </div>
+                        @endif
+
                         @if($notifikasi->count() > 0)
                         @foreach($notifikasi as $notif)
                             @php
@@ -165,7 +200,7 @@
                                     @endif
                                 </div>
                             @endforeach
-                        @else
+                        @elseif(!$showStatusDisetujui)
                             <div class="p-2 text-center text-gray-600">
                                 Tidak ada notifikasi
                             </div>

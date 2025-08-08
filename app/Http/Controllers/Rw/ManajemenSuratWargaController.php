@@ -61,6 +61,7 @@ class ManajemenSuratWargaController extends Controller
             'pengajuanSurat.warga.scan_Kk.alamat',
             'pengajuanSurat.pengajuan.persyaratan',
         ])
+        ->orderBy('created_at', 'desc')
         ->get();
 
         return view('rw.manajemenSuratWarga', compact('profile_rw', 'surats', 'ttdDigital', 'showModalUploadTtdRw'));

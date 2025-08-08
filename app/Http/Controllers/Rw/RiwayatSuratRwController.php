@@ -58,6 +58,7 @@ class RiwayatSuratRwController extends Controller
                         }
                     });
             })
+            ->orderBy('created_at', 'desc')
             ->get();
 
         // 2. Surat yang ditolak (tidak ada di tb_hasil_surat_ttd_rw)
@@ -73,6 +74,7 @@ class RiwayatSuratRwController extends Controller
                     });
                 });
             })
+            ->orderBy('created_at', 'desc')
             ->get();
 
         $pengajuanDitolakLain = PengajuanSuratLain::with(['warga', 'pengajuan.persyaratan'])
@@ -85,6 +87,7 @@ class RiwayatSuratRwController extends Controller
                     })->orWhere('tujuan_manual', 'like', '%' . $keyword . '%');
                 });
             })
+            ->orderBy('created_at', 'desc')
             ->get();
 
 //             dd([

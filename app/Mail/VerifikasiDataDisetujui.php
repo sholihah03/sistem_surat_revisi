@@ -9,27 +9,27 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class VerifikasiAkunDitolak extends Mailable
+class VerifikasiDataDisetujui extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $nama;
-    public $alasan;
+    public $rt;
+    public $rw;
     public $loginUrl;
 
-
-    public function __construct($nama, $alasan, $loginUrl)
+    public function __construct($nama, $rt, $rw, $loginUrl)
     {
         $this->nama = $nama;
-        $this->alasan = $alasan;
+        $this->rt = $rt;
+        $this->rw = $rw;
         $this->loginUrl = $loginUrl;
-
     }
 
     public function build()
     {
-        return $this->subject('Verifikasi Akun Ditolak')
-                    ->view('email.verifikasiAkunDitolak');
+        return $this->subject('Verifikasi Data Berhasil oleh RT')
+                    ->view('email.verifikasiDataDisetujui');
     }
 }
 

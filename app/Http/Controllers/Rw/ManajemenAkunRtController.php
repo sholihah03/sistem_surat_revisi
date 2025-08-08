@@ -27,7 +27,7 @@ class ManajemenAkunRtController extends Controller
                   ->orWhere('nama_lengkap_rt', 'like', "%{$search}%");
         }
 
-        $rts = $query->get();
+        $rts = $query->orderBy('no_rt', 'asc')->get();
 
         return view('rw.manajemenAkunRt', compact('rts', 'profile_rw', 'no_rw', 'ttdDigital', 'showModalUploadTtdRw'));
     }
@@ -56,7 +56,7 @@ class ManajemenAkunRtController extends Controller
             });
         }
 
-        $rtList = $rtQuery->get();
+        $rtList = $rtQuery->orderBy('no_rt', 'asc')->get();
 
         return view('rw.akunRT', compact('rtList', 'no_rw', 'ttdDigital', 'showModalUploadTtdRw'));
     }

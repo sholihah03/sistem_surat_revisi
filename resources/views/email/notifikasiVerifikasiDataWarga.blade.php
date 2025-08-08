@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Verifikasi KK Baru</title>
+    <title>Verifikasi Data Baru</title>
 </head>
 <body>
-    <h2>Permintaan Verifikasi KK Baru</h2>
-    <p>Yth. Ketua RT,</p>
+    <h2>Permintaan Verifikasi Data Baru</h2>
+    <p>Yth. Ketua RT {{ $rt_nomor }},</p>
 
     <p>Telah diunggah data KK baru dengan informasi berikut:</p>
 

@@ -26,9 +26,8 @@ class VerifikasiSuratController extends Controller
         $showModalUploadTtd = empty($ttdDigital);
 
         $pengajuanSurat = PengajuanSurat::with(['warga', 'tujuanSurat', 'pengajuan.persyaratan'])
-    ->where('status_rt', 'menunggu')->get();
-        // $pengajuanSurat = PengajuanSurat::with('warga', 'tujuanSurat')->where('status', 'menunggu')->get();
-        $pengajuanSuratLain = PengajuanSuratLain::with('warga')->where('status_rt_pengajuan_lain', 'menunggu')->get();
+    ->where('status_rt', 'menunggu')->orderBy('created_at', 'desc') ->get();
+        $pengajuanSuratLain = PengajuanSuratLain::with('warga')->where('status_rt_pengajuan_lain', 'menunggu')->orderBy('created_at', 'desc') ->get();
 
         return view('rt.verifikasiSuratWarga', compact('pengajuanSurat', 'pengajuanSuratLain', 'profile_rt', 'showModalUploadTtd','ttdDigital'));
     }

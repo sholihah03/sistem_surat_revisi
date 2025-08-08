@@ -31,18 +31,24 @@ class RiwayatSuratWargaController extends Controller
         $search = $request->input('search');
 
         $pengajuanBiasa = PengajuanSurat::with(['warga', 'tujuanSurat', 'pengajuan.persyaratan'])
-            ->whereHas('warga', function($query) use ($rt_id) {
-                $query->where('rt_id', $rt_id);
-            })
-            ->whereIn('status_rt', ['disetujui', 'ditolak'])
-            ->orWhereIn('status_rw', ['disetujui', 'ditolak']);
+        ->whereHas('warga', function($query) use ($rt_id) {
+            $query->where('rt_id', $rt_id);
+        })
+        ->where(function ($q) {
+            $q->whereIn('status_rt', ['disetujui', 'ditolak'])
+                ->orWhereIn('status_rw', ['disetujui', 'ditolak']);
+        })
+        ->orderBy('updated_at', 'desc');
 
         $pengajuanLain = PengajuanSuratLain::with('warga')
-            ->whereHas('warga', function($query) use ($rt_id) {
-                $query->where('rt_id', $rt_id);
-            })
-            ->whereIn('status_rt_pengajuan_lain', ['disetujui', 'ditolak'])
-            ->orWhereIn('status_rw_pengajuan_lain', ['disetujui', 'ditolak']);
+        ->whereHas('warga', function($query) use ($rt_id) {
+            $query->where('rt_id', $rt_id);
+        })
+        ->where(function ($q) {
+            $q->whereIn('status_rt_pengajuan_lain', ['disetujui', 'ditolak'])
+                ->orWhereIn('status_rw_pengajuan_lain', ['disetujui', 'ditolak']);
+        })
+        ->orderBy('updated_at', 'desc');
 
         if ($search) {
             $months = [
