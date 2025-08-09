@@ -65,7 +65,6 @@ Route::post('/otp/kirim-ulang', [OTPController::class, 'kirimUlang'])->name('otp
 Route::get('/buatPassword', [BuatPasswordController::class, 'index'])->name('buatPassword');
 Route::post('/buatPassword', [BuatPasswordController::class, 'store'])->name('buatPassword.store');
 
-Route::get('/suratPengantar', [TemplateSuratController::class, 'index'])->name('suratPengantar');
 
 Route::get('/verifikasi-surat/{token}', [ManajemenSuratWargaController::class, 'verifikasiSurat'])->name('verifikasi.surat');
 
@@ -172,6 +171,9 @@ Route::prefix('rw')->middleware(AuthenticateRw::class)->group(function () {
     Route::get('/riwayatSurat', [RiwayatSuratRwController::class, 'index'])->name('riwayatSuratRw');
     Route::get('/surat/{id}/lihatRw', [RiwayatSuratRwController::class, 'lihatHasilSuratRw'])->name('rw.lihatHasilSurat');
 
+    Route::get('/suratPengantar', [TemplateSuratController::class, 'index'])->name('suratPengantar');
+    Route::post('/suratPengantar-store', [TemplateSuratController::class, 'store'])->name('suratPengantar-store');
+    Route::put('/suratPengantar-update/{id}', [TemplateSuratController::class, 'update'])->name('suratPengantar-update');
 });
 
 
