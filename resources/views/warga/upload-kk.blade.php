@@ -17,11 +17,14 @@
             @csrf
 
             <!-- Input NIK Pengupload -->
-    <div class="mb-4">
-        <label for="nik_pengupload" class="block text-sm font-medium text-gray-700 mb-1">Masukkan NIK Anda (yang mengupload KK)</label>
-        <input type="text" name="nik_pengupload" id="nik_pengupload" required placeholder="Masukkan NIK Anda" minlength="16" maxlength="16"
-            class="block w-full px-3 py-2 border border-blue-400 rounded-md">
-    </div>
+<div class="mb-4">
+    <label for="nik_pengupload" class="block text-sm font-medium text-gray-700 mb-1">Masukkan NIK Anda (yang mengupload KK)</label>
+    <input type="text" name="nik_pengupload" id="nik_pengupload" minlength="16" maxlength="16" required
+        value="{{ old('nik_pengupload', $nik_pendaftar ?? '') }}"
+        placeholder="Masukkan NIK Anda"
+        class="block w-full px-3 py-2 border border-blue-400 rounded-md">
+</div>
+
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Gambar KK</label>

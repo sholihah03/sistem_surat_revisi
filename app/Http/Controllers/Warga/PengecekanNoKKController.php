@@ -30,7 +30,9 @@ public function cek(Request $request)
 
     if (!$scanKK) {
         // Jika No KK belum ada → arahkan ke halaman upload KK
-        return redirect()->route('uploadKK')->with('info', 'No KK belum ada di sistem. Silakan upload KK terlebih dahulu.');
+        return redirect()->route('uploadKK')
+            ->with('nik_pendaftar', $nik)
+        ->with('info', 'No KK belum ada di sistem. Silakan upload KK terlebih dahulu.');
     }
 
     // Ambil user yang sedang login

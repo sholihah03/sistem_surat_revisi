@@ -20,7 +20,10 @@ class UploadKKController extends Controller
         // Mengambil data RT dari tabel tb_rt (misalnya hanya mengambil kolom no_rt)
         $dataRT = DB::table('tb_rt')->select('id_rt', 'no_rt', 'nama_lengkap_rt')->get();
         $dataRW = DB::table('tb_rw')->select('id_rw', 'no_rw', 'nama_lengkap_rw')->get();
-        return view('warga.upload-kk', compact('dataRT','dataRW'));
+
+        $nik_pendaftar = session('nik_pendaftar') ?? null;
+
+        return view('warga.upload-kk', compact('dataRT','dataRW', 'nik_pendaftar'));
     }
 
     public function konfirm(Request $request)
