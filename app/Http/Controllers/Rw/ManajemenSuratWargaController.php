@@ -7,6 +7,7 @@ use App\Models\Wargas;
 use Illuminate\Support\Str;
 use App\Mail\SuratDitolakRw;
 use Illuminate\Http\Request;
+use App\Models\LogTtdDigital;
 use App\Mail\SuratDisetujuiRw;
 use App\Models\PengajuanSurat;
 use App\Models\HasilSuratTtdRt;
@@ -67,66 +68,71 @@ class ManajemenSuratWargaController extends Controller
         return view('rw.manajemenSuratWarga', compact('profile_rw', 'surats', 'ttdDigital', 'showModalUploadTtdRw'));
     }
 
-    public function setujui(Request $request)
-    {
-        Carbon::setLocale('id');
-        $jenis = $request->jenis;
-        $pengajuanSuratId = $request->pengajuan_surat_id;
-        $pengajuanSuratLainId = $request->pengajuan_surat_lain_id;
+public function setujui(Request $request)
+{
+    Carbon::setLocale('id');
 
-        if ($jenis === 'biasa') {
-            $suratRt = HasilSuratTtdRt::where('pengajuan_surat_id', $pengajuanSuratId)
-                ->where('jenis', $jenis)
-                ->first();
+    $jenis = $request->jenis;
+    $pengajuanSuratId = $request->pengajuan_surat_id;
+    $pengajuanSuratLainId = $request->pengajuan_surat_lain_id;
 
-            $pengajuan = PengajuanSurat::with(['warga.rt.rw', 'warga.scan_KK.alamat', 'tujuanSurat'])
-                ->find($pengajuanSuratId);
-        } else {
-            $suratRt = HasilSuratTtdRt::where('pengajuan_surat_lain_id', $pengajuanSuratLainId)
-                ->where('jenis', $jenis)
-                ->first();
+    // Ambil data surat tanda tangan RT sesuai jenis pengajuan
+    if ($jenis === 'biasa') {
+        $suratRt = HasilSuratTtdRt::where('pengajuan_surat_id', $pengajuanSuratId)
+            ->where('jenis', $jenis)
+            ->first();
 
-            $pengajuan = PengajuanSuratLain::with(['warga.rt.rw', 'warga.scan_KK.alamat'])
-                ->find($pengajuanSuratLainId);
-        }
+        $pengajuan = PengajuanSurat::with(['warga.rt.rw', 'warga.scan_KK.alamat', 'tujuanSurat'])
+            ->find($pengajuanSuratId);
+    } else {
+        $suratRt = HasilSuratTtdRt::where('pengajuan_surat_lain_id', $pengajuanSuratLainId)
+            ->where('jenis', $jenis)
+            ->first();
 
-        if (!$suratRt) {
-            return back()->with('error', 'Surat dari RT belum tersedia.');
-        }
+        $pengajuan = PengajuanSuratLain::with(['warga.rt.rw', 'warga.scan_KK.alamat'])
+            ->find($pengajuanSuratLainId);
+    }
 
-        if (!$pengajuan) {
-            return back()->with('error', 'Data pengajuan tidak ditemukan.');
-        }
+    if (!$suratRt) {
+        return back()->with('error', 'Surat dari RT belum tersedia.');
+    }
 
-        // Update status RW pada tabel pengajuan
-        if ($jenis === 'biasa') {
-            $pengajuan->status_rw = 'disetujui';
-            $pengajuan->waktu_persetujuan_rw = now();
-        } else {
-            $pengajuan->status_rw_pengajuan_lain = 'disetujui';
-            $pengajuan->waktu_persetujuan_rw_pengajuan_lain = now();
-        }
-        $pengajuan->save();
+    if (!$pengajuan) {
+        return back()->with('error', 'Data pengajuan tidak ditemukan.');
+    }
 
-        $rt = $pengajuan->warga->rt;
-        $rw = $rt->rw;
+    // Update status RW pada tabel pengajuan
+    if ($jenis === 'biasa') {
+        $pengajuan->status_rw = 'disetujui';
+        $pengajuan->waktu_persetujuan_rw = now();
+    } else {
+        $pengajuan->status_rw_pengajuan_lain = 'disetujui';
+        $pengajuan->waktu_persetujuan_rw_pengajuan_lain = now();
+    }
+    $pengajuan->save();
 
-        $nomorSurat = ($jenis === 'biasa')
-            ? ($pengajuan->tujuanSurat->nomor_surat ?? '-')
-            : ($pengajuan->nomor_surat_pengajuan_lain ?? '-');
+    // Ambil RT dan RW terkait
+    $rt = $pengajuan->warga->rt;
+    $rw = $rt->rw;
 
-        $tujuan = ($jenis === 'biasa')
-            ? ($pengajuan->tujuanSurat->nama_tujuan ?? '-')
-            : ($pengajuan->tujuan_manual ?? '-');
+    // Data surat untuk QR code dan dokumen
+    $nomorSurat = ($jenis === 'biasa')
+        ? ($pengajuan->tujuanSurat->nomor_surat ?? '-')
+        : ($pengajuan->nomor_surat_pengajuan_lain ?? '-');
 
-        $nik = $pengajuan->warga->nik;
-        $maskedNIK = substr($nik, 0, 6) . '******' . substr($nik, -4);
+    $tujuan = ($jenis === 'biasa')
+        ? ($pengajuan->tujuanSurat->nama_tujuan ?? '-')
+        : ($pengajuan->tujuan_manual ?? '-');
 
-        $token = Str::random(40);
-        $verificationUrl = route('verifikasi.surat.publik', ['token' => $token]);
-        $waktuTtdRt = $suratRt->created_at ?? now();
+    $nik = $pengajuan->warga->nik;
+    $maskedNIK = substr($nik, 0, 6) . '******' . substr($nik, -4);
 
-        $qrContent = "SURAT|"
+    $token = Str::random(40);
+    $verificationUrl = route('verifikasi.surat.publik', ['token' => $token]);
+    $waktuTtdRt = $suratRt->created_at ?? now();
+
+    // Buat konten QR code berisi informasi validasi
+    $qrContent = "SURAT|"
         . "NS:" . $nomorSurat . "|"
         . "TUJUAN:" . strtoupper($tujuan) . "|"
         . "NIK:" . $maskedNIK . "|"
@@ -135,54 +141,56 @@ class ManajemenSuratWargaController extends Controller
         . "TTD RW:" . Carbon::now()->translatedFormat('d F Y') . " (" . $rw->nama_rw . ")" . "|"
         . "VERIF_URL:" . $verificationUrl;
 
+    $qrPng = QrCode::format('png')->size(300)->generate($qrContent);
+    $qrBase64 = 'data:image/png;base64,' . base64_encode($qrPng);
 
-        $qrPng = QrCode::format('png')->size(300)->generate($qrContent);
-        $qrBase64 = 'data:image/png;base64,' . base64_encode($qrPng);
+    // Baca tanda tangan digital RT & RW (file base64)
+    $ttdRwBase64 = base64_encode(file_get_contents(Storage::path($rw->ttd_digital_bersih)));
+    $ttdRtBase64 = base64_encode(file_get_contents(Storage::path($rt->ttd_digital_bersih)));
 
-        $ttdRwBase64 = base64_encode(file_get_contents(Storage::path($rw->ttd_digital_bersih)));
-        $ttdRtBase64 = base64_encode(file_get_contents(Storage::path($rt->ttd_digital_bersih)));
+    $waktuTtd = now();
 
-        $waktuTtd = now();
+    // Generate PDF sementara untuk dapatkan hash dokumen yang valid
+    $tempPdf = Pdf::loadView('rw.suratPengantarRw', [
+        'pengajuan' => $pengajuan,
+        'rt' => $rt,
+        'rw' => $rw,
+        'ttd_rt' => $ttdRtBase64,
+        'ttd_rw' => $ttdRwBase64,
+        'jenis' => $jenis,
+        'tanggal_disetujui_rw' => $waktuTtd,
+        'qr_code_base64' => $qrBase64,
+        'hash_dokumen' => '',
+        'waktuTtd' => $waktuTtd,
+    ])->setPaper('a4');
 
-        // Generate sementara untuk hash
-        $tempPdf = Pdf::loadView('rw.suratPengantarRw', [
-            'pengajuan' => $pengajuan,
-            'rt' => $rt,
-            'rw' => $rw,
-            'ttd_rt' => $ttdRtBase64,
-            'ttd_rw' => $ttdRwBase64,
-            'jenis' => $jenis,
-            'tanggal_disetujui_rw' => $waktuTtd,
-            'qr_code_base64' => $qrBase64,
-            'hash_dokumen' => '',
-            'waktuTtd' => $waktuTtd,
-        ])->setPaper('a4');
+    $pdfContent = $tempPdf->output();
+    $hashDokumen = hash('sha256', $pdfContent);
 
-        $pdfContent = $tempPdf->output();
-        $hashDokumen = hash('sha256', $pdfContent);
+    // Generate PDF final dengan hash dokumen yang sudah dihitung
+    $finalPdf = Pdf::loadView('rw.suratPengantarRw', [
+        'pengajuan' => $pengajuan,
+        'rt' => $rt,
+        'rw' => $rw,
+        'ttd_rt' => $ttdRtBase64,
+        'ttd_rw' => $ttdRwBase64,
+        'jenis' => $jenis,
+        'tanggal_disetujui_rw' => $waktuTtd,
+        'qr_code_base64' => $qrBase64,
+        'hash_dokumen' => $hashDokumen,
+        'waktuTtd' => $waktuTtd,
+    ])->setPaper('a4');
 
-        // Final PDF dengan hash aktual
-        $finalPdf = Pdf::loadView('rw.suratPengantarRw', [
-            'pengajuan' => $pengajuan,
-            'rt' => $rt,
-            'rw' => $rw,
-            'ttd_rt' => $ttdRtBase64,
-            'ttd_rw' => $ttdRwBase64,
-            'jenis' => $jenis,
-            'tanggal_disetujui_rw' => $waktuTtd,
-            'qr_code_base64' => $qrBase64,
-            'hash_dokumen' => $hashDokumen,
-            'waktuTtd' => $waktuTtd,
-        ])->setPaper('a4');
+    $pdfContentFinal = $finalPdf->output();
 
-        $pdfContentFinal = $finalPdf->output();
+    // Simpan file PDF hasil tanda tangan RW
+    $filename = 'surat-ttd-rtrw-' . $pengajuan->id . '-' . str_replace(' ', '-', strtolower($pengajuan->warga->nama_lengkap)) . '-' . time() . '.pdf';
+    $filepath = 'public/hasil_surat/ttd_rw/' . $filename;
 
-        $filename = 'surat-ttd-rtrw-' . $pengajuan->id . '-' . str_replace(' ', '-', strtolower($pengajuan->warga->nama_lengkap)) . '-' . time() . '.pdf';
-        $filepath = 'public/hasil_surat/ttd_rw/' . $filename;
+    Storage::put($filepath, $pdfContentFinal);
 
-        Storage::put($filepath, $pdfContentFinal);
-
-        HasilSuratTtdRw::updateOrCreate(
+    // Simpan data hasil tanda tangan RW di tabel hasil surat ttd RW
+    HasilSuratTtdRw::updateOrCreate(
         [
             'jenis' => $jenis,
             'pengajuan_surat_id' => $jenis === 'biasa' ? $pengajuanSuratId : null,
@@ -196,60 +204,120 @@ class ManajemenSuratWargaController extends Controller
         ]
     );
 
-        if (!empty($pengajuan->warga->email)) {
-            Mail::to($pengajuan->warga->email)->send(new SuratDisetujuiRw($pengajuan));
-        }
+    // --- SIMPAN LOG TANDA TANGAN DIGITAL di tb_log_ttd_digital ---
+    LogTtdDigital::create([
+        'jenis_penandatangan' => 'rw',
+        'rw_id' => $rw->id_rw,
+        'pengajuan_surat_id' => $jenis === 'biasa' ? $pengajuanSuratId : null,
+        'pengajuan_surat_lain_id' => $jenis === 'lain' ? $pengajuanSuratLainId : null,
+        'aksi' => 'sign_dokumen',
+        'file_ttd' => $filepath,
+        'hash_dokumen' => $hashDokumen,
+        'token_verifikasi' => $token,
+        'ip_address' => $request->ip(),
+        'user_agent' => $request->header('User-Agent'),
+        'lokasi_approx' => null, // opsional, isi jika punya data lokasi
+        'status_verifikasi' => 'valid',
+        'metadata' => json_encode([
+            'browser_fingerprint' => $request->header('User-Agent'),
+            'waktu_ttd' => $waktuTtd->toDateTimeString(),
+        ]),
+    ]);
 
-        if (!empty($rt->email_rt)) {
-            Mail::to($rt->email_rt)->send(new SuratDisetujuiRwUntukRt($pengajuan));
-        }
-
-        return back()->with('success', 'Surat berhasil disetujui RW.');
+    // Kirim email notifikasi ke warga
+    if (!empty($pengajuan->warga->email)) {
+        Mail::to($pengajuan->warga->email)->send(new SuratDisetujuiRw($pengajuan));
     }
 
-    public function tolak(Request $request)
-    {
-        $pengajuanSuratId = $request->pengajuan_surat_id;
-        $pengajuanSuratLainId = $request->pengajuan_surat_lain_id;
-        $jenis = $request->jenis;
-        $alasan = $request->alasan_penolakan;
+    // Kirim email notifikasi ke RT
+    if (!empty($rt->email_rt)) {
+        Mail::to($rt->email_rt)->send(new SuratDisetujuiRwUntukRt($pengajuan));
+    }
 
-        if ($jenis === 'biasa') {
-            $pengajuan = PengajuanSurat::with('warga.rt')->find($pengajuanSuratId);
-            if ($pengajuan) {
-                $pengajuan->status_rw = 'ditolak';
-                $pengajuan->waktu_persetujuan_rw = now();
-                $pengajuan->alasan_penolakan_pengajuan = $alasan;
-                $pengajuan->save();
+    return back()->with('success', 'Surat berhasil disetujui RW dan tanda tangan digital tercatat.');
+}
 
-                if (!empty($pengajuan->warga->email)) {
-                    Mail::to($pengajuan->warga->email)->send(new SuratDitolakRw($pengajuan));
-                }
+public function tolak(Request $request)
+{
+    $pengajuanSuratId = $request->pengajuan_surat_id;
+    $pengajuanSuratLainId = $request->pengajuan_surat_lain_id;
+    $jenis = $request->jenis;
+    $alasan = $request->alasan_penolakan;
 
-                if (!empty($pengajuan->warga->rt->email_rt)) {
-                    Mail::to($pengajuan->warga->rt->email_rt)->send(new SuratDitolakRwUntukRt($pengajuan));
-                }
+    if ($jenis === 'biasa') {
+        $pengajuan = PengajuanSurat::with('warga.rt')->find($pengajuanSuratId);
+        if ($pengajuan) {
+            $pengajuan->status_rw = 'ditolak';
+            $pengajuan->waktu_persetujuan_rw = now();
+            $pengajuan->alasan_penolakan_pengajuan = $alasan;
+            $pengajuan->save();
+
+            // Simpan log penolakan di tb_log_ttd_digital
+            LogTtdDigital::create([
+                'jenis_penandatangan' => 'rw',
+                'rw_id' => auth('rw')->check() ? auth('rw')->user()->id_rw : null,
+                'pengajuan_surat_id' => $pengajuanSuratId,
+                'aksi' => 'tolak_dokumen',
+                'file_ttd' => null,
+                'hash_dokumen' => null,
+                'token_verifikasi' => null,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->header('User-Agent'),
+                'lokasi_approx' => null,
+                'status_verifikasi' => 'invalid',
+                'metadata' => json_encode([
+                    'alasan_penolakan' => $alasan,
+                    'waktu_tolak' => Carbon::now()->toDateTimeString(),
+                ]),
+            ]);
+
+            if (!empty($pengajuan->warga->email)) {
+                Mail::to($pengajuan->warga->email)->send(new SuratDitolakRw($pengajuan));
             }
-        } else {
-            $pengajuan = PengajuanSuratLain::with('warga.rt')->find($pengajuanSuratLainId);
-            if ($pengajuan) {
-                $pengajuan->status_rw_pengajuan_lain = 'ditolak';
-                $pengajuan->waktu_persetujuan_rw_lain = now();
-                $pengajuan->alasan_penolakan_pengajuan_lain = $alasan;
-                $pengajuan->save();
 
-                if (!empty($pengajuan->warga->email)) {
-                    Mail::to($pengajuan->warga->email)->send(new SuratDitolakRw($pengajuan));
-                }
-
-                if (!empty($pengajuan->warga->rt->email_rt)) {
-                    Mail::to($pengajuan->warga->rt->email_rt)->send(new SuratDitolakRwUntukRt($pengajuan));
-                }
+            if (!empty($pengajuan->warga->rt->email_rt)) {
+                Mail::to($pengajuan->warga->rt->email_rt)->send(new SuratDitolakRwUntukRt($pengajuan));
             }
         }
+    } else {
+        $pengajuan = PengajuanSuratLain::with('warga.rt')->find($pengajuanSuratLainId);
+        if ($pengajuan) {
+            $pengajuan->status_rw_pengajuan_lain = 'ditolak';
+            $pengajuan->waktu_persetujuan_rw_lain = now();
+            $pengajuan->alasan_penolakan_pengajuan_lain = $alasan;
+            $pengajuan->save();
 
-        return back()->with('success', 'Pengajuan surat berhasil ditolak.');
+            // Simpan log penolakan di tb_log_ttd_digital
+            LogTtdDigital::create([
+                'jenis_penandatangan' => 'rw',
+                'rw_id' => auth('rw')->check() ? auth('rw')->user()->id_rw : null,
+                'pengajuan_surat_lain_id' => $pengajuanSuratLainId,
+                'aksi' => 'tolak_dokumen',
+                'file_ttd' => null,
+                'hash_dokumen' => null,
+                'token_verifikasi' => null,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->header('User-Agent'),
+                'lokasi_approx' => null,
+                'status_verifikasi' => 'invalid',
+                'metadata' => json_encode([
+                    'alasan_penolakan' => $alasan,
+                    'waktu_tolak' => Carbon::now()->toDateTimeString(),
+                ]),
+            ]);
+
+            if (!empty($pengajuan->warga->email)) {
+                Mail::to($pengajuan->warga->email)->send(new SuratDitolakRw($pengajuan));
+            }
+
+            if (!empty($pengajuan->warga->rt->email_rt)) {
+                Mail::to($pengajuan->warga->rt->email_rt)->send(new SuratDitolakRwUntukRt($pengajuan));
+            }
+        }
     }
+
+    return back()->with('success', 'Pengajuan surat berhasil ditolak dan tercatat.');
+}
 
     public function verifikasiSurat($token)
     {

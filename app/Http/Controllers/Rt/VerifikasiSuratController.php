@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Rt;
 
 use App\Models\Rw;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\LogTtdDigital;
 use App\Models\PengajuanSurat;
 use App\Models\HasilSuratTtdRt;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -32,155 +34,145 @@ class VerifikasiSuratController extends Controller
         return view('rt.verifikasiSuratWarga', compact('pengajuanSurat', 'pengajuanSuratLain', 'profile_rt', 'showModalUploadTtd','ttdDigital'));
     }
 
-    public function proses(Request $request)
-    {
-        Carbon::setLocale('id');
-        $id = $request->pengajuan_surat_id ?? $request->pengajuan_surat_lain_id ?? $request->id;
-        $jenis = $request->jenis;
-        $aksi = $request->aksi;
+public function proses(Request $request)
+{
+    Carbon::setLocale('id');
+    $id = $request->pengajuan_surat_id ?? $request->pengajuan_surat_lain_id ?? $request->id;
+    $jenis = $request->jenis;
+    $aksi = $request->aksi;
 
-        $rt = Auth::guard('rt')->user();
-        $rw = Rw::find($rt->rw_id); // pastikan relasi rw_id tersedia
+    $rt = Auth::guard('rt')->user();
+    $rw = Rw::find($rt->rw_id);
 
-        if ($jenis == 'biasa') {
+    // 🔹 Ambil data pengajuan sesuai jenis
+    if ($jenis == 'biasa') {
         $data = PengajuanSurat::with('warga', 'tujuanSurat')->findOrFail($id);
         $jenisSurat = $data->tujuanSurat->nama_tujuan ?? 'Surat Tidak Diketahui';
-        $linkDetail = route('riwayatSurat', ['id' => $data->id]); // sesuaikan route
+        $linkDetail = route('riwayatSurat', ['id' => $data->id]);
+    } else {
+        $data = PengajuanSuratLain::with('warga')->findOrFail($id);
+        $jenisSurat = $data->tujuan_manual ?? 'Surat Lain';
+        $linkDetail = route('riwayatSurat', ['id' => $data->id]);
+    }
 
-        if ($aksi == 'setuju') {
+    if ($aksi == 'setuju') {
+
+        // 1️⃣ Validasi hash tanda tangan RT
+        $pathTtd = Storage::path($rt->ttd_digital);
+        $currentHashTtd = hash_file('sha256', $pathTtd);
+
+        $lastLog = LogTtdDigital::where('rt_id', $rt->id_rt)
+            ->whereIn('aksi', ['upload_ttd', 'edit_ttd'])
+            ->latest()
+            ->first();
+
+        if (!$lastLog || $currentHashTtd !== $lastLog->hash_dokumen) {
+            return back()->with('error', 'Tanda tangan digital tidak valid atau telah berubah. Silakan upload ulang.');
+        }
+
+        // 2️⃣ Update status persetujuan
+        if ($jenis == 'biasa') {
             $data->status_rt = 'disetujui';
             $data->waktu_persetujuan_rt = now();
-            $data->save();
-
-            // --- Generate dan simpan surat hasil tanda tangan RT ---
-            $pdfData = [
-                'pengajuan' => $data,
-                'rt' => $rt,
-                'rw' => $rw,
-                'ttd' => base64_encode(file_get_contents(Storage::path($rt->ttd_digital_bersih))),
-                'jenis' => 'biasa',
-            ];
-
-            $pdf = Pdf::loadView('rt.suratPengantar', $pdfData)->setPaper('a4');
-            $filename = 'surat-ttd-rt-' . $data->id . '-' . str_replace(' ', '-', strtolower($data->warga->nama_lengkap)) . '-' . time() . '.pdf';
-            Storage::put('public/hasil_surat/ttd_rt/' . $filename, $pdf->output());
-
-            // Simpan data hasil surat ke tb_hasil_surat_ttd_rt
-            HasilSuratTtdRt::updateOrCreate(
-                [
-                    'jenis' => 'biasa',
-                    'pengajuan_surat_id' => $data->id_pengajuan_surat,
-                ],
-                [
-                    'pengajuan_surat_lain_id' => null,
-                    'file_surat' => 'public/hasil_surat/ttd_rt/' . $filename,
-                ]
-            );
-
-            Mail::to($rw->email_rw)->send(
-                new NotifikasiVerifikasiRw($rw->nama_lengkap_rw, $jenisSurat, $data->warga->nama_lengkap)
-            );
-
-            // Email ke warga
-            Mail::to($data->warga->email)->send(
-                new NotifikasiStatusPengajuanKeWarga(
-                    $data->warga->nama_lengkap,
-                    $jenisSurat,
-                    'disetujui',
-                    null,
-                    $linkDetail
-                )
-            );
-
         } else {
+            $data->status_rt_pengajuan_lain = 'disetujui';
+            $data->waktu_persetujuan_rt_lain = now();
+            $data->nomor_surat_pengajuan_lain = $request->nomor_surat;
+        }
+        $data->save();
+
+        // 3️⃣ Generate PDF dan simpan
+        $pdfData = [
+            'pengajuan' => $data,
+            'rt' => $rt,
+            'rw' => $rw,
+            'ttd' => base64_encode(file_get_contents(Storage::path($rt->ttd_digital_bersih))),
+            'jenis' => $jenis,
+        ];
+
+        $pdf = Pdf::loadView('rt.suratPengantar', $pdfData)->setPaper('a4');
+        $pdfContent = $pdf->output();
+        $filename = 'surat-ttd-rt-' . $data->id . '-' .
+                    str_replace(' ', '-', strtolower($data->warga->nama_lengkap)) .
+                    '-' . time() . '.pdf';
+        $filepath = 'public/hasil_surat/ttd_rt/' . $filename;
+        Storage::put($filepath, $pdfContent);
+
+        $hashDokumen = hash('sha256', $pdfContent);
+
+        // 4️⃣ Simpan ke hasil surat
+        HasilSuratTtdRt::updateOrCreate(
+            [
+                'jenis' => $jenis,
+                'pengajuan_surat_id' => $jenis == 'biasa' ? $data->id_pengajuan_surat : null,
+                'pengajuan_surat_lain_id' => $jenis == 'lain' ? $data->id_pengajuan_surat_lain : null,
+            ],
+            [
+                'file_surat' => $filepath,
+            ]
+        );
+
+        // 5️⃣ Simpan log tanda tangan dokumen
+        LogTtdDigital::create([
+            'jenis_penandatangan' => 'rt',
+            'rt_id' => $rt->id_rt,
+            'pengajuan_surat_id' => $jenis == 'biasa' ? $data->id_pengajuan_surat : null,
+            'pengajuan_surat_lain_id' => $jenis == 'lain' ? $data->id_pengajuan_surat_lain : null,
+            'aksi' => 'sign_dokumen',
+            'file_ttd' => $rt->ttd_digital,
+            'hash_dokumen' => $hashDokumen,
+            'token_verifikasi' => Str::random(40),
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->header('User-Agent'),
+            'metadata' => [
+                'filename_pdf' => $filename,
+                'jenis_surat' => $jenis,
+                'nama_warga' => $data->warga->nama_lengkap,
+            ],
+        ]);
+
+        // 6️⃣ Kirim email notifikasi
+        Mail::to($rw->email_rw)->send(
+            new NotifikasiVerifikasiRw($rw->nama_lengkap_rw, $jenisSurat, $data->warga->nama_lengkap)
+        );
+
+        Mail::to($data->warga->email)->send(
+            new NotifikasiStatusPengajuanKeWarga(
+                $data->warga->nama_lengkap,
+                $jenisSurat,
+                'disetujui',
+                null,
+                $linkDetail
+            )
+        );
+
+    } else {
+        // ❌ Proses penolakan
+        if ($jenis == 'biasa') {
             $data->status_rt = 'ditolak';
             $data->waktu_persetujuan_rt = now();
             $data->alasan_penolakan_pengajuan = $request->alasan_penolakan;
-            $data->save();
-
-            // Email ke warga dengan alasan penolakan
-            Mail::to($data->warga->email)->send(
-                new NotifikasiStatusPengajuanKeWarga(
-                    $data->warga->nama_lengkap,
-                    $jenisSurat,
-                    'ditolak',
-                    $data->alasan_penolakan_pengajuan,
-                    $linkDetail
-                )
-            );
-        }
-
         } else {
-            $data = PengajuanSuratLain::with('warga')->findOrFail($id);
-            $jenisSurat = $data->tujuan_manual ?? 'Surat Lain';
-            $linkDetail = route('riwayatSurat', ['id' => $data->id]); // sesuaikan route
-
-            if ($aksi == 'setuju') {
-                $data->status_rt_pengajuan_lain = 'disetujui';
-                $data->waktu_persetujuan_rt_lain = now();
-                $data->nomor_surat_pengajuan_lain = $request->nomor_surat;
-                $data->save();
-
-                // Generate dan simpan surat hasil tanda tangan RT untuk surat lain
-                $pdfData = [
-                    'pengajuan' => $data,
-                    'rt' => $rt,
-                    'rw' => $rw,
-                    'ttd' => base64_encode(file_get_contents(Storage::path($rt->ttd_digital_bersih))),
-                    'jenis' => 'lain',
-                ];
-
-                $pdf = Pdf::loadView('rt.suratPengantar', $pdfData)->setPaper('a4');
-                $filename = 'surat-ttd-rt-' . $data->id . '-' . str_replace(' ', '-', strtolower($data->warga->nama_lengkap)) . '-' . time() . '.pdf';
-                Storage::put('public/hasil_surat/ttd_rt/' . $filename, $pdf->output());
-
-                HasilSuratTtdRt::updateOrCreate(
-                    [
-                        'jenis' => 'lain',
-                        'pengajuan_surat_lain_id' => $data->id_pengajuan_surat_lain,
-                    ],
-                    [
-                        'pengajuan_surat_id' => null,
-                        'file_surat' => 'public/hasil_surat/ttd_rt/' . $filename,
-                    ]
-                );
-
-                Mail::to($rw->email_rw)->send(
-                    new NotifikasiVerifikasiRw($rw->nama_lengkap_rw, $jenisSurat, $data->warga->nama_lengkap)
-                );
-
-                 // Email ke warga
-                Mail::to($data->warga->email)->send(
-                    new NotifikasiStatusPengajuanKeWarga(
-                        $data->warga->nama_lengkap,
-                        $jenisSurat,
-                        'disetujui',
-                        null,
-                        $linkDetail
-                    )
-                );
-
-            } else {
-                $data->status_rt_pengajuan_lain = 'ditolak';
-                $data->waktu_persetujuan_rt_lain = now();
-                $data->alasan_penolakan_pengajuan_lain = $request->alasan_penolakan;
-                $data->save();
-
-                // Email ke warga dengan alasan penolakan
-                Mail::to($data->warga->email)->send(
-                    new NotifikasiStatusPengajuanKeWarga(
-                        $data->warga->nama_lengkap,
-                        $jenisSurat,
-                        'ditolak',
-                        $data->alasan_penolakan_pengajuan_lain,
-                        $linkDetail
-                    )
-                );
-            }
+            $data->status_rt_pengajuan_lain = 'ditolak';
+            $data->waktu_persetujuan_rt_lain = now();
+            $data->alasan_penolakan_pengajuan_lain = $request->alasan_penolakan;
         }
+        $data->save();
 
-        return redirect()->back()->with('success', 'Pengajuan berhasil diproses.');
+        Mail::to($data->warga->email)->send(
+            new NotifikasiStatusPengajuanKeWarga(
+                $data->warga->nama_lengkap,
+                $jenisSurat,
+                'ditolak',
+                $jenis == 'biasa' ? $data->alasan_penolakan_pengajuan : $data->alasan_penolakan_pengajuan_lain,
+                $linkDetail
+            )
+        );
     }
+
+    return redirect()->back()->with('success', 'Pengajuan berhasil diproses.');
+}
+
 
     public function getNotifikasi()
     {

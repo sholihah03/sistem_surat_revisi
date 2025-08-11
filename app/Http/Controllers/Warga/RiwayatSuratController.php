@@ -105,11 +105,35 @@ class RiwayatSuratController extends Controller
         // Cari data surat hasil tanda tangan RW berdasarkan id
         $surat = HasilSuratTtdRw::findOrFail($id);
 
+        $scanKK = ScanKK::where('nama_pendaftar', $warga->nama_lengkap)->first();
+
+        $statusKK = null;
+        $alasanPenolakan = null;
+
+        if ($scanKK) {
+            $statusKK = $scanKK->status_verifikasi;
+            $alasanPenolakan = $scanKK->alasan_penolakan;
+        }
+
+        $dataBelumLengkap = (empty($warga->no_kk) && empty($warga->nik) && !$scanKK);
+
+        // Hitung notifikasi baru
+        $notifikasi = collect(); // ambil dari model notifikasi kamu
+
+        $totalNotifBaru = $notifikasi->where('is_read', false)->count();
+
+        // Tambahkan notifikasi "status disetujui" ke total jika kurang dari 1 hari
+        $showStatusDisetujui = false;
+        if ($statusKK === 'disetujui' && $scanKK && $scanKK->updated_at->gt(Carbon::now()->subDay())) {
+            $showStatusDisetujui = true;
+            $totalNotifBaru++;
+        }
+
         // Misal file PDF ada di storage path
         $fileUrl = Storage::url($surat->file_surat);
 
         // Render view khusus untuk menampilkan iframe PDF
-        return view('warga.suratPdf', compact('surat', 'fileUrl', 'warga'));
+        return view('warga.suratPdf', compact('surat', 'fileUrl', 'warga', 'dataBelumLengkap', 'statusKK', 'alasanPenolakan', 'totalNotifBaru', 'showStatusDisetujui'));
     }
 
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Rw;
 
 use App\Models\Rw;
 use Illuminate\Http\Request;
+use App\Models\LogTtdDigital;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 
@@ -11,8 +12,13 @@ class TtdDigitalRwController extends Controller
 {
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'ttd_digital' => 'required|image|mimes:jpg,jpeg,png',
+        $request->validate([
+        'ttd_digital' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ], [
+            'ttd_digital.max' => 'Gagal mengunggah tanda tangan. Ukuran file melebihi batas maksimal 2 MB.',
+            'ttd_digital.required' => 'File tanda tangan wajib diunggah.',
+            'ttd_digital.image' => 'File tanda tangan harus berupa gambar.',
+            'ttd_digital.mimes' => 'Format tanda tangan harus jpg, jpeg, atau png.',
         ]);
 
         $user = auth()->guard('rw')->user();
@@ -33,20 +39,36 @@ class TtdDigitalRwController extends Controller
             Storage::makeDirectory($cleanDir);
         }
 
-        try {
-            $this->makeTransparentBackground(
-                Storage::path($originalPath),
-                Storage::path($cleanPath)
-            );
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Gagal memproses gambar: ' . $e->getMessage()], 500);
-        }
+        $this->makeTransparentBackground(
+            Storage::path($originalPath),
+            Storage::path($cleanPath)
+        );
+
+        // Hitung hash SHA-256 file asli
+        $hashFileTtd = hash_file('sha256', Storage::path($originalPath));
 
         // Simpan ke DB
         $rw = Rw::find($user->id_rw);
+        $aksi = $rw->ttd_digital ? 'edit_ttd' : 'upload_ttd'; // deteksi edit / upload baru
         $rw->update([
             'ttd_digital' => $originalPath,
             'ttd_digital_bersih' => $cleanPath,
+        ]);
+
+            // Simpan log
+        LogTtdDigital::create([
+            'jenis_penandatangan' => 'rw',
+            'rt_id' => $rw->id_rw,
+            'aksi' => $aksi,
+            'file_ttd' => $originalPath,
+            'hash_dokumen' => $hashFileTtd,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->header('User-Agent'),
+            'metadata' => [
+                'filename_original' => $file->getClientOriginalName(),
+                'storage_path_asli' => $originalPath,
+                'storage_path_bersih' => $cleanPath,
+            ],
         ]);
 
         return redirect()->back()->with('ttdSuccess', 'Tanda tangan berhasil disimpan.');
