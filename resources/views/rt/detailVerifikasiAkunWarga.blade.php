@@ -17,9 +17,6 @@
                     <li>RT/RW: {{ $item->alamat->rt_alamat ?? '-' }}/{{ $item->alamat->rw_alamat ?? '-' }}</li>
                     <li>Kelurahan: {{ $item->alamat->kelurahan ?? '-' }}</li>
                     <li>Kecamatan: {{ $item->alamat->kecamatan ?? '-' }}</li>
-                    <li>Kab/Kota: {{ $item->alamat->kabupaten_kota ?? '-' }}</li>
-                    <li>Provinsi: {{ $item->alamat->provinsi ?? '-' }}</li>
-                    <li>Kode Pos: {{ $item->alamat->kode_pos ?? '-' }}</li>
                 </ul>
             </div>
             <div class="md:w-1/2">

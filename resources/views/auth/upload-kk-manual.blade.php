@@ -61,16 +61,6 @@
                     </div>
 
                     <div>
-                        <label for="provinsi" class="block text-sm font-medium text-gray-700">Provinsi</label>
-                        <input type="text" name="provinsi" id="provinsi" class="w-full px-3 py-2 border rounded-md" placeholder="Provinsi">
-                    </div>
-
-                    <div>
-                        <label for="kabupaten" class="block text-sm font-medium text-gray-700">Kabupaten/Kota</label>
-                        <input type="text" name="kabupaten_kota" id="kabupaten_kota" class="w-full px-3 py-2 border rounded-md" placeholder="Kabupaten">
-                    </div>
-
-                    <div>
                         <label for="kecamatan" class="block text-sm font-medium text-gray-700">Kecamatan</label>
                         <input type="text" name="kecamatan" id="kecamatan" class="w-full px-3 py-2 border rounded-md" placeholder="Kecamatan">
                     </div>
@@ -88,11 +78,6 @@
                     <div>
                         <label for="rw" class="block text-sm font-medium text-gray-700">RW</label>
                         <input type="text" name="rw_alamat" id="rw_alamat" class="w-full px-3 py-2 border rounded-md" placeholder="RW">
-                    </div>
-
-                    <div>
-                        <label for="kode_pos" class="block text-sm font-medium text-gray-700">Kode Pos</label>
-                        <input type="text" name="kode_pos" id="kode_pos" class="w-full px-3 py-2 border rounded-md" placeholder="Kode Pos">
                     </div>
                 </div>
 

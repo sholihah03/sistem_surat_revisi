@@ -58,7 +58,7 @@ class TtdDigitalRwController extends Controller
             // Simpan log
         LogTtdDigital::create([
             'jenis_penandatangan' => 'rw',
-            'rt_id' => $rw->id_rw,
+            'rw_id' => $rw->id_rw,
             'aksi' => $aksi,
             'file_ttd' => $originalPath,
             'hash_dokumen' => $hashFileTtd,

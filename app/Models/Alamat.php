@@ -17,9 +17,6 @@ class Alamat extends Model
         'rw_alamat',
         'kelurahan',
         'kecamatan',
-        'kabupaten_kota',
-        'provinsi',
-        'kode_pos',
     ];
 
     public function scanKks()

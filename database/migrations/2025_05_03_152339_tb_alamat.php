@@ -18,9 +18,6 @@ return new class extends Migration
             $table->string('rw_alamat', 225);
             $table->string('kelurahan', 225);
             $table->string('kecamatan', 225);
-            $table->string('kabupaten_kota', 225);
-            $table->string('provinsi', 225)->nullable();
-            $table->string('kode_pos', 10);
             $table->timestamps();
         });
     }

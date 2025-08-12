@@ -108,13 +108,10 @@ class UploadKKController extends Controller
             'nama_kepala_keluarga' => 'required|string|max:100',
             'path' => 'required|string',
             'nama_jalan' => 'nullable|string|max:255',
-            'provinsi' => 'nullable|string|max:100',
-            'kabupaten_kota' => 'nullable|string|max:100',
             'kecamatan' => 'nullable|string|max:100',
             'desa' => 'nullable|string|max:100',
             'rt_alamat' => 'nullable|string|max:10',
             'rw_alamat' => 'nullable|string|max:10',
-            'kode_pos' => 'nullable|string|max:10',
         ],[
             'required' => ':attribute wajib diisi.',
             'string' => ':attribute harus berupa teks.',
@@ -127,13 +124,10 @@ class UploadKKController extends Controller
         // Simpan data alamat
         $alamat = new Alamat();
         $alamat->nama_jalan = $request->nama_jalan;
-        $alamat->provinsi = $request->provinsi;
-        $alamat->kabupaten_kota = $request->kabupaten_kota;
         $alamat->kecamatan = $request->kecamatan;
         $alamat->kelurahan = $request->desa;
         $alamat->rt_alamat = $request->rt_alamat;
         $alamat->rw_alamat = $request->rw_alamat;
-        $alamat->kode_pos = $request->kode_pos;
         $alamat->save();  // Simpan alamat ke tb_alamat
 
         // Ambil alamat_id yang baru disimpan
@@ -207,25 +201,10 @@ private function extractNamaKepalaKeluarga($text)
             $data['kelurahan'] = $this->cleanText($matches[2]);
         }
 
+
         // Kecamatan
         if (preg_match('/Kecamatan\s*[:\-]?\s*([A-Z\s]+?)(?=\s+(Kelurahan|Desa|Alamat|RT\/RW|$))/i', $text, $matches)) {
             $data['kecamatan'] = $this->cleanText($matches[1]);
-        }
-
-
-        // Kabupaten/Kota
-        if (preg_match('/(Kabupaten|Kota)\s*[:\-]?\s*(.*?)\s*(Kode Pos|Provinsi|$)/i', $text, $matches)) {
-            $data['kabupaten_kota'] = $this->cleanText($matches[2]);
-        }
-
-        // Provinsi
-        if (preg_match('/Provinsi\s*[:\-]?\s*(.*?)($|\n)/i', $text, $matches)) {
-            $data['provinsi'] = $this->cleanText($matches[1]);
-        }
-
-        // Kode Pos
-        if (preg_match('/Kode Pos\s*[:\-]?\s*(\d{5})/i', $text, $matches)) {
-            $data['kode_pos'] = $matches[1];
         }
 
         return $data;

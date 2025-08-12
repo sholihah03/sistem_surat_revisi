@@ -38,13 +38,10 @@ class UploadKKManualController extends Controller
             'nama_kepala_keluarga' => 'required|string|max:255', // validasi nama kepala keluarga
             'no_kk' => 'required|string|unique:tb_scan_kk,no_kk_scan|max:20', // validasi no KK
             'nama_jalan' => 'required|string|max:255', // validasi alamat
-            'provinsi' => 'required|string|max:255',
-            'kabupaten_kota' => 'required|string|max:255',
             'kecamatan' => 'required|string|max:255',
             'desa' => 'required|string|max:255',
             'rt_alamat' => 'required|string|max:5',
             'rw_alamat' => 'required|string|max:5',
-            'kode_pos' => 'required|string|max:5',
         ],[
             'required' => ':attribute wajib diisi.',
             'string' => ':attribute harus berupa teks.',
@@ -64,9 +61,6 @@ class UploadKKManualController extends Controller
             'rw_alamat' => $request->rw_alamat,
             'kelurahan' => $request->desa,
             'kecamatan' => $request->kecamatan,
-            'kabupaten_kota' => $request->kabupaten_kota,
-            'provinsi' => $request->provinsi,
-            'kode_pos' => $request->kode_pos,
         ]);
 
         // Simpan data scan KK
@@ -83,17 +77,6 @@ class UploadKKManualController extends Controller
 
         // Hapus path dari session agar tidak digunakan ulang
         session()->forget('failed_kk_path');
-
-        // // Tambahan untuk update tb_pendaftaran
-        // $pendaftaran = Pendaftaran::where('no_kk', $request->no_kk)->first();
-        // if ($pendaftaran) {
-        //     $pendaftaran->scan_id = $scanKK->id_scan;
-        //     $pendaftaran->save();
-
-        //     if ($pendaftaran->rt && $pendaftaran->rt->email_rt) {
-        //         Mail::to($pendaftaran->rt->email_rt)->send(new NotifikasiVerifikasiAkun($pendaftaran));
-        //     }
-        // }
 
         return redirect()->route('login')->with('success_upload_kk', 'Data berhasil disimpan.');
     }

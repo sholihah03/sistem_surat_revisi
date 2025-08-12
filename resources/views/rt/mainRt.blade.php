@@ -4,7 +4,7 @@
     <h1 class="text-2xl pt-20 md:text-3xl font-bold text-gray-800 mb-6">Selamat Datang, Ketua RT {{ $rt->no_rt }}!</h1>
 
     <!-- Kartu Statistik -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    {{-- <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="p-4 md:p-6 bg-green-100 rounded-xl shadow border-l-4 border-green-500">
             <h2 class="text-base md:text-lg font-semibold mb-2">📑 Surat Masuk Dalam Sebulan</h2>
             <p class="text-xl md:text-2xl font-bold text-green-700">{{ $totalSuratMasuk }}</p>
@@ -17,7 +17,22 @@
             <h2 class="text-base md:text-lg font-semibold mb-2">👥 Warga Belum Diverifikasi</h2>
             <p class="text-xl md:text-2xl font-bold text-yellow-700">{{ $pendingCount }}</p>
         </div>
+    </div> --}}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <a href="{{ route('riwayatSuratWarga') }}" class="block p-4 md:p-6 bg-green-100 rounded-xl shadow border-l-4 border-green-500 hover:bg-green-200 transition">
+            <h2 class="text-base md:text-lg font-semibold mb-2">📑 Surat Masuk Dalam Sebulan</h2>
+            <p class="text-xl md:text-2xl font-bold text-green-700">{{ $totalSuratMasuk }}</p>
+        </a>
+        <a href="{{ route('riwayatSuratWarga') }}" class="block p-4 md:p-6 bg-blue-100 rounded-xl shadow border-l-4 border-blue-500 hover:bg-blue-200 transition">
+            <h2 class="text-base md:text-lg font-semibold mb-2">✅ Surat Disetujui Dalam Sebulan</h2>
+            <p class="text-xl md:text-2xl font-bold text-blue-700">{{ $totalDisetujui }}</p>
+        </a>
+        <a href="{{ route('verifikasiAkunWarga') }}" class="block p-4 md:p-6 bg-yellow-100 rounded-xl shadow border-l-4 border-yellow-500 hover:bg-yellow-200 transition">
+            <h2 class="text-base md:text-lg font-semibold mb-2">👥 Warga Belum Diverifikasi</h2>
+            <p class="text-xl md:text-2xl font-bold text-yellow-700">{{ $pendingCount }}</p>
+        </a>
     </div>
+
 
     <!-- Informasi Riwayat Surat -->
     <div class="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded-md mb-4">
