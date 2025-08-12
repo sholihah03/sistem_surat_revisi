@@ -11,6 +11,7 @@
         "laravel/tinker": "^2.9",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/image": "*",
+        "symfony/process": "^7.3",
         "thiagoalessio/tesseract_ocr": "^2.13"
     },
     "require-dev": {

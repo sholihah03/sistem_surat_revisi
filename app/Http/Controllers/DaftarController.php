@@ -34,11 +34,6 @@ public function store(Request $request)
         'no_hp' => 'required|numeric',
     ]);
 
-    // Cek jika sudah ada di tb_wargas
-    if (Wargas::where('nik', $request->nik)->exists()) {
-        return back()->withErrors(['daftar_error' => 'NIK sudah terdaftar sebagai warga.'])->withInput();
-    }
-
     if (Wargas::where('nama_lengkap', $request->nama_lengkap)->exists()) {
         return back()->withErrors(['daftar_error' => 'Nama lengkap sudah terdaftar sebagai warga.'])->withInput();
     }

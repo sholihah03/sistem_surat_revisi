@@ -173,24 +173,28 @@ Mail::to($rt->email_rt)->send(new NotifikasiVerifikasiDataWarga($scan, $alamat, 
         return $matches[0] ?? '';
     }
 
-    private function extractNamaKepalaKeluarga($text)
-    {
-        if (preg_match('/Nama Kepala Keluarga\s*[:\-]?\s*([A-Za-z\s\.,]+)/i', $text, $matches)) {
-            $nama = trim($matches[1]);
-            $potongan = preg_split('/\b(Desa|Kelurahan|RW|RT)\b/i', $nama);
-            return trim($potongan[0]);
-        }
-        return '';
+private function extractNamaKepalaKeluarga($text)
+{
+    if (preg_match('/Nama Kepala Keluarga\s*[:\-]?\s*([A-Za-z\s\.\,]+)/i', $text, $matches)) {
+        $nama = trim($matches[1]);
+
+        // Potong kalau ketemu kata kunci alamat atau angka
+        $potongan = preg_split('/\b(Desa|Kelurahan|Kecamatan|RW|RT|\d)\b/i', $nama);
+
+        return trim($potongan[0]);
     }
+    return '';
+}
+
 
     private function extractAlamatData($text)
     {
         $data = [];
 
-        // Nama jalan
-        if (preg_match('/Alamat\s*[:\-]?\s*(.*?)\s*(Kecamatan|RT\/RW)/i', $text, $matches)) {
-            $data['nama_jalan'] = $this->cleanText($matches[1]);
-        }
+            // --- Ambil Nama Jalan ---
+            if (preg_match('/ALAMAT\s*[:\-]?\s*(.*?)\s*(KECAMATAN|RT\/RW|KABUPATEN)/i', $text, $matches)) {
+                $data['nama_jalan'] = trim($matches[1]);
+            }
 
         // RT/RW
         if (preg_match('/RT\/RW\s*[:\-]?\s*(\d{1,3})[\/\s]*(\d{1,3})/i', $text, $matches)) {
@@ -204,9 +208,10 @@ Mail::to($rt->email_rt)->send(new NotifikasiVerifikasiDataWarga($scan, $alamat, 
         }
 
         // Kecamatan
-        if (preg_match('/Kecamatan\s*[:\-]?\s*(.*?)\s*(Kabupaten|Kota|Kode Pos|Provinsi)/i', $text, $matches)) {
+        if (preg_match('/Kecamatan\s*[:\-]?\s*([A-Z\s]+?)(?=\s+(Kelurahan|Desa|Alamat|RT\/RW|$))/i', $text, $matches)) {
             $data['kecamatan'] = $this->cleanText($matches[1]);
         }
+
 
         // Kabupaten/Kota
         if (preg_match('/(Kabupaten|Kota)\s*[:\-]?\s*(.*?)\s*(Kode Pos|Provinsi|$)/i', $text, $matches)) {

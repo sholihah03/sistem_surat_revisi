@@ -35,6 +35,13 @@ public function cek(Request $request)
         ->with('info', 'No KK belum ada di sistem. Silakan upload KK terlebih dahulu.');
     }
 
+    // Tambahkan pengecekan status pending di sini
+    if ($scanKK->status_verifikasi === 'pending') {
+        return redirect()->back()->with('error_pending_kk',
+            'Data diri Anda sedang diverifikasi oleh RT. Anda akan mendapatkan informasi melalui email setelah proses selesai.'
+        );
+    }
+
     // Ambil user yang sedang login
     /** @var \App\Models\Wargas $user */
     $user = Auth::guard('warga')->user();

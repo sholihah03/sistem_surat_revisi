@@ -23,6 +23,12 @@
             </div>
         @endif
 
+        @if (session('error_pending_kk'))
+            <div class="bg-red-100 text-red-800 p-2 rounded mb-3 text-sm">
+                {{ session('error_pending_kk') }}
+            </div>
+        @endif
+
         <form method="POST" action="{{ route('cekKKProcess') }}" class="space-y-4">
             @csrf
 
