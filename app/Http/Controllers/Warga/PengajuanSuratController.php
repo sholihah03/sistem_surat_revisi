@@ -54,7 +54,7 @@ class PengajuanSuratController extends Controller
 
         $tujuanSurat = $query->get();
 
-        return view('warga.pengajuanSurat', compact('tujuanSurat', 'warga', 'dataBelumLengkap', 'statusKK', 'alasanPenolakan', 'totalNotifBaru', 'showStatusDisetujui'));
+        return view('warga.pengajuanSurat', compact('tujuanSurat', 'warga', 'dataBelumLengkap', 'statusKK', 'alasanPenolakan', 'totalNotifBaru', 'showStatusDisetujui', 'scanKK'));
     }
 
     public function formPengajuanSurat(Request $request)

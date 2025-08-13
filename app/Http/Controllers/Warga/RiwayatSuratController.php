@@ -96,7 +96,7 @@ class RiwayatSuratController extends Controller
         });
 
 
-        return view('warga.riwayatSurat', compact('pengajuanBiasa', 'pengajuanLain', 'suratSelesai', 'warga', 'dataBelumLengkap', 'statusKK', 'alasanPenolakan', 'totalNotifBaru', 'showStatusDisetujui'));
+        return view('warga.riwayatSurat', compact('pengajuanBiasa', 'pengajuanLain', 'suratSelesai', 'warga', 'dataBelumLengkap', 'statusKK', 'alasanPenolakan', 'totalNotifBaru', 'showStatusDisetujui', 'scanKK'));
     }
 
     public function showPdf($id)
@@ -133,7 +133,7 @@ class RiwayatSuratController extends Controller
         $fileUrl = Storage::url($surat->file_surat);
 
         // Render view khusus untuk menampilkan iframe PDF
-        return view('warga.suratPdf', compact('surat', 'fileUrl', 'warga', 'dataBelumLengkap', 'statusKK', 'alasanPenolakan', 'totalNotifBaru', 'showStatusDisetujui'));
+        return view('warga.suratPdf', compact('surat', 'fileUrl', 'warga', 'dataBelumLengkap', 'statusKK', 'alasanPenolakan', 'totalNotifBaru', 'showStatusDisetujui', 'scanKK'));
     }
 
 }

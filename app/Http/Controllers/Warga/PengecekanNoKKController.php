@@ -20,6 +20,11 @@ public function cek(Request $request)
     $request->validate([
         'no_kk' => 'required|digits:16',
         'nik'   => 'required|digits:16',
+    ], [
+        'no_kk.required' => 'Nomor KK wajib diisi.',
+        'no_kk.digits'   => 'Nomor KK harus terdiri dari 16 digit.',
+        'nik.required'   => 'NIK wajib diisi.',
+        'nik.digits'     => 'NIK harus terdiri dari 16 digit.',
     ]);
 
     $noKK = $request->no_kk;

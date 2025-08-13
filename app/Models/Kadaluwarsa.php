@@ -25,9 +25,6 @@ class Kadaluwarsa extends Model
         'nama_jalan',
         'kelurahan',
         'kecamatan',
-        'kabupaten_kota',
-        'provinsi',
-        'kode_pos',
     ];
 
     public function rtss()

@@ -14,17 +14,17 @@ class NotifikasiVerifikasiDataWarga extends Mailable
     public $scan;
     public $alamat;
     public $scan_id;
-    public $rt_nomor;
+    public $rt;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($scan, $alamat, $scan_id, $rt_nomor)
+    public function __construct($scan, $alamat, $scan_id, $rt)
     {
         $this->scan = $scan;
         $this->alamat = $alamat;
         $this->scan_id = $scan_id;
-        $this->rt_nomor = $rt_nomor;
+        $this->rt = $rt;
 
     }
 

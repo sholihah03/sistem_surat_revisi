@@ -34,12 +34,22 @@
 
             <div id="kk-field">
                 <label>No KK:</label>
-                <input type="text" name="no_kk" class="w-full border rounded p-2" maxlength="16" placeholder="Masukkan No KK Anda">
+                <input type="text" name="no_kk" value="{{ old('no_kk') }}"
+                    class="w-full border rounded p-2 @error('no_kk') border-red-500 @enderror"
+                    maxlength="16" placeholder="Masukkan No KK Anda">
+                @error('no_kk')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
             <div id="nik-field">
                 <label>NIK:</label>
-                <input type="text" name="nik" class="w-full border rounded p-2" maxlength="16" placeholder="Masukkan No NIK Anda">
+                <input type="text" name="nik" value="{{ old('nik') }}"
+                    class="w-full border rounded p-2 @error('nik') border-red-500 @enderror"
+                    maxlength="16" placeholder="Masukkan No NIK Anda">
+                @error('nik')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
             <button type="submit" class="w-full bg-yellow-500 text-white py-2 font-semibold rounded">

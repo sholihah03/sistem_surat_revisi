@@ -71,6 +71,9 @@ Route::get('/verifikasi-surat/{token}', [ManajemenSuratWargaController::class, '
 // Route publik untuk verifikasi surat
 Route::get('/verifikasi/surat/{token}', [ManajemenSuratWargaController::class, 'verifikasiSuratPublik'])->name('verifikasi.surat.publik');
 
+// Verifikasi surat berdasarkan hash dari QR Code
+Route::get('/verifikasi-surat', [ManajemenSuratWargaController::class, 'verifikasiSuratHash'])
+    ->name('verifikasi.surat.hash');
 
 
 Route::prefix('warga')->middleware(AuthenticateWarga::class)->group(function () {

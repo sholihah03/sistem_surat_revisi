@@ -5,7 +5,7 @@
 </head>
 <body>
     <h2>Permintaan Verifikasi Data Baru</h2>
-    <p>Yth. Ketua RT {{ $rt_nomor }},</p>
+    <p>Yth. Ketua RT {{ $rt }},</p>
 
     <p>Telah diunggah data KK baru dengan informasi berikut:</p>
 

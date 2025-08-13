@@ -153,7 +153,7 @@ class UploadKKController extends Controller
 
 if ($rt && $rt->email_rt) {
     // Kirim email notifikasi ke email RT
-Mail::to($rt->email_rt)->send(new NotifikasiVerifikasiDataWarga($scan, $alamat, $scan_id, $rt->rt_nomor));
+Mail::to($rt->email_rt)->send(new NotifikasiVerifikasiDataWarga($scan, $alamat, $scan_id, $rt->no_rt));
 
 }
 

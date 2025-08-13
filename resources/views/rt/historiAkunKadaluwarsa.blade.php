@@ -47,8 +47,7 @@
                         <td class="px-4 py-2 whitespace-nowrap">{{ $item->email }}</td>
                         <td class="px-4 py-2 whitespace-normal break-words max-w-[250px]">
                             {{ $item->nama_jalan }}, RW {{ $item->rw }}, Kel. {{ $item->kelurahan }},
-                            Kec. {{ $item->kecamatan }}, {{ $item->kabupaten_kota }}, {{ $item->provinsi }},
-                            {{ $item->kode_pos }}
+                            Kec. {{ $item->kecamatan }}
                         </td>
                         <td class="px-4 py-2 whitespace-nowrap">{{ \Carbon\Carbon::parse($item->created_at)->format('d-m-Y H:i') }}</td>
                     </tr>

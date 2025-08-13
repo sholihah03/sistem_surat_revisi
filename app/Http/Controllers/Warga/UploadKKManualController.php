@@ -25,7 +25,7 @@ class UploadKKManualController extends Controller
         // Ambil URL untuk ditampilkan di view
         $url = Storage::url($filePath); // Akan menghasilkan URL publik seperti /storage/uploads/kk/...
 
-        return view('auth.upload-kk-manual', ['kkImageUrl' => $url]);
+        return view('warga.upload-kk-manual', ['kkImageUrl' => $url]);
     }
 
     public function uploadKKSimpan(Request $request)
