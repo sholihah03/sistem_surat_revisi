@@ -153,8 +153,7 @@
                         </p>
                         <p class="pl-2">
                             {{ $alamat->nama_jalan ?? '-' }}, RT {{ $alamat->rt_alamat ?? '-' }} RW {{ $alamat->rw_alamat ?? '-' }},<br>
-                            Kel/Desa {{ $alamat->kelurahan ?? '-' }}, Kec {{ $alamat->kecamatan ?? '-' }}, Kab/Kota {{ $alamat->kabupaten_kota ?? '-' }},<br>
-                            Provinsi {{ $alamat->provinsi ?? '-' }}, Kode Pos {{ $alamat->kode_pos ?? '-' }}
+                            Kel/Desa {{ $alamat->kelurahan ?? '-' }}, Kec {{ $alamat->kecamatan ?? '-' }}
                         </p>
                     </div>
                     <div class="flex flex-col sm:flex-row sm:items-center mb-2">
