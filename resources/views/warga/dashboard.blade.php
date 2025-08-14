@@ -56,7 +56,7 @@
     </style>
 
 </head>
-<body class="min-h-screen bg-yellow-50">
+<body class="min-h-screen bg-[#CFFFE2]">
 
     <!-- Navbar -->
     @include('komponen.nav')
@@ -215,7 +215,7 @@
         @endif
 
     <!-- Carousel + Teks Selamat Datang -->
-    <div class="max-w-5xl mx-auto px-4 mt-6 rounded-xl overflow-hidden shadow">
+    <div class="max-w-5xl mx-auto px-4 mt-6 bg-[#EEEFE0] rounded-xl overflow-hidden shadow">
         <div id="autoCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
             <div class="carousel-inner">
 

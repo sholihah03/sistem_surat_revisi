@@ -43,7 +43,7 @@
   </style>
 </head>
 {{-- <body class="min-h-screen bg-gradient-to-br from-blue-100 via-white to-pink-100"> --}}
-<body class="min-h-screen bg-yellow-50">
+<body class="min-h-screen bg-[#CFFFE2]">
     @include('komponen.nav')
 
     <!-- Breadcrumb -->
@@ -59,7 +59,7 @@
     <div class="max-w-7xl mx-auto mt-6 px-4 py-6 bg-white bg-opacity-90 rounded-lg">
 
         <h2 class="text-2xl font-bold text-gray-800 mb-4">📄 Riwayat Pengajuan Surat</h2>
-        <div class="alert alert-warning bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-4" role="alert">
+        <div class="alert alert-warning bg-green-100 border-l-4 border-green-500 text-green-800 p-4 mb-4" role="alert">
             ⏳ <strong>Catatan:</strong> Data proses dan data surat yang telah selesai akan otomatis hilang dari halaman ini setelah 1 bulan dari tanggal persetujuan RW.
             Untuk melihat surat lama, silakan buka menu <a href="{{ route('historiSuratWarga') }}" class="text-blue-600">Histori Surat</a>.
         </div>

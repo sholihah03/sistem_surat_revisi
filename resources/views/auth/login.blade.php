@@ -130,13 +130,16 @@
 
                     <!-- Button -->
                     <button type="submit"
-                            class="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 rounded-md transition">
+                            class="w-full bg-[#8AC47F] hover:bg-[#76A95B] text-white font-semibold py-2 rounded-md transition">
                         Masuk
                     </button>
 
+</button>
+
+
                     <!-- Link daftar -->
                     <p class="text-center text-sm text-gray-600">
-                        Belum punya akun? <a href="{{ route('daftar') }}" class="text-yellow-600 font-medium">Daftar</a>
+                        Belum punya akun? <a href="{{ route('daftar') }}" class="text-[#76A95B] font-medium">Daftar</a>
                     </p>
                 </form>
             </div>

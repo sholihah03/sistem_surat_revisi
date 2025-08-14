@@ -12,7 +12,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body class="min-h-screen bg-yellow-50">
+<body class="min-h-screen bg-[#CFFFE2]">
     @include('komponen.nav')
 
     <!-- Breadcrumb -->
@@ -59,19 +59,20 @@
         <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
             <div class="flex flex-col md:flex-row">
                 <!-- Avatar Section -->
-                <div class="bg-gradient-to-r from-amber-300 to-orange-300 text-white flex flex-col items-center justify-center p-6 md:w-1/3">
-                    <div class="relative">
-                        <img src="{{ $warga->profile_warga ? asset('storage/profile_warga/' . $warga->profile_warga) : asset('images/profile.png') }}"
-                        alt="Avatar" class="w-32 h-32 rounded-full border-4 border-white shadow">
-                        <button class="absolute bottom-0 right-0 bg-white text-blue-600 p-2 rounded-full shadow" data-bs-toggle="modal" data-bs-target="#modalUploadFoto">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6-6m2 2l-6 6m-6 2v4h4l10-10a2.828 2.828 0 00-4-4L5 15z" />
-                            </svg>
-                        </button>
-                    </div>
-                    <h3 class="mt-4 text-xl font-semibold text-white">{{ $warga->nama_lengkap }}</h3>
-                    <p class="text-base text-white">RW {{ $warga->rw->no_rw ?? '-' }} - RT {{ $warga->rt->no_rt ?? '-' }}</p>
-                </div>
+                <div class="bg-gradient-to-r from-[#9FC87E] to-[#80D8C3] text-white flex flex-col items-center justify-center p-6 md:w-1/3 rounded-r-xl">
+    <div class="relative">
+        <img src="{{ $warga->profile_warga ? asset('storage/profile_warga/' . $warga->profile_warga) : asset('images/profile.png') }}"
+        alt="Avatar" class="w-32 h-32 rounded-full border-4 border-white shadow">
+        <button class="absolute bottom-0 right-0 bg-white text-[#9FC87E] p-2 rounded-full shadow" data-bs-toggle="modal" data-bs-target="#modalUploadFoto">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6-6m2 2l-6 6m-6 2v4h4l10-10a2.828 2.828 0 00-4-4L5 15z" />
+            </svg>
+        </button>
+    </div>
+    <h3 class="mt-4 text-xl font-semibold text-white">{{ $warga->nama_lengkap }}</h3>
+    <p class="text-base text-white">RW {{ $warga->rw->no_rw ?? '-' }} - RT {{ $warga->rt->no_rt ?? '-' }}</p>
+</div>
+
 
                 <!-- Form Section -->
                 <div class="p-6 md:w-2/3">

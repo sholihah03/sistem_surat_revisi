@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 {{-- <body class="min-h-screen bg-gradient-to-br from-blue-100 via-white to-pink-100"> --}}
-<body class="min-h-screen bg-yellow-50">
+<body class="min-h-screen bg-[#CFFFE2]">
 
     {{-- Include Nav --}}
     @include('komponen.nav')
@@ -60,11 +60,11 @@
                         {{-- Biasa --}}
                         @foreach ($disetujuiBiasa->merge($ditolakBiasa) as $item)
                         <li class="border p-4 rounded-md">
-                            <h3 class="font-semibold text-gray-800">{{ $item->tujuanSurat->nama_tujuan ?? 'Tidak ada tujuan surat' }}</h3>
+                            <h3 class="font-semibold text-red-800">{{ $item->tujuanSurat->nama_tujuan ?? 'Tidak ada tujuan surat' }}</h3>
                             <p class="text-sm text-gray-600">Tanggal Pengajuan: {{ $item->created_at->translatedFormat('d F Y') }}</p>
 
                             {{-- Status RT --}}
-                            <p class="text-sm {{ $item->status_rt === 'ditolak' ? 'text-red-600' : ($item->status_rt === 'disetujui' ? 'text-green-600' : 'text-gray-600') }}">
+                            <p class="text-sm {{ $item->status_rt === 'ditolak' ? 'text-red-600' : ($item->status_rt === 'disetujui' ? 'text-yellow-600' : 'text-gray-600') }}">
                                 Status RT {{ $item->status_rt ? strtolower($item->status_rt) : '-' }}
                                 @if($item->waktu_persetujuan_rt)
                                     pada {{ \Carbon\Carbon::parse($item->waktu_persetujuan_rt)->translatedFormat('d F Y') }}
@@ -76,7 +76,7 @@
 
                             {{-- Status RW (hanya tampil jika RT bukan "ditolak") --}}
                             @if($item->status_rt !== 'ditolak')
-                                <p class="text-sm {{ $item->status_rw === 'ditolak' ? 'text-red-600' : ($item->status_rw === 'disetujui' ? 'text-green-600' : 'text-gray-600') }}">
+                                <p class="text-sm {{ $item->status_rw === 'ditolak' ? 'text-red-600' : ($item->status_rw === 'disetujui' ? 'text-yellow-600' : 'text-gray-600') }}">
                                     Status RW {{ $item->status_rw ? strtolower($item->status_rw) : '-' }}
                                     @if($item->waktu_persetujuan_rw)
                                         pada {{ \Carbon\Carbon::parse($item->waktu_persetujuan_rw)->translatedFormat('d F Y') }}
@@ -92,11 +92,11 @@
                         {{-- Lain --}}
                         @foreach ($disetujuiLain->merge($ditolakLain) as $item)
                         <li class="border p-4 rounded-md">
-                            <h3 class="font-semibold text-gray-800">{{ $item->tujuan_manual }}</h3>
+                            <h3 class="font-semibold text-red-800">{{ $item->tujuan_manual }}</h3>
                             <p class="text-sm text-gray-600">Tanggal Pengajuan: {{ $item->created_at->translatedFormat('d F Y') }}</p>
 
                             {{-- Status RT --}}
-                            <p class="text-sm {{ $item->status_rt_pengajuan_lain === 'ditolak' ? 'text-red-600' : ($item->status_rt_pengajuan_lain === 'disetujui' ? 'text-green-600' : 'text-gray-600') }}">
+                            <p class="text-sm {{ $item->status_rt_pengajuan_lain === 'ditolak' ? 'text-red-600' : ($item->status_rt_pengajuan_lain === 'disetujui' ? 'text-yellow-600' : 'text-gray-600') }}">
                                 Status RT {{ $item->status_rt_pengajuan_lain ? strtolower($item->status_rt_pengajuan_lain) : '-' }}
                                 @if($item->waktu_persetujuan_rt_lain)
                                     pada {{ \Carbon\Carbon::parse($item->waktu_persetujuan_rt_lain)->translatedFormat('d F Y') }}
@@ -108,7 +108,7 @@
 
                             {{-- Status RW (hanya tampil jika RT bukan "ditolak") --}}
                             @if($item->status_rt_pengajuan_lain !== 'ditolak')
-                                <p class="text-sm {{ $item->status_rw_pengajuan_lain === 'ditolak' ? 'text-red-600' : ($item->status_rw_pengajuan_lain === 'disetujui' ? 'text-green-600' : 'text-gray-600') }}">
+                                <p class="text-sm {{ $item->status_rw_pengajuan_lain === 'ditolak' ? 'text-red-600' : ($item->status_rw_pengajuan_lain === 'disetujui' ? 'text-yellow-600' : 'text-gray-600') }}">
                                     Status RW {{ $item->status_rw_pengajuan_lain ? strtolower($item->status_rw_pengajuan_lain) : '-' }}
                                     @if($item->waktu_persetujuan_rw_lain)
                                         pada {{ \Carbon\Carbon::parse($item->waktu_persetujuan_rw_lain)->translatedFormat('d F Y') }}

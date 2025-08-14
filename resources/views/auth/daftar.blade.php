@@ -80,13 +80,13 @@
 
                     <!-- Button -->
                     <button type="submit"
-                        class="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 rounded-md transition">
+                        class="w-full bg-[#8AC47F] hover:bg-[#76A95B] text-white font-semibold py-2 rounded-md transition">
                         Daftar
                     </button>
 
                     <!-- Link kembali ke login -->
                     <p class="text-center text-sm text-gray-600">
-                        Kembali ke <a href="{{ route('login') }}" class="text-yellow-600 font-medium">Login</a>
+                        Kembali ke <a href="{{ route('login') }}" class="text-[#76A95B] font-medium">Login</a>
                     </p>
                 </form>
             </div>

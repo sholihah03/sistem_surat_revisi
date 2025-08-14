@@ -18,7 +18,7 @@
 </head>
 
 {{-- <body class="min-h-screen bg-gradient-to-br from-blue-100 via-white to-pink-100"> --}}
-<body class="min-h-screen bg-yellow-50">
+<body class="min-h-screen bg-[#CFFFE2]">
 
   @if(session('success_form'))
   <div x-data="{ open: true }" x-show="open" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -91,7 +91,7 @@
         <h2 class="text-2xl font-semibold text-gray-800">Tujuan Populer</h2>
         <div class="space-y-4 max-h-[550px] overflow-y-auto pr-2">
           @foreach($tujuanSurat->where('status_populer', true)->take(20) as $item)
-          <div class="bg-white border border-yellow-400 p-4 rounded-xl shadow-lg flex flex-col sm:flex-row justify-between items-start sm:items-center">
+          <div class="bg-white border border-[#97B067] p-4 rounded-xl shadow-lg flex flex-col sm:flex-row justify-between items-start sm:items-center">
             <div class="flex flex-col mb-4 sm:mb-0 sm:mr-4">
               <h3 class="text-lg font-semibold text-gray-800">{{ $item->nama_tujuan }}</h3>
               <p class="text-gray-600 text-sm">{{ Str::limit($item->deskripsi ?? 'Deskripsi tidak tersedia', 100) }}</p>

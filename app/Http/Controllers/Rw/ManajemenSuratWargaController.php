@@ -190,29 +190,39 @@ public function verifikasiSuratHash(Request $request)
 {
     $hashInput = $request->hash;
 
-    $hasilSurat = HasilSuratTtdRw::where('hash_dokumen', $hashInput)->first();
+    $hasilSuratRw = HasilSuratTtdRw::where('hash_dokumen', $hashInput)->first();
 
-    if (!$hasilSurat) {
+    if (!$hasilSuratRw) {
         return view('verifikasiSurat.hasilQrCode', [
             'status' => 'invalid',
             'pesan' => 'Hash tidak ditemukan di database. Dokumen tidak valid.'
         ]);
     }
 
-    // Jika hash ditemukan, dokumen dianggap valid
-    if ($hasilSurat->jenis === 'biasa') {
+    // Ambil data pengajuan
+    if ($hasilSuratRw->jenis === 'biasa') {
         $pengajuan = PengajuanSurat::with(['warga.rt.rw','warga.scan_KK.alamat','tujuanSurat'])
-            ->find($hasilSurat->pengajuan_surat_id);
+            ->find($hasilSuratRw->pengajuan_surat_id);
+
+        $hasilSuratRt = HasilSuratTtdRt::where('pengajuan_surat_id', $hasilSuratRw->pengajuan_surat_id)
+            ->where('jenis', 'biasa')
+            ->first();
     } else {
         $pengajuan = PengajuanSuratLain::with(['warga.rt.rw','warga.scan_KK.alamat'])
-            ->find($hasilSurat->pengajuan_surat_lain_id);
+            ->find($hasilSuratRw->pengajuan_surat_lain_id);
+
+        $hasilSuratRt = HasilSuratTtdRt::where('pengajuan_surat_lain_id', $hasilSuratRw->pengajuan_surat_lain_id)
+            ->where('jenis', 'lain')
+            ->first();
     }
 
     return view('verifikasiSurat.hasilQrCode', [
         'status' => 'valid',
         'pengajuan' => $pengajuan,
-        'hasilSurat' => $hasilSurat
+        'hasilSuratRw' => $hasilSuratRw,
+        'hasilSuratRt' => $hasilSuratRt
     ]);
 }
+
 
 }

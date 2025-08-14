@@ -1,4 +1,4 @@
-<nav class="bg-yellow-400 p-6 shadow-md sticky top-0 z-50">
+<nav class="bg-[#4A9782] p-6 shadow-md sticky top-0 z-50">
     <div class="max-w-7xl mx-auto flex justify-between items-center text-white">
         <a href="{{ route('dashboardWarga') }}" class="font-bold text-base md:text-lg whitespace-nowrap">
             🧾 Surat Digital RT/RW
@@ -36,7 +36,7 @@
                     class="{{ $showStatusDisetujui ? 'block' : 'hidden' }} absolute right-0 mt-2 w-80 bg-white text-black rounded shadow-lg z-50 max-h-96 overflow-auto">
 
                     @if($showStatusDisetujui)
-                        <div class="border-b border-green-400 bg-green-100 p-2">
+                        <div class="border-b border-green-400 bg-[#EEEFE0] p-2">
                             <p class="text-sm">
                                 ✅ <strong>Status pengajuan data</strong> Anda telah
                                 <span class="text-green-600 font-bold">disetujui</span>.
@@ -56,7 +56,7 @@
                                 $isHasil = $notif instanceof \App\Models\HasilSuratTtdRw;
                                 $isUnread = !$notif->is_read;
                             @endphp
-                            <div class="border-b border-gray-300 p-2 hover:bg-yellow-100 cursor-pointer {{ $isUnread ? 'bg-yellow-200 font-semibold' : '' }}"
+                            <div class="border-b border-gray-300 p-2 hover:bg-[#EEEFE0] cursor-pointer {{ $isUnread ? 'bg-[#D1D8BE] font-semibold' : '' }}"
                                 data-id="{{ $isHasil ? $notif->id_hasil_surat_ttd_rw : ($notif->id_pengajuan_surat ?? $notif->id_pengajuan_surat_lain) }}"
                                 data-type="{{ $isHasil ? 'hasil' : (isset($notif->id_pengajuan_surat) ? 'biasa' : 'lain') }}">
                                 @if($isHasil)
@@ -120,8 +120,8 @@
                     </svg>
                 </button>
                 <div id="profileDropdown" class="hidden absolute right-0 mt-2 bg-white text-gray-800 rounded shadow-md w-40 z-50">
-                    <a href="{{ route('profileWarga') }}" class="block px-4 py-2 hover:bg-yellow-100">Profil</a>
-                    <a href="{{ route('logout') }}" class="block px-4 py-2 hover:bg-yellow-100">Logout</a>
+                    <a href="{{ route('profileWarga') }}" class="block px-4 py-2 hover:bg-[#EEEFE0]">Profil</a>
+                    <a href="{{ route('logout') }}" class="block px-4 py-2 hover:bg-[#EEEFE0]">Logout</a>
                 </div>
             </div>
 
