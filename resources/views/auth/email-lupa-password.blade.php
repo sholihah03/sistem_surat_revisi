@@ -54,13 +54,13 @@
                 <input type="text" name="no_rw" class="w-full border rounded p-2" placeholder="NO RW Anda">
             </div>
 
-            <button type="submit" class="w-full bg-yellow-500 text-white py-2 font-semibold rounded">
+            <button type="submit" class="w-full bg-[#8AC47F] hover:bg-[#76A95B] text-white py-2 font-semibold rounded">
                 Kirim OTP
             </button>
 
             <!-- Link daftar -->
             <p class="text-center text-sm text-gray-600">
-                Kembali ke <a href="{{ route('login') }}" class="text-yellow-600 font-medium">Login</a>
+                Kembali ke <a href="{{ route('login') }}" class="text-[#76A95B] font-medium">Login</a>
             </p>
         </form>
     </div>

@@ -197,10 +197,32 @@ private function extractNamaKepalaKeluarga($text)
         }
 
         // Kelurahan/Desa
-        if (preg_match('/(Desa|Kelurahan)\s*[:\-]?\s*(.*?)\s*(Kecamatan|Alamat|RT\/RW)/i', $text, $matches)) {
-            $data['kelurahan'] = $this->cleanText($matches[2]);
-        }
+        if (preg_match('/(Desa|Kelurahan)\s*[:\-]?\s*([A-Z\s]{2,50})/i', $text, $matches)) {
+            $kelurahanRaw = trim($matches[2]);
 
+            // Pisahkan per kata
+            $kelurahanParts = explode(' ', $kelurahanRaw);
+            $filtered = [];
+
+            foreach ($kelurahanParts as $part) {
+                $part = trim($part);
+
+                // Hentikan jika kata ini mengandung kata terlarang
+                if (in_array($part, ['PROVINSI', 'JAWA', 'BARAT', 'TIMUR', 'UTARA', 'SELATAN', 'NMA', 'DE'])) {
+                    break;
+                }
+
+                // Hentikan jika kata ini mengandung angka atau karakter aneh
+                if (!preg_match('/^[A-Z]+$/', $part)) {
+                    break;
+                }
+
+                $filtered[] = $part;
+            }
+
+            // Ambil hasil filter
+            $data['kelurahan'] = strtoupper(implode(' ', $filtered));
+        }
 
         // Kecamatan
         if (preg_match('/Kecamatan\s*[:\-]?\s*([A-Z\s]+?)(?=\s+(Kelurahan|Desa|Alamat|RT\/RW|$))/i', $text, $matches)) {

@@ -80,7 +80,7 @@
 
             <!-- Submit -->
             <button type="submit"
-                    class="w-full bg-yellow-400 hover:bg-yellow-500 text-white py-2 rounded-lg font-semibold transition">
+                    class="w-full bg-[#8AC47F] hover:bg-[#76A95B] text-white py-2 rounded-lg font-semibold transition">
                 Simpan Password
             </button>
         </form>

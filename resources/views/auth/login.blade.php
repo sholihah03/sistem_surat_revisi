@@ -145,10 +145,11 @@
             </div>
 
             <!-- Gambar Ilustrasi (disembunyikan di layar kecil) -->
-            <div class="hidden md:block md:w-1/2 ml-0 md:ml-10 mt-10 md:mt-0">
-                <img src="{{ asset('images/gambaran login2-fotor.png') }}" alt="Ilustrasi Login"
-                    class="object-contain w-full h-auto drop-shadow-lg rounded-xl">
-            </div>
+<div class="hidden md:block md:w-1/2 ml-0 md:ml-10 mt-10 md:mt-0">
+    <img src="{{ asset('images/ilustrasi-login1.png') }}" alt="Ilustrasi Login"
+        class="object-contain w-full h-auto drop-shadow-lg rounded-xl scale-125">
+</div>
+
 
         </div>
     </div>
