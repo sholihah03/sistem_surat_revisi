@@ -180,7 +180,31 @@ class PengajuanSuratController extends Controller
         // Ambil alamat dari relasi melalui ScanKK
         $alamat = $warga->scan_Kk?->alamat;
 
-        return view('warga.formSuratTujuanLainnya', compact( 'warga', 'alamat'));
+        $scanKK = ScanKK::where('nama_pendaftar', $warga->nama_lengkap)->first();
+
+        $statusKK = null;
+        $alasanPenolakan = null;
+
+        if ($scanKK) {
+            $statusKK = $scanKK->status_verifikasi;
+            $alasanPenolakan = $scanKK->alasan_penolakan;
+        }
+
+        $dataBelumLengkap = (empty($warga->no_kk) && empty($warga->nik) && !$scanKK);
+
+        // Hitung notifikasi baru
+        $notifikasi = collect(); // ambil dari model notifikasi kamu
+
+        $totalNotifBaru = $notifikasi->where('is_read', false)->count();
+
+        // Tambahkan notifikasi "status disetujui" ke total jika kurang dari 1 hari
+        $showStatusDisetujui = false;
+        if ($statusKK === 'disetujui' && $scanKK && $scanKK->updated_at->gt(Carbon::now()->subDay())) {
+            $showStatusDisetujui = true;
+            $totalNotifBaru++;
+        }
+
+        return view('warga.formSuratTujuanLainnya', compact( 'warga', 'alamat', 'statusKK', 'alasanPenolakan', 'dataBelumLengkap', 'totalNotifBaru', 'showStatusDisetujui'));
     }
 
     public function formPengajuanSuratLainStore(Request $request)

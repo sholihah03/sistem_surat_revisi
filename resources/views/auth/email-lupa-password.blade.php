@@ -39,11 +39,6 @@
                 <input type="email" name="email" class="w-full border rounded p-2" required placeholder="Email yang terdaftar">
             </div>
 
-            <div id="nik-field" style="display:none;">
-                <label>NIK:</label>
-                <input type="text" name="nik" class="w-full border rounded p-2" maxlength="16" placeholder="NIK yang terdaftar">
-            </div>
-
             <div id="rt-field" style="display:none;">
                 <label>No RT:</label>
                 <input type="text" name="no_rt" class="w-full border rounded p-2" placeholder="NO RT Anda">
@@ -70,7 +65,6 @@
     <script>
         function toggleFields() {
             const role = document.getElementById('role').value;
-            document.getElementById('nik-field').style.display = role === 'warga' ? 'block' : 'none';
             document.getElementById('rt-field').style.display = role === 'rt' ? 'block' : 'none';
             document.getElementById('rw-field').style.display = role === 'rw' ? 'block' : 'none';
         }

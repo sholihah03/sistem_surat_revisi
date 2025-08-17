@@ -15,7 +15,7 @@
 
 <div class="bg-white w-full max-w-md rounded-xl shadow-lg p-6 space-y-5">
     <h2 class="text-2xl font-bold text-center text-gray-800">Verifikasi Kode OTP</h2>
-    <p class="text-center text-sm text-gray-600">Kode telah dikirim ke Email Anda.</p>
+    {{-- <p class="text-center text-sm text-gray-600">Kode telah dikirim ke Email Anda.</p> --}}
 
     <form method="POST" action="{{ route('otp.verifikasi') }}" class="space-y-4">
         @csrf
@@ -51,59 +51,63 @@
             Verifikasi
         </button>
 
-        <!-- Kirim Ulang -->
-        <div class="text-center">
-            <p class="text-sm text-gray-600">Belum menerima kode?</p>
-            <button type="button"
-                    id="resendBtn"
-                    class="text-blue-600 hover:underline text-sm font-medium mt-1 {{ $otpExpired ? '' : 'disabled:opacity-50' }}"
-                    {{ $otpExpired ? '' : 'disabled' }}>
-                {{ $otpExpired ? 'Kirim Ulang OTP' : 'Kirim Ulang OTP (' }}
-                <span id="timer" {{ $otpExpired ? 'hidden' : '' }}>120</span>
-                {{ $otpExpired ? '' : ' detik)' }}
-            </button>
-            <p id="resend-message" class="text-sm text-green-600 mt-1 hidden">Kode OTP telah dikirim ulang.</p>
-        </div>
+<!-- Kirim Ulang -->
+<div class="text-center">
+    <p class="text-sm text-gray-600">Belum menerima kode?</p>
+    <button type="button"
+            id="resendBtn"
+            class="text-blue-600 hover:underline text-sm font-medium mt-1"
+            {{ $otpExpired ? '' : 'disabled' }}>
+        {{ $otpExpired ? 'Kirim Ulang OTP' : 'Kirim Ulang OTP (' }}
+        <span id="timer" {{ $otpExpired ? 'hidden' : '' }}>120</span>
+        {{ $otpExpired ? '' : ' detik)' }}
+    </button>
+    <p id="resend-message" class="text-sm text-green-600 mt-1 hidden">Kode OTP telah dikirim ulang.</p>
+</div>
+
     </form>
 </div>
 
 <script>
-    const otpExpired = {{ $otpExpired ? 'true' : 'false' }};
-    let countdown = 120;
-    let interval;
+const otpExpired = {{ $otpExpired ? 'true' : 'false' }};
+let countdown = 120;
+let interval;
 
-    const timerEl = document.getElementById('timer');
-    const resendBtn = document.getElementById('resendBtn');
-    const message = document.getElementById('resend-message');
+const timerEl = document.getElementById('timer');
+const resendBtn = document.getElementById('resendBtn');
+const message = document.getElementById('resend-message');
 
-    function startCountdown() {
-        if (otpExpired) {
+function startCountdown() {
+    if (otpExpired) {
+        // Kalau OTP sudah expired, langsung aktifkan tombol
+        clearInterval(interval);
+        resendBtn.disabled = false;
+        resendBtn.textContent = 'Kirim Ulang OTP';
+        if (timerEl) timerEl.hidden = true; // sembunyikan timer
+        return;
+    }
+
+    clearInterval(interval);
+    countdown = 120;
+    timerEl.textContent = countdown;
+    resendBtn.disabled = true;
+    resendBtn.textContent = `Kirim Ulang OTP (${countdown} detik)`;
+
+    interval = setInterval(() => {
+        countdown--;
+        timerEl.textContent = countdown;
+        resendBtn.textContent = `Kirim Ulang OTP (${countdown} detik)`;
+        if (countdown <= 0) {
             clearInterval(interval);
             resendBtn.disabled = false;
             resendBtn.textContent = 'Kirim Ulang OTP';
-            return;
         }
+    }, 1000);
+}
 
-        clearInterval(interval);
-        countdown = 120;
-        timerEl.textContent = countdown;
-        resendBtn.disabled = true;
-        resendBtn.textContent = `Kirim Ulang OTP (${countdown} detik)`;
+// Jalankan countdown
+startCountdown();
 
-        interval = setInterval(() => {
-            countdown--;
-            timerEl.textContent = countdown;
-            resendBtn.textContent = `Kirim Ulang OTP (${countdown} detik)`;
-            if (countdown <= 0) {
-                clearInterval(interval);
-                resendBtn.disabled = false;
-                resendBtn.textContent = 'Kirim Ulang OTP';
-            }
-        }, 1000);
-    }
-
-    // Jalankan countdown jika belum expired
-    startCountdown();
 
     resendBtn.addEventListener('click', () => {
         resendBtn.disabled = true;

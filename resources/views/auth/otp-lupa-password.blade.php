@@ -11,7 +11,7 @@
 
     <div class="bg-white w-full max-w-md rounded-xl shadow-lg p-6 space-y-5">
         <h2 class="text-2xl font-bold text-center text-gray-800">Verifikasi Kode OTP</h2>
-        <p class="text-center text-sm text-gray-600">Kode telah dikirim ke Email Anda.</p>
+        {{-- <p class="text-center text-sm text-gray-600">Kode telah dikirim ke Email Anda.</p> --}}
 
         <form method="POST" action="{{ route('otp.verifikasiReset') }}" class="space-y-4">
             @if (session('success'))

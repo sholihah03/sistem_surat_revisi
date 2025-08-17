@@ -15,6 +15,7 @@ class Otp extends Model
 
     protected $fillable = [
         'pendaftaran_id',
+        'warga_id',
         'rt_id',
         'rw_id',
         'kode_otp',
@@ -26,6 +27,10 @@ class Otp extends Model
     public function pendaftaran()
     {
         return $this->belongsTo(Pendaftaran::class, 'pendaftaran_id', 'id_pendaftaran');
+    }
+    public function warga()
+    {
+        return $this->belongsTo(Wargas::class, 'warga_id', 'id_warga');
     }
     public function rt()
     {

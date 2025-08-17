@@ -33,23 +33,12 @@ public function kirimOtp(Request $request)
     $errors = [];
 
     if ($role === 'warga') {
-        $request->validate(['nik' => 'required']);
         $emailAda = Wargas::where('email', $email)->first();
-        $nikAda = Wargas::where('nik', $request->nik)->first();
 
         if (!$emailAda) {
             $errors[] = 'Email tidak terdaftar di data warga.';
-        }
-
-        if (!$nikAda) {
-            $errors[] = 'NIK tidak ditemukan di data warga.';
-        }
-
-        if ($emailAda && $nikAda) {
-            $user = Wargas::where('email', $email)->where('nik', $request->nik)->first();
-            if (!$user) {
-                $errors[] = 'Email dan NIK tidak cocok.';
-            }
+        } else {
+            $user = $emailAda;
         }
 
     } elseif ($role === 'rt') {

@@ -52,13 +52,13 @@
                 @enderror
             </div>
 
-            <button type="submit" class="w-full bg-yellow-500 text-white py-2 font-semibold rounded">
+            <button type="submit" class="w-full bg-[#8AC47F] hover:bg-[#76A95B] text-white py-2 font-semibold rounded">
                 Pengecekan
             </button>
 
             <!-- Link daftar -->
             <p class="text-center text-sm text-gray-600">
-                Kembali ke <a href="{{ route('dashboardWarga') }}" class="text-yellow-600 font-medium">Dashboard</a>
+                Kembali ke <a href="{{ route('dashboardWarga') }}" class="text-[#76A95B] font-medium">Dashboard</a>
             </p>
         </form>
     </div>
