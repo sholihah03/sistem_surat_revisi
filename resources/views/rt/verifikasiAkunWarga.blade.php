@@ -2,11 +2,11 @@
 
 @section('content')
 <div class="container mx-auto p-4 mb-6 pt-20">
-    <h1 class="text-2xl font-bold mb-2">Verifikasi Akun Warga</h1>
+    <h1 class="text-2xl font-bold mb-2">Verifikasi Data Warga</h1>
 
     <p class="mb-6 text-lg text-gray-700">
-        Halaman ini memungkinkan Anda untuk memverifikasi akun warga yang telah mendaftar. Silakan periksa detail mereka dan ambil tindakan yang sesuai.
-        <br><strong class="text-red-500">Penting!</strong> Akun harus diverifikasi dalam waktu 24 jam. Jika tidak, warga akan diminta untuk mengunggah ulang dokumen mereka.
+        Halaman ini memungkinkan Anda untuk memverifikasi data warga yang telah mendaftar. Silakan periksa detail mereka dan ambil tindakan yang sesuai.
+        <br><strong class="text-red-500">Penting!</strong> Data harus diverifikasi dalam waktu 24 jam. Jika tidak, warga akan diminta untuk mengunggah ulang dokumen mereka.
     </p>
 
     <div class="bg-white bg-opacity-80 p-4 md:p-6 rounded-xl shadow w-full">

@@ -24,14 +24,14 @@
                         hover:bg-blue-100 hover:text-blue-700 hover:shadow-md text-gray-700"
                 onclick="document.getElementById('submenu-verifikasi').classList.toggle('hidden')"
             @endif>
-                👤 Verifikasi Akun
+                👤 Verifikasi Data Warga
             </button>
             <div id="submenu-verifikasi" class="mt-1 space-y-1 {{ request()->routeIs('verifikasiAkunWarga') || request()->routeIs('historiVerifikasiAkunWarga') || request()->routeIs('historiAkunKadaluwarsa') ? '' : 'hidden' }}">
                 <a href="{{ route('verifikasiAkunWarga') }}"
                     class="block pl-8 py-1.5 rounded-lg font-medium text-sm transition-all duration-200
                             hover:bg-yellow-100 hover:text-yellow-700
                             {{ request()->routeIs('verifikasiAkunWarga') ? 'bg-yellow-100 text-yellow-700' : 'text-gray-700' }}">
-                    Verifikasi Akun Warga
+                    Verifikasi Data Warga
                 </a>
                 <a href="{{ route('historiVerifikasiAkunWarga') }}"
                     class="block pl-8 py-1.5 rounded-lg font-medium text-sm transition-all duration-200
